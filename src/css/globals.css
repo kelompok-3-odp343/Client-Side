@@ -1,0 +1,281 @@
+/* layout */
+.dashboard-container {
+  font-family: "Poppins", sans-serif;
+  color: #222;
+  background: #fff;
+  padding: 20px;
+}
+/* Header */
+.dashboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #39a3b2;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.dashboard-header h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.dashboard-header nav a {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 10px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.dashboard-header nav a:hover,
+.dashboard-header nav a.active {
+  color: #2cb1ff;
+}
+
+.dashboard-header .icons i {
+  margin-left: 15px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Top section */
+.top-section {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+  background-color: #f5f7fa;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.asset-card h2 {
+  font-size: 28px;
+  margin: 10px 0;
+}
+
+.asset-card p {
+  color: #666;
+}
+
+/* split bill */
+.split-card {
+  text-align: center;
+}
+
+.split-card .circle {
+  width: 100px;
+  height: 100px;
+  border: 8px solid #2cb1ff;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.split-card .percent {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2cb1ff;
+}
+
+.split-card .description {
+  font-size: 14px;
+  color: #555;
+  margin-top: 10px;
+}
+
+.detail-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #2cb1ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.detail-link:hover {
+  text-decoration: underline;
+}
+
+/* category */
+.category-section {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.category {
+  flex: 1;
+  text-align: center;
+  padding: 15px;
+  border-radius: 12px;
+  margin: 5px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.yellow {
+  background: #f6c233;
+}
+.purple {
+  background: #7b5fe0;
+}
+.green {
+  background: #4bbf73;
+}
+.orange {
+  background: #ffa851;
+}
+.blue {
+  background: #6ca6f8;
+}
+
+/* bottom section */
+.bottom-section {
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.mycards,
+.earnings {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* MY CARDS SLIDER */
+.slider-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.card-slider {
+  display: flex;
+  overflow-x: hidden; /* pakai tombol panah */
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  gap: 15px;
+  padding-bottom: 10px;
+}
+
+.card-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.bank-card {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  background: linear-gradient(90deg, #ffd7b5, #ff914d);
+  color: #000;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.bank-card:hover {
+  transform: scale(1.03);
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #2cb1ff;
+  color: #fff;
+  border: none;
+  width: 30px;
+  height: 50px;
+  cursor: pointer;
+  font-size: 20px;
+  border-radius: 5px;
+  z-index: 10;
+}
+
+.slider-btn.left {
+  left: -10px;
+}
+
+.slider-btn.right {
+  right: -10px;
+}
+
+.slider-btn:hover {
+  background: #1a8fbf;
+}
+
+/* bar chart */
+.bar-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 200px;
+  margin-top: 20px;
+}
+
+.bar {
+  width: 40%;
+  text-align: center;
+}
+
+.bar-value {
+  width: 60%;
+  margin: 0 auto;
+  border-radius: 6px;
+}
+
+.income-bar .bar-value {
+  background: #aef5af;
+}
+
+.expense-bar .bar-value {
+  background: #ffb4b4;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .top-section,
+  .bottom-section,
+  .category-section {
+    flex-direction: column;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .dashboard-header nav {
+    display: flex;
+    justify-content: center;
+  }
+
+  .card {
+    width: 100%;
+  }
+}

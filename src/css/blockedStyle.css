@@ -1,0 +1,30 @@
+/* contoh file CSS — buat file ini kalau belum ada */
+.popup-block {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff2f2;
+    font-family: Arial, sans-serif;
+  }
+  
+  .popup-card {
+    background: white;
+    border: 1px solid #f5c6cb;
+    padding: 32px;
+    border-radius: 8px;
+    text-align: center;
+    color: #721c24;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  
+  .popup-card button {
+    margin-top: 16px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background-color: #d9534f;
+    color: white;
+  }
+  

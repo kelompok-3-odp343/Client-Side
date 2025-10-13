@@ -1,0 +1,109 @@
+.input-email {
+  background-color: #2c98aa;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.card-otp {
+  background-color: #ffffff;
+  width: 480px;
+  padding: 40px 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.enter-the-code-we-ve {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #000;
+}
+
+.we-ve-sent-a-sign-in {
+  font-size: 14px;
+  color: #222;
+  margin-bottom: 32px;
+}
+
+.text-wrapper-3 {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.rectangle-3 {
+  text-align: center;
+  letter-spacing: 10px;
+  width: 70%;
+  /* width: 50px; */
+  height: 60px;
+  border: 2px solid #4496ad;
+  border-radius: 10px;
+  box-shadow: 0px 4px 4px #00000040;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: #2c98aa;
+  font-size: 18px;
+  background-color: #fff;
+}
+
+.email {
+  margin-bottom: 20px;
+}
+
+.open-email-now {
+  background-color: #4496ac;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 12px 0;
+  width: 100%;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.open-email-now:hover {
+  background-color: #3a8498;
+}
+
+.didn-t-receive-the {
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 20px;
+}
+
+.didn-t-receive-the .text-wrapper-2 {
+  text-decoration: underline;
+  color: #005f73;
+  cursor: pointer;
+}
+
+.back-to-sign {
+  background-color: #fff;
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 10px 0;
+  font-weight: 700;
+  color: #4496ad;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.back-to-sign:hover {
+  background-color: #f0f0f0;
+}

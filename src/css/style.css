@@ -1,0 +1,104 @@
+/* === Global Styling === */
+
+/* === Card Container === */
+.login-card {
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  padding: 60px 50px;
+  width: 420px;
+  transition: 0.3s;
+}
+
+.login-card:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  transform: translateY(-3px);
+}
+
+/* === Header === */
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-header h4 {
+  font-weight: 600;
+  color: #3b8d9e;
+  margin-bottom: 10px;
+}
+
+.login-header p {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+/* === Input Group === */
+.input-group {
+  /* background-color: #3b8d9e; */
+  border: solid 2px #3b8d9e;
+  border-radius: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.input-group-text {
+  /* background-color: #3b8d9e; */
+  border: none;
+  /* color: #fff; */
+  padding-left: 18px;
+}
+
+.form-control {
+  border: none;
+  /* background-color: #3b8d9e; */
+  color: #3b8d9e;
+  padding: 12px 15px;
+  border-radius: 25px;
+}
+
+.form-control::placeholder {
+  color: #3b8d9e;
+}
+
+.form-control:focus {
+  /* background-color: #3b8d9e; */
+  color: #3b8d9e;
+  box-shadow: none;
+}
+
+/* === Button === */
+.btn-login {
+  width: 100%;
+  border-radius: 25px;
+  background-color: #3b8d9e;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+}
+
+.btn-login:hover {
+  background-color: #357f8d;
+  transform: translateY(-2px);
+}
+
+/* === Footer === */
+.login-footer {
+  text-align: center;
+  margin-top: 25px;
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.login-footer a {
+  color: #3b8d9e;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
