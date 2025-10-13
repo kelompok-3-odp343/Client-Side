@@ -1,0 +1,200 @@
+.dashboard {
+    background-color: #fff;
+    min-height: 100vh;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 32px;
+    border-bottom: 1px solid #ccc;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .logo img {
+    width: 32px;
+  }
+  
+  .logo h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  .logo span {
+    color: #0aa89f;
+  }
+  .header-icons {
+    display: flex;
+    gap: 18px;
+    color: #333;
+  }
+  
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    padding: 40px 48px;
+  }
+  
+  .left h2,
+  .right h2 {
+    font-weight: 700;
+    font-size: 18px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 16px;
+  }
+  
+  /* balance card */
+  .balance-card {
+    display: flex;
+    background: #fff8e0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    align-items: center;
+    box-shadow: 0 0 4px rgba(0,0,0,0.05);
+  }
+  
+  .balance-icon img {
+    width: 72px;
+    height: 72px;
+  }
+  
+  .balance-info {
+    margin-left: 16px;
+  }
+  
+  .balance-amount {
+    font-size: 26px;
+    font-weight: 700;
+  }
+  
+  .your-deposit-title {
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  
+  /* ===== NEW DESIGN FOR DEPOSIT CARD ===== */
+
+.deposit-card-new {
+    width: 260px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  
+  .deposit-card-new:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  .deposit-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+    color: #000;
+  }
+  
+  .deposit-balance-label {
+    color: #555;
+    font-size: 0.85rem;
+  }
+  
+  .deposit-balance-amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  
+  /* Circle Date Style */
+  .circle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .circle-ring {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(
+      #f4e3b0 0deg,
+      #f4e3b0 220deg,
+      #bca159 220deg,
+      #bca159 360deg
+    );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .circle-inner-text {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    width: 78px;
+    height: 78px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    color: #3b3b3b;
+  }
+  
+  .circle-inner-text .day {
+    font-size: 1rem;
+  }
+  
+  .circle-inner-text .month {
+    font-size: 0.85rem;
+    color: #856f2c;
+  }
+  
+  .circle-inner-text .year {
+    font-size: 0.8rem;
+    color: #bba76d;
+  }
+  
+  /* Divider */
+  .deposit-divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 10px 0 14px;
+  }
+  
+  /* Info Section */
+  .deposit-info {
+    font-size: 0.85rem;
+    color: #333;
+  }
+  
+  .deposit-info p {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+  }
+  
+  .deposit-info span:first-child {
+    color: #555;
+  }
+  
+  

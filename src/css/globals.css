@@ -4,7 +4,9 @@
   color: #222;
   background: #fff;
   padding: 20px;
+  min-height: 100vh;
 }
+
 /* Header */
 .dashboard-header {
   position: sticky;
@@ -138,15 +140,19 @@
 .yellow {
   background: #f6c233;
 }
+
 .purple {
   background: #7b5fe0;
 }
+
 .green {
   background: #4bbf73;
 }
+
 .orange {
   background: #ffa851;
 }
+
 .blue {
   background: #6ca6f8;
 }
@@ -174,7 +180,8 @@
 
 .card-slider {
   display: flex;
-  overflow-x: hidden; /* pakai tombol panah */
+  overflow-x: hidden;
+  /* pakai tombol panah */
   scroll-snap-type: x mandatory;
   width: 100%;
   gap: 15px;
@@ -258,6 +265,7 @@
 
 /* responsive */
 @media (max-width: 768px) {
+
   .top-section,
   .bottom-section,
   .category-section {
