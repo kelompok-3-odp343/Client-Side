@@ -132,7 +132,7 @@ export default function Dashboard() {
 
       {/* Middle Section — Navigasi ke Halaman Fitur */}
       <div className="category-section">
-        <div className="category yellow" onClick={() => handleNavigate("deposit")}>
+        <div className="category yellow" onClick={() => handleNavigate("deposits")}>
           Deposits
           <br />Rp 15.000.000
         </div>

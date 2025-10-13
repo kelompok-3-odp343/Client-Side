@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../css/lifegoalsDetail.css";
 
@@ -13,186 +13,142 @@ import vehicleIcon from "../assets/images/vehicle.png";
 export default function LifeGoalDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedMonth, setSelectedMonth] = useState("May");
 
   const goals = {
-    education: {
-      title: "Education",
-      desc: "Save for brighter dawn",
-      color: "#71d9d0",
-      icon: graduationIcon,
-    },
-    vacations: {
-      title: "Vacations",
-      desc: "Your Passport to New Memories",
-      color: "#ffd367",
-      icon: vacationIcon,
-    },
-    marriage: {
-      title: "Marriage",
-      desc: "Funding your new chapter",
-      color: "#b18cff",
-      icon: marriageIcon,
-    },
-    home: {
-      title: "Home",
-      desc: "Saving for Memories Unmade",
-      color: "#d0a3ff",
-      icon: homeIcon,
-    },
-    gadget: {
-      title: "Gadget",
-      desc: "Smart saving for smart tech",
-      color: "#6fd6c1",
-      icon: gadgetIcon,
-    },
-    vehicles: {
-      title: "Vehicles",
-      desc: "Fuel your future ride",
-      color: "#ffd28a",
-      icon: vehicleIcon,
-    },
+    education: { title: "Education", desc: "Save for brighter dawn", color: "#71d9d0", icon: graduationIcon },
+    vacations: { title: "Vacations", desc: "Your Passport to New Memories", color: "#ffd367", icon: vacationIcon },
+    marriage: { title: "Marriage", desc: "Funding your new chapter", color: "#b18cff", icon: marriageIcon },
+    home: { title: "Home", desc: "Saving for Memories Unmade", color: "#9c7edc", icon: homeIcon },
+    gadget: { title: "Gadget", desc: "Smart saving for smart tech", color: "#6fd6c1", icon: gadgetIcon },
+    vehicles: { title: "Vehicles", desc: "Fuel your future ride", color: "#ffd28a", icon: vehicleIcon },
   };
 
-  const goal = goals[id] || goals.education;
+  const goal = location.state?.goal || goals[id] || goals.education;
 
+  const months = ["May","Jun","Jul","Aug","Sept","Oct","Nov","Dec","Jan","Feb","Mar","Apr"];
   const transactions = {
     May: [
-      { date: "31 May 2025", type: "Others", desc: "Interest", amount: "+5.000" },
-      { date: "31 May 2025", type: "Others", desc: "Tax", amount: "-1.000" },
-      { date: "25 May 2025", type: "Autodebit", desc: "Life Goals Deposit", amount: "+2.000.000" },
-      { date: "5 May 2025", type: "Top Up", desc: "Life Goals Deposit", amount: "+250.000" },
+      { date: "31 May 2025", items: [
+        { type: "Others", desc: "Interest", amount: "+5.000" },
+        { type: "Others", desc: "Tax", amount: "-Rp1.000" },
+      ]},
+      { date: "25 May 2025", items: [
+        { type: "Autodebit", desc: "Life Goals Deposit", amount: "+Rp2.000.000" },
+      ]},
+      { date: "5 May 2025", items: [
+        { type: "Top Up", desc: "Life Goals Deposit", amount: "+Rp250.000" },
+      ]},
     ],
   };
 
-  const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-  ];
-
   return (
-    <div className="lifegoal-detail-container">
+    <div className="lg-container" style={{ "--theme": goal.color }}>
       <Navbar />
-      <main className="lifegoal-detail-main">
-        <button
-          className="back-link"
-          onClick={() => navigate("/lifegoals")}
-          style={{ color: goal.color }}
-        >
-          ← Back to Life Goals
-        </button>
+      <main className="lg-main">
+        <button className="lg-back" onClick={() => navigate("/lifegoals")}>← Back to Life Goals</button>
 
-        <h2 className="page-title">Life Goals Progress</h2>
-        <p className="subtitle">Small saves fuel big dreams</p>
+        <div className="lg-grid">
+          {/* LEFT COLUMN */}
+          <div className="left-column">
+            <header className="section-header">
+              <h1 className="lg-title">Life Goals Progress</h1>
+              <p className="lg-sub">Small saves fuel big dreams</p>
+            </header>
 
-        {/* === TOP CARD === */}
-        <div className="goal-header-card">
-          <div className="goal-header-left" style={{ backgroundColor: goal.color }}>
-            <img src={goal.icon} alt={goal.title} />
-          </div>
+            <section className="lg-topcard">
+              <div className="topcard-left" style={{ background: "var(--theme)" }}>
+                <img src={goal.icon} alt={goal.title} />
+              </div>
 
-          <div className="goal-header-right">
-            <h3>{goal.title}</h3>
-            <p>{goal.desc}</p>
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: "50%", backgroundColor: goal.color }}
-              ></div>
-            </div>
-            <div className="progress-text">
-              <span>Rp50.000.000</span>
-              <span>Rp100.000.000</span>
-            </div>
-          </div>
-        </div>
-
-        {/* === MAIN GRID === */}
-        <div className="lifegoal-grid">
-          {/* === LEFT SECTION === */}
-          <section className="history-section">
-            <h3>History</h3>
-            <div className="month-selector">
-              {months.map((m) => (
-                <button
-                  key={m}
-                  className={`month-btn ${selectedMonth === m ? "active" : ""}`}
-                  onClick={() => setSelectedMonth(m)}
-                  style={
-                    selectedMonth === m
-                      ? { backgroundColor: goal.color, color: "#fff" }
-                      : {}
-                  }
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
-
-            {transactions[selectedMonth]?.map((tx, i) => (
-              <div className="tx-card" key={i}>
-                <p className="tx-date">{tx.date}</p>
-                <div className="tx-row">
+              <div className="topcard-right">
+                <div className="top-row">
                   <div>
-                    <p className="tx-type">{tx.type}</p>
-                    <span className="tx-desc">{tx.desc}</span>
+                    <h2 className="goal-title">{goal.title}</h2>
+                    <p className="goal-desc">{goal.desc}</p>
                   </div>
-                  <p
-                    className={`tx-amount ${
-                      tx.amount.startsWith("-") ? "negative" : "positive"
-                    }`}
-                  >
-                    {tx.amount}
-                  </p>
+                  <div className="meta">
+                    <div className="meta-left">Current Savings</div>
+                    <div className="meta-right">Target</div>
+                  </div>
+                </div>
+
+                <div className="top-progress">
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: "50%", background: "var(--theme)" }} />
+                  </div>
+                  <div className="progress-values">
+                    <span>Rp50.000.000</span>
+                    <span>Rp100.000.000</span>
+                  </div>
                 </div>
               </div>
-            ))}
-          </section>
+            </section>
 
-          {/* === RIGHT SECTION === */}
-          <section className="info-section">
-            <h3>Life Goals Information</h3>
+            <section className="history-panel">
+              <h3 className="panel-title">History</h3>
 
-            <div className="info-box">
-              <h4>Life Goals Detail</h4>
-              <div className="info-row">
-                <span>Life Goals Account</span>
-                <span>1234567890</span>
+              <div className="months-row">
+                {months.map((m) => (
+                  <button
+                    key={m}
+                    className={`month-pill ${selectedMonth === m ? "active" : ""}`}
+                    onClick={() => setSelectedMonth(m)}
+                  >
+                    {m}
+                  </button>
+                ))}
               </div>
-              <div className="info-row">
-                <span>Estimated Accumulated Funds</span>
-                <span>Rp50.000.000</span>
+
+              <div className="tx-list">
+                {transactions[selectedMonth]?.map((group, gi) => (
+                  <div key={gi} className="tx-group">
+                    <div className="tx-date">{group.date}</div>
+                    {group.items.map((tx, i) => (
+                      <div key={i} className="tx-row">
+                        <div className="tx-left">
+                          <div className="tx-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.2"/></svg>
+                          </div>
+                          <div className="tx-text">
+                            <div className="tx-type">{tx.type}</div>
+                            <div className="tx-sub">{tx.desc}</div>
+                          </div>
+                        </div>
+                        <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>{tx.amount}</div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
-              <div className="info-row">
-                <span>Initial Deposit</span>
-                <span>Rp100.000</span>
+            </section>
+          </div>
+
+          {/* RIGHT COLUMN */}
+          <aside className="info-column">
+            <h3 className="info-title">Life Goals Information</h3>
+
+            <div className="info-card">
+              <h4 className="info-heading">Life Goals Detail</h4>
+              <div className="info-grid">
+                <div className="label">Life Goals Account</div><div className="value">1234567890</div>
+                <div className="label">Estimated Accumulated Funds</div><div className="value">Rp50.000.000</div>
+                <div className="label">Initial Deposit</div><div className="value">Rp100.000</div>
+                <div className="label">Annual Interest Rate</div><div className="value">3%</div>
+                <div className="label">Duration</div><div className="value">5 years</div>
+                <div className="label">Creation Date</div><div className="value">25 May 2023</div>
               </div>
-              <div className="info-row">
-                <span>Annual Interest Rate</span>
-                <span>3%</span>
-              </div>
-              <div className="info-row">
-                <span>Duration</span>
-                <span>5 years</span>
-              </div>
-              <div className="info-row">
-                <span>Creation Date</span>
-                <span>25 May 2023</span>
+
+              <div className="divider" />
+
+              <h4 className="info-heading small">Disbursement Details</h4>
+              <div className="info-grid">
+                <div className="label">Disbursement Date</div><div className="value">25 May 2028</div>
+                <div className="label">Disbursement Account</div><div className="value">1234567890</div>
               </div>
             </div>
-
-            <div className="info-box">
-              <h4>Disbursement Details</h4>
-              <div className="info-row">
-                <span>Disbursement Date</span>
-                <span>25 May 2028</span>
-              </div>
-              <div className="info-row">
-                <span>Disbursement Account</span>
-                <span>1234567890</span>
-              </div>
-            </div>
-          </section>
+          </aside>
         </div>
       </main>
     </div>
