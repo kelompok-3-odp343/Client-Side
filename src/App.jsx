@@ -9,6 +9,7 @@ import LifeGoalDetail from "./pages/LifeGoalsDetail";
 import Profile from "./pages/Profile";
 import OtpLogin from "./pages/OtpLogin";
 import PopupBlock from "./pages/PopupBlock";
+import DetailMyCard from "./pages/detailMyCard";
 
 export default function App() {
   const location = useLocation();
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/otpLogin" element={<OtpLogin />} />
         <Route path="/popupblock" element={<PopupBlock />} />
+        <Route path="/detailmycard" element={<DetailMyCard />} />
       </Routes>
     </AnimatePresence>
   );

@@ -1,0 +1,516 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body,
+html {
+  height: 100%;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+}
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 700;
+  color: #00a884;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.2s ease;
+}
+
+.logo-text:hover {
+  opacity: 0.8;
+  transform: scale(1.02);
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: #555;
+}
+
+/* MAIN LAYOUT */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding: 25px 40px;
+  gap: 30px;
+  background: #fff;
+}
+
+/* LEFT PANEL */
+.left-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.account-details h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.earnings h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.account-details-dropdown {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.account-details-dropdown select {
+  width: 70%;
+  padding: 5px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  background-color: #d9d9d9;
+  color: #000000;
+  cursor: pointer;
+}
+
+select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.subtext {
+  font-size: 12px;
+  color: #000000;
+  margin-bottom: 10px;
+}
+
+/* ACCOUNT CARD */
+.account-card {
+  background: linear-gradient(to bottom, #ffa669 0%, #ffffff 100%);
+  border-radius: 12px;
+  padding: 18px 22px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+.account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.badge {
+  background: #f3f3f3;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #333;
+  font-weight: 500;
+}
+
+.account-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.acc-number {
+  color: #000000;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.acc-name {
+  color: #222;
+  font-weight: 151;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.balance-title {
+  font-size: 12px;
+  color: #777;
+  margin-top: 14px;
+}
+
+.balance-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.balance-container h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.eye-icon {
+  cursor: pointer;
+  color: #333;
+}
+
+/* WARNING BOX */
+.warning-box {
+  background: #ffe8b0;
+  padding: 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid #e5a449;
+  margin-top: 15px;
+}
+
+/* EARNINGS OVERVIEW */
+/* ====== EARNINGS OVERVIEW (REVISED) ====== */
+.earnings {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  padding: 20px 25px;
+  margin-top: 20px;
+}
+
+.earnings h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #111;
+}
+
+.earnings .numbers {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.earnings .numbers div {
+  text-align: center;
+  flex: 1;
+}
+
+.earnings .numbers h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+.earnings .numbers p {
+  font-size: 0.9rem;
+  color: #000000;
+}
+
+.earnings .difference {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #333;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.earnings .bar-chart {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 60px;
+  height: 120px;
+  margin-top: 10px;
+  padding-bottom: 5px;
+}
+
+.earnings .bar {
+  width: 45px;
+  border-radius: 10px;
+  transition: height 0.3s ease, background 0.3s ease;
+}
+
+.earnings .income-bar {
+  background: #00a884;
+  height: 100px;
+  box-shadow: 0 2px 6px rgba(0, 168, 132, 0.3);
+}
+
+.earnings .expense-bar {
+  background: #f2b38a;
+  height: 65px;
+  box-shadow: 0 2px 6px rgba(242, 179, 138, 0.3);
+}
+
+.earnings:hover .income-bar {
+  height: 105px;
+}
+
+.earnings:hover .expense-bar {
+  height: 70px;
+}
+.earnings {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  padding: 25px 25px 40px 25px;
+  margin-top: -10px; /* naikin posisi card */
+  margin-bottom: 40px; /* jarak bawah secukupnya */
+}
+
+/* RIGHT PANEL */
+.right-panel {
+  flex: 1.6;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 25px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.months {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.months button {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f3f3f3;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.months button.active {
+  background: #ffa669;
+  /* color: white; */
+}
+
+.transaction-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.transaction-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.transaction-list::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 10px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 8px;
+  border-top: 1px solid #b3b3b3;
+}
+
+.transaction-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Ratakan ke kanan */
+  gap: 8px;
+}
+
+.transaction-amount button {
+  width: 80px;
+  border: 1px solid #6dddd0;
+  border-radius: 10px;
+  background-color: white;
+  color: #6dddd0;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.transaction-info .date {
+  font-size: 12px;
+  color: #000000;
+}
+
+.transaction-info .type {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.transaction-info .detail {
+  font-size: 13px;
+  color: #b8b8b8;
+}
+
+.amount {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.credit {
+  color: #00a884;
+}
+
+.debit {
+  color: #e74c3c;
+}
+
+.no-data {
+  text-align: center;
+  color: #aaa;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+/* ====== SPLIT BILL STYLE ====== */
+.split-btn {
+  background: #e8f8f5;
+  border: none;
+  color: #00a884;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-top: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.split-btn:hover {
+  background: #6dddd0;
+  color: #fff;
+  border: 1px solid white;
+  text-decoration: underline;
+}
+
+/* MODAL */
+.split-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.split-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px 35px;
+  width: 340px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.split-box h3 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.split-box label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.split-box input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.split-box input:focus {
+  border-color: #00a884;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-actions .cancel {
+  background: #eee;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-actions .confirm {
+  background: #00a884;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-actions .confirm:hover {
+  background: #009b7a;
+}
+
+.transaction-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+  max-height: calc(100vh - 250px); /* biar scroll area pas di panel kanan */
+}
+
+/* Scrollbar style */
+.transaction-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.transaction-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.transaction-list::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
