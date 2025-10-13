@@ -1,0 +1,223 @@
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #fff;
+}
+
+.lifegoal-detail-main {
+  padding: 110px 80px 80px 80px;
+}
+
+/* Back */
+.back-link {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+/* Title */
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 25px;
+}
+
+/* === Top Card === */
+.goal-header-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 500px;
+  margin-bottom: 40px;
+}
+
+.goal-header-left {
+  width: 160px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+}
+
+.goal-header-left img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.goal-header-right {
+  flex: 1;
+  padding: 18px;
+}
+
+.goal-header-right h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 5px;
+}
+
+.goal-header-right p {
+  font-size: 13px;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+/* Progress bar */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #333;
+}
+
+/* === GRID LAYOUT === */
+.lifegoal-grid {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 40px;
+}
+
+/* === LEFT SECTION === */
+.history-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.month-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 25px;
+}
+
+.month-btn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: #e6e6e6;
+  cursor: pointer;
+  font-weight: 500;
+  color: #333;
+}
+
+.month-btn.active {
+  color: #fff;
+}
+
+/* Transactions */
+.tx-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 14px 18px;
+  margin-bottom: 15px;
+}
+
+.tx-date {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 5px;
+}
+
+.tx-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tx-type {
+  font-weight: 600;
+  color: #222;
+}
+
+.tx-desc {
+  font-size: 12px;
+  color: #999;
+}
+
+.tx-amount {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tx-amount.positive {
+  color: #16a34a;
+}
+
+.tx-amount.negative {
+  color: #dc2626;
+}
+
+/* === RIGHT SECTION === */
+.info-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.info-box {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.info-box h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.info-row span:first-child {
+  color: #555;
+}
+
+.info-row span:last-child {
+  font-weight: 600;
+  color: #000;
+}
+
+@media (max-width: 900px) {
+  .lifegoal-grid {
+    grid-template-columns: 1fr;
+  }
+}

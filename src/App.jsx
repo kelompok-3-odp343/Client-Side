@@ -1,24 +1,29 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/login";
-import Profile from "./pages/Profile";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import CardSection from "./pages/CardSection";
-import InputEmail from "./pages/otpLogin";
-import DetailFitur from "./pages/DetailFitur";
+import LifeGoals from "./pages/LifeGoals";
+import LifeGoalDetail from "./pages/LifeGoalsDetail";
+import Profile from "./pages/Profile";
+import OtpLogin from "./pages/OtpLogin";
 import PopupBlock from "./pages/PopupBlock";
 
-export default function App () {
+export default function App() {
+  const location = useLocation();
+
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/cardSection" element={<CardSection />} />
-      <Route path="/otpLogin" element={<InputEmail />} />
-      <Route path="/detailfitur" element={<DetailFitur />} />
-      <Route path="/popupblock" element={<PopupBlock />} />
-    </Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/lifegoals" element={<LifeGoals />} />
+        <Route path="/lifegoal/:id" element={<LifeGoalDetail />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/otpLogin" element={<OtpLogin />} />
+        <Route path="/popupblock" element={<PopupBlock />} />
+      </Routes>
+    </AnimatePresence>
   );
 }
