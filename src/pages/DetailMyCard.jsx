@@ -1,64 +1,57 @@
 import React, { useState } from "react";
+import SplitBillForm from "../components/SplitBillForm";
 import "../css/detailMyCard.css";
-import { EyeOff, Eye, Settings, Bell, User, Filter } from "lucide-react";
+import { EyeOff, Eye, Settings, Bell, User, Filter, Star } from "lucide-react";
 
 export default function DetailMyCard() {
   const [selectedMonth, setSelectedMonth] = useState("May");
   const [showBalance, setShowBalance] = useState(true);
   const [showSplitModal, setShowSplitModal] = useState(false);
-  const [splitData, setSplitData] = useState({ name: "", amount: "" });
 
   const transactions = {
     May: [
       {
         date: "31 May 2025",
-        type: "QRIS",
-        detail: "Warung Kak Ros",
-        amount: "-Rp25.000",
-      },
-      {
-        date: "31 May 2025",
-        type: "QRIS",
-        detail: "Warung Kak Udin",
-        amount: "-Rp25.000",
+        items: [
+          { type: "QRIS", detail: "Warung Kak Ros", amount: "-Rp25.000" },
+          { type: "QRIS", detail: "Warung Kak Udin", amount: "-Rp25.000" },
+        ],
       },
       {
         date: "30 May 2025",
-        type: "Transfer",
-        detail: "BNI - Gajian uhuy",
-        amount: "+Rp50.000.000",
-      },
-      {
-        date: "30 May 2025",
-        type: "E-Wallet",
-        detail: "Top Up Ovo - 0123456789",
-        amount: "-Rp25.000",
+        items: [
+          {
+            type: "Transfer",
+            detail: "BNI - Gajian uhuy",
+            amount: "+Rp50.000.000",
+          },
+          {
+            type: "E-Wallet",
+            detail: "Top Up Ovo - 0123456789",
+            amount: "-Rp25.000",
+          },
+        ],
       },
     ],
     June: [
       {
         date: "01 June 2025",
-        type: "Transfer",
-        detail: "BNI - Payroll Bonus",
-        amount: "+Rp10.000.000",
+        items: [
+          {
+            type: "Transfer",
+            detail: "BNI - Payroll Bonus",
+            amount: "+Rp10.000.000",
+          },
+        ],
       },
       {
         date: "02 June 2025",
-        type: "QRIS",
-        detail: "Warung Kak Ros",
-        amount: "-Rp50.000",
+        items: [
+          { type: "QRIS", detail: "Warung Kak Ros", amount: "-Rp50.000" },
+        ],
       },
     ],
     July: [],
-  };
-
-  const handleSplitSubmit = (e) => {
-    e.preventDefault();
-    alert(
-      `Split bill created for ${splitData.name} with amount ${splitData.amount}`
-    );
-    setShowSplitModal(false);
-    setSplitData({ name: "", amount: "" });
   };
 
   return (
@@ -66,12 +59,12 @@ export default function DetailMyCard() {
       {/* HEADER */}
       <header className="header">
         <div className="logo-text" onClick={() => window.history.back()}>
-          wandoor
+          wand<span>oo</span>r
         </div>
         <div className="header-icons">
-          <Bell />
-          <User />
-          <Settings />
+          <Bell style={{ color: "black" }} />
+          <User style={{ color: "black" }} />
+          <Settings style={{ color: "black" }} />
         </div>
       </header>
 
@@ -123,8 +116,9 @@ export default function DetailMyCard() {
             </div>
           </div>
 
+          <h5>Earnings Overview</h5>
+
           <div className="earnings">
-            <h2>Earnings Overview</h2>
             <div className="numbers">
               <div>
                 <h3>Rp17.580.062</h3>
@@ -154,7 +148,7 @@ export default function DetailMyCard() {
         <section className="right-panel">
           <div className="transactions">
             <div className="transaction-header">
-              <h2>Transaction History</h2>
+              <h3>Transaction History</h3>
               <Filter className="filter-icon" />
             </div>
 
@@ -182,49 +176,42 @@ export default function DetailMyCard() {
                 </button>
               ))}
             </div>
-            {/* <div className="transaction-list-date">
+
+            {/* UPDATED TRANSACTION LIST */}
+            <div className="transaction-list-modern">
               {transactions[selectedMonth]?.length ? (
-                transactions[selectedMonth].map((t, i) => (
-                  <div key={i} className="transaction-item">
-                    <div className="transaction-info">
-                      <p className="date">
-                        <strong>{t.date}</strong>
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="no-data">
-                  No transactions available for {selectedMonth}
-                </p>
-              )}
-            </div> */}
-            <div className="transaction-list">
-              {transactions[selectedMonth]?.length ? (
-                transactions[selectedMonth].map((t, i) => (
-                  <div key={i} className="transaction-item">
-                    <div className="transaction-info">
-                      <p className="date">
-                        <strong>{t.date}</strong>
-                      </p>
-                      <p className="type">{t.type}</p>
-                      <p className="detail">{t.detail}</p>
-                    </div>
-                    <div className="transaction-amount">
-                      <p
-                        className={`amount ${
-                          t.amount.startsWith("+") ? "credit" : "debit"
-                        }`}
-                      >
-                        {t.amount}
-                      </p>
-                      <button
-                        className="split-btn"
-                        onClick={() => setShowSplitModal(true)}
-                      >
-                        Split bill?
-                      </button>
-                    </div>
+                transactions[selectedMonth].map((group, idx) => (
+                  <div key={idx} className="transaction-group">
+                    <p className="transaction-date">
+                      <strong>{group.date}</strong>
+                    </p>
+                    <hr />
+                    {group.items.map((item, i) => (
+                      <div key={i} className="transaction-modern-item">
+                        {/* <div className="transaction-icon">
+                          <Star size={18} />
+                        </div> */}
+                        <div className="transaction-text">
+                          <p className="transaction-type">{item.type}</p>
+                          <p className="transaction-detail">{item.detail}</p>
+                        </div>
+                        <div className="transaction-amount-modern">
+                          <span
+                            className={`amount ${
+                              item.amount.startsWith("+") ? "credit" : "debit"
+                            }`}
+                          >
+                            {item.amount}
+                          </span>
+                          <button
+                            className="split-btn"
+                            onClick={() => setShowSplitModal(true)}
+                          >
+                            Split bill?
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ))
               ) : (
@@ -239,45 +226,15 @@ export default function DetailMyCard() {
 
       {/* SPLIT BILL MODAL */}
       {showSplitModal && (
-        <div className="split-modal">
-          <div className="split-box">
-            <h3>Create Split Bill</h3>
-            <form onSubmit={handleSplitSubmit}>
-              <label>Friend’s Name</label>
-              <input
-                type="text"
-                placeholder="Enter name"
-                value={splitData.name}
-                onChange={(e) =>
-                  setSplitData({ ...splitData, name: e.target.value })
-                }
-                required
-              />
-              <label>Amount (Rp)</label>
-              <input
-                type="number"
-                placeholder="Enter amount"
-                value={splitData.amount}
-                onChange={(e) =>
-                  setSplitData({ ...splitData, amount: e.target.value })
-                }
-                required
-              />
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="cancel"
-                  onClick={() => setShowSplitModal(false)}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="confirm">
-                  Create
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <SplitBillForm
+          onClose={() => setShowSplitModal(false)}
+          transaction={{
+            id: "ldx01231231sadawq",
+            date: "31 May 2025",
+            detail: "Warung Kak Udin",
+            amount: "Rp25.000",
+          }}
+        />
       )}
     </div>
   );
