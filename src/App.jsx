@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import LifeGoals from "./pages/LifeGoals";
 import LifeGoalDetail from "./pages/LifeGoalsDetail";
+import DepositsDashboard from "./pages/Deposit";
 import Profile from "./pages/Profile";
 import OtpLogin from "./pages/OtpLogin";
 import PopupBlock from "./pages/PopupBlock";
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/lifegoals" element={<LifeGoals />} />
         <Route path="/lifegoal/:id" element={<LifeGoalDetail />} />
+        <Route path="/deposits" element={<DepositsDashboard />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/otpLogin" element={<OtpLogin />} />
         <Route path="/popupblock" element={<PopupBlock />} />
