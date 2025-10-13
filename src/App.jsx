@@ -8,7 +8,7 @@ import InputEmail from "./pages/otpLogin";
 import DetailFitur from "./pages/DetailFitur";
 import PopupBlock from "./pages/PopupBlock";
 
-export default function App() {
+export default function App () {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
