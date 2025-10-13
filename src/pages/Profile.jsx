@@ -1,7 +1,7 @@
 import React from "react";
 import "../css/profile.css";
-import "../components/Navbar.css";
-import Navbar from "../components/navbar";
+import "../css/Navbar.css";
+import Navbar from "../components/Navbar";
 
 export default function Profile() {
   return (

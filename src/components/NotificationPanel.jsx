@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import "./NotificationPanel.css";
+import "../css/NotificationPanel.css";
 
 export default function NotificationPanel({ visible, anchorRef }) {
   const panelRef = useRef(null);

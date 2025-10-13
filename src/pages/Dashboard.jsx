@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import "../css/globals.css";
 
@@ -8,7 +8,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const sliderRef = useRef(null);
-  const navigate = useNavigate(); // 
+  const navigate = useNavigate();
 
   useEffect(() => {
     let userId = localStorage.getItem("userId");
@@ -29,6 +29,7 @@ export default function Dashboard() {
           const result = await response.json();
           setData(result);
         } else {
+          // Simulasi data dummy
           setData({
             name: "User Simulasi",
             assets: 17580062,
@@ -57,7 +58,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [API_BASE_URL]);
 
   if (loading) return <p>Loading dashboard...</p>;
   if (!data) return <p>No data found</p>;
@@ -72,59 +73,46 @@ export default function Dashboard() {
     sliderRef.current.scrollBy({ left: 260, behavior: "smooth" });
   };
 
-  //Fungsi navigate untuk pindah ke halaman detail
+  // ✅ Fungsi navigasi langsung ke halaman fitur
   const handleNavigate = (section) => {
-    navigate(`/detailfitur#${section}`);
+    navigate(`/${section}`);
   };
 
   return (
     <div className="dashboard-container">
+      <Navbar />
+
       {/* Header */}
-      <>
-        <Navbar />
-        <main style={{ paddingTop: "90px", textAlign: "center" }}>
-          <h2>Welcome to your Dashboard</h2>
-        </main>
-      </>
+      <main style={{ paddingTop: "90px", textAlign: "center" }}>
+        <h2>Welcome to your Dashboard</h2>
+      </main>
 
       {/* Top Section */}
       <div className="top-section">
         <div className="card asset-card">
-          <h3>
-            <b>Assets Total</b>
-          </h3>
+          <h3><b>Assets Total</b></h3>
           <h2>Rp{assets.toLocaleString("id-ID")}</h2>
           <p>You made extra Rp20.000 this month</p>
         </div>
 
         <div className="card income-expense-card">
-          <h4>
-            <b>Income & Expenses</b>
-          </h4>
+          <h4><b>Income & Expenses</b></h4>
           <div className="info-row">
             <p className="income">
-              <span>
-                <i className="bi bi-pie-chart"></i>
-              </span>
-              + Rp{income.toLocaleString("id-ID")}
+              <i className="bi bi-pie-chart"></i> + Rp{income.toLocaleString("id-ID")}
             </p>
             <span>Total income this month</span>
           </div>
           <div className="info-row">
             <p className="expense">
-              <span>
-                <i className="bi bi-pie-chart"></i>
-              </span>
-              - Rp{expenses.toLocaleString("id-ID")}
+              <i className="bi bi-pie-chart"></i> - Rp{expenses.toLocaleString("id-ID")}
             </p>
             <span>Total expenses this month</span>
           </div>
         </div>
 
         <div className="card split-card">
-          <h4>
-            <b>Split Bill</b>
-          </h4>
+          <h4><b>Split Bill</b></h4>
           <div
             className="circle"
             style={{
@@ -134,48 +122,39 @@ export default function Dashboard() {
             <div className="percent">{splitProgress}%</div>
           </div>
           <div className="description">
-            There are 4 ongoing split bills
-            <br />
-            Remaining bill: Rp2.000.000
-            <br />
+            There are 4 ongoing split bills<br />
+            Remaining bill: Rp2.000.000<br />
             Potential asset: Rp32.580.062
           </div>
-          <a href="#" className="detail-link">
-            View Detail
-          </a>
+          <a href="#" className="detail-link">View Detail</a>
         </div>
       </div>
 
-      {/* ✅ Middle Section — navigasi ke DetailFitur */}
+      {/* Middle Section — Navigasi ke Halaman Fitur */}
       <div className="category-section">
-        <div className="category yellow" onClick={() => handleNavigate("deposit")} style={{ cursor: "pointer" }}>
+        <div className="category yellow" onClick={() => handleNavigate("deposit")}>
           Deposits
-          <br />
-          Rp 15.000.000
+          <br />Rp 15.000.000
         </div>
 
-        <div className="category purple" onClick={() => handleNavigate("savings")} style={{ cursor: "pointer" }}>
-          Savings
-          <br />
-          Rp 15.000.000
+        <div className="category purple" onClick={() => handleNavigate("mycard")}>
+          My Card
+          <br />Rp 25.000.000
         </div>
 
-        <div className="category green" onClick={() => handleNavigate("lifegoals")} style={{ cursor: "pointer" }}>
+        <div className="category green" onClick={() => handleNavigate("lifegoals")}>
           Life Goals
-          <br />
-          Rp 15.000.000
+          <br />Rp 35.000.000
         </div>
 
-        <div className="category orange" onClick={() => handleNavigate("dplk")} style={{ cursor: "pointer" }}>
+        <div className="category orange" onClick={() => handleNavigate("dplk")}>
           DPLK
-          <br />
-          Rp 15.000.000
+          <br />Rp 12.000.000
         </div>
 
-        <div className="category blue" onClick={() => handleNavigate("other")} style={{ cursor: "pointer" }}>
-          Other
-          <br />
-          Rp 15.000.000
+        <div className="category blue" onClick={() => handleNavigate("splitbill")}>
+          Split Bill
+          <br />Rp 10.000.000
         </div>
       </div>
 
@@ -184,12 +163,10 @@ export default function Dashboard() {
         <div className="mycards">
           <h3>My Cards</h3>
           <div className="slider-wrapper">
-            <button className="slider-btn left" onClick={scrollLeft}>
-              &lt;
-            </button>
+            <button className="slider-btn left" onClick={scrollLeft}>&lt;</button>
             <div className="card-slider" ref={sliderRef}>
               {cards.map((card, idx) => (
-                <Link to="/cardSection" key={idx} className="bank-card">
+                <Link to="/mycard" key={idx} className="bank-card">
                   <h5>{card.name.toUpperCase()}</h5>
                   <p>12345678910</p>
                   <p>Effective balance</p>
@@ -197,13 +174,10 @@ export default function Dashboard() {
                 </Link>
               ))}
             </div>
-            <button className="slider-btn right" onClick={scrollRight}>
-              &gt;
-            </button>
+            <button className="slider-btn right" onClick={scrollRight}>&gt;</button>
           </div>
         </div>
 
-        {/* Earnings Overview */}
         <div className="earnings">
           <h3>Earnings Overview</h3>
           <div className="bar-container">
