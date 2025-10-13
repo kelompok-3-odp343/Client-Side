@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Navbar from "../components/navbar";
 import { Link, useNavigate } from "react-router-dom";
 import "../css/globals.css";
 
@@ -7,7 +8,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const sliderRef = useRef(null);
-  const navigate = useNavigate(); // ✅ gunakan navigate dari react-router-dom
+  const navigate = useNavigate(); // 
 
   useEffect(() => {
     let userId = localStorage.getItem("userId");
@@ -79,21 +80,12 @@ export default function Dashboard() {
   return (
     <div className="dashboard-container">
       {/* Header */}
-      <header className="dashboard-header">
-        <h1>Wandoor</h1>
-        <nav>
-          <a href="#" className="active">
-            Dashboard
-          </a>
-          <a href="#">Menu 1</a>
-          <a href="#">Menu 2</a>
-        </nav>
-        <div className="icons">
-          <i className="bi bi-gear"></i>
-          <i className="bi bi-bell"></i>
-          <i className="bi bi-person"></i>
-        </div>
-      </header>
+      <>
+        <Navbar />
+        <main style={{ paddingTop: "90px", textAlign: "center" }}>
+          <h2>Welcome to your Dashboard</h2>
+        </main>
+      </>
 
       {/* Top Section */}
       <div className="top-section">
