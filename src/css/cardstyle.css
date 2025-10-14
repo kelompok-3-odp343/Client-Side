@@ -25,7 +25,8 @@
   .dashboard-main {
     /* display: flex; */
     gap: 40px;
-    margin-top: 20px;
+    margin-top: 80px;
+    padding: 12px 16px 80px;
   }
 
   /* LEFT SECTION */

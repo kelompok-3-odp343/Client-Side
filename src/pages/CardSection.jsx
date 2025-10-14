@@ -3,7 +3,7 @@ import "../css/cardstyle.css";
 import { EyeOff, Eye, Settings, Bell, User, Filter } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { DUMMY_CARDS } from "../data/dummy";
-
+import Navbar from "../components/Navbar";
 /**
  * CardSection: expects location.state.card (object) OR falls back to first dummy card
  */
@@ -49,14 +49,7 @@ export default function MyCards() {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <h1 className="logo">Wandoor</h1>
-        <div className="icons">
-          <Settings />
-          <Bell />
-          <User />
-        </div>
-      </header>
+      <Navbar />
 
       <main className="dashboard-main">
         {/* Header area or back button */}
