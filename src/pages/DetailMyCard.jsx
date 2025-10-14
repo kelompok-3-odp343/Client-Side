@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SplitBillForm from "../components/SplitBillForm";
 import "../css/detailMyCard.css";
+import Navbar from "../components/Navbar";
 import { EyeOff, Eye, Settings, Bell, User, Filter } from "lucide-react";
 
 export default function DetailMyCard() {
@@ -45,16 +46,7 @@ export default function DetailMyCard() {
   return (
     <div className="detail-mycard">
       {/* HEADER */}
-      <header className="header">
-        <div className="logo-text" onClick={() => window.history.back()}>
-          wand<span>oo</span>r
-        </div>
-        <div className="header-icons">
-          <Bell style={{ color: "black" }} />
-          <User style={{ color: "black" }} />
-          <Settings style={{ color: "black" }} />
-        </div>
-      </header>
+      <Navbar />
 
       {/* MAIN */}
       <main className="main">
@@ -127,7 +119,7 @@ export default function DetailMyCard() {
             </div>
 
             <div className="months">
-              {["May","June","July","Aug","Sept","Oct","Nov","Dec","Jan","Feb","Mar","Apr"].map((m) => (
+              {["May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"].map((m) => (
                 <button
                   key={m}
                   className={selectedMonth === m ? "active" : ""}
