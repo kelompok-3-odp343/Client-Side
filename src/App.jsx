@@ -12,6 +12,7 @@ import OtpLogin from "./pages/OtpLogin";
 import PopupBlock from "./pages/PopupBlock";
 import CardSection from "./pages/CardSection"
 import DetailMyCard from "./pages/detailMyCard";
+import SavingsDashboard from "./pages/Savings";
 
 export default function App() {
   const location = useLocation();
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/popupblock" element={<PopupBlock />} />
         <Route path="/mycard" element={<CardSection />} />
         <Route path="/detailmycard" element={<DetailMyCard />} />
+        <Route path="/savings" element={<SavingsDashboard />} />
       </Routes>
     </AnimatePresence>
   );
