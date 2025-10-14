@@ -19,9 +19,9 @@ export default function LifeGoalDetail() {
   const goals = {
     education: { title: "Education", desc: "Save for brighter dawn", color: "#71d9d0", icon: graduationIcon },
     vacations: { title: "Vacations", desc: "Your Passport to New Memories", color: "#ffd367", icon: vacationIcon },
-    marriage: { title: "Marriage", desc: "Funding your new chapter", color: "#b18cff", icon: marriageIcon },
+    marriage: { title: "Marriage", desc: "Funding your new chapter", color: "#9c7edc", icon: marriageIcon },
     home: { title: "Home", desc: "Saving for Memories Unmade", color: "#9c7edc", icon: homeIcon },
-    gadget: { title: "Gadget", desc: "Smart saving for smart tech", color: "#6fd6c1", icon: gadgetIcon },
+    gadget: { title: "Gadget", desc: "Smart saving for smart tech", color: "#6dddd0", icon: gadgetIcon },
     vehicles: { title: "Vehicles", desc: "Fuel your future ride", color: "#ffd367", icon: vehicleIcon },
   };
 
