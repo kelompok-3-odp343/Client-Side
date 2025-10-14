@@ -20,11 +20,13 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-.title {
+.splitbill-modal .title {
   text-align: center;
-  margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 25px;
   font-size: 22px;
   font-weight: 700;
+  font-size: 30px;
 }
 
 .transaction-info {
@@ -32,8 +34,22 @@
   justify-content: space-between;
   font-size: 14px;
   margin-bottom: 16px;
-  border-bottom: 1px solid #ddd;
+  /* border-bottom: 1px solid #ddd; */
   padding-bottom: 8px;
+}
+
+.transaction-info-left-panel {
+  margin-left: 75px;
+}
+.transaction-info-left-panel p {
+  color: #000000;
+}
+
+.transaction-info-right-panel {
+  margin-right: 75px;
+}
+.transaction-info-right-panel p {
+  color: #000000;
 }
 
 .transaction-type {
@@ -54,33 +70,46 @@
   gap: 8px;
 }
 
+.detail-mycard .bill-info-container {
+  display: flex;
+  justify-content: center;
+}
+
 .bill-info {
   width: 741px;
-  height: 241px;
+  height: 121px;
   background: linear-gradient(to bottom, #6dddd0, #ffffff);
   border-radius: 10px;
   padding: 12px 16px;
   margin-bottom: 18px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .bill-info p {
   margin: 6px 0;
   font-size: 15px;
+  color: #000000;
+}
+
+.participant-secition-container {
+  display: flex;
+  justify-content: center;
 }
 
 .participant-section {
+  height: 262px;
+  width: 738px;
   border: 1px solid #9ae0d2;
   border-radius: 8px;
   padding: 12px 14px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .participant-header {
   display: grid;
   grid-template-columns: 40px 1fr 1fr;
   font-weight: 600;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #b3b3b3;
   padding-bottom: 8px;
   margin-bottom: 10px;
 }
@@ -90,7 +119,7 @@
   grid-template-columns: 40px 1fr 1fr 30px;
   align-items: center;
   padding: 6px 0;
-  border-bottom: 1px solid #f1f1f1;
+  border-bottom: 1px solid #b3b3b3;
 }
 
 .participant-row:last-child {
@@ -99,13 +128,14 @@
 
 .participant-row input {
   border: none;
-  border-bottom: 1px solid #ccc;
+  /* border-bottom: 1px solid #ccc; */
   padding: 4px;
   font-size: 14px;
   outline: none;
 }
 
-.add-btn {
+.participant-row .add-btn {
+  padding: 0;
   background: none;
   border: none;
   cursor: pointer;
@@ -113,16 +143,67 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: none;
 }
 
-.add-participant-btn {
-  margin-top: 20px;
-  width: 100%;
-  background: #cfd1d1;
-  color: white;
+.splitbill-modal .add-participant-btn:hover {
+  color: #000000;
+}
+
+.participant-row .add-btn:hover {
+  padding: 0;
+  background: none;
   border: none;
-  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+}
+
+.bi-plus-circle {
+  color: black;
+}
+.bi-plus-circle:hover {
+  color: #c00f0c;
+}
+
+.add-participant-btn-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cancel-add-participant {
+  justify-content: center;
+  margin-left: 75px;
+  margin-top: 20px;
+  width: 135px;
+  border: 1px solid #c00f0c !important ;
+  background-color: #cfd1d100;
+  color: #c00f0c;
+  border: none;
   border-radius: 6px;
   cursor: not-allowed;
   font-weight: 600;
+  font-size: 14px;
+}
+
+.cancel-add-participant:hover {
+  background-color: #c00f0c;
+  color: #000000;
+}
+
+.add-participant-btn {
+  justify-content: center;
+  margin-right: 75px;
+  margin-top: 20px;
+  width: 275px;
+  border: 1px solid #6dddd0 !important ;
+  background-color: #cfd1d100;
+  color: #6dddd0;
+  border: none;
+  border-radius: 6px;
+  cursor: not-allowed;
+  font-weight: 600;
+  font-size: 14px;
 }

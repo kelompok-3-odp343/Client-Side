@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SplitBillForm from "../components/SplitBillForm";
 import "../css/detailMyCard.css";
+import Navbar from "../components/Navbar";
 import { EyeOff, Eye, Settings, Bell, User, Filter } from "lucide-react";
 
 export default function DetailMyCard() {
@@ -20,8 +21,16 @@ export default function DetailMyCard() {
       {
         date: "30 May 2025",
         items: [
-          { type: "Transfer", detail: "BNI - Gajian uhuy", amount: "+Rp50.000.000" },
-          { type: "E-Wallet", detail: "Top Up Ovo - 0123456789", amount: "-Rp25.000" },
+          {
+            type: "Transfer",
+            detail: "BNI - Gajian uhuy",
+            amount: "+Rp50.000.000",
+          },
+          {
+            type: "E-Wallet",
+            detail: "Top Up Ovo - 0123456789",
+            amount: "-Rp25.000",
+          },
         ],
       },
     ],
@@ -29,7 +38,11 @@ export default function DetailMyCard() {
       {
         date: "01 June 2025",
         items: [
-          { type: "Transfer", detail: "BNI - Payroll Bonus", amount: "+Rp10.000.000" },
+          {
+            type: "Transfer",
+            detail: "BNI - Payroll Bonus",
+            amount: "+Rp10.000.000",
+          },
         ],
       },
       {
@@ -45,16 +58,7 @@ export default function DetailMyCard() {
   return (
     <div className="detail-mycard">
       {/* HEADER */}
-      <header className="header">
-        <div className="logo-text" onClick={() => window.history.back()}>
-          wand<span>oo</span>r
-        </div>
-        <div className="header-icons">
-          <Bell style={{ color: "black" }} />
-          <User style={{ color: "black" }} />
-          <Settings style={{ color: "black" }} />
-        </div>
-      </header>
+      <Navbar />
 
       {/* MAIN */}
       <main className="main">
@@ -62,7 +66,9 @@ export default function DetailMyCard() {
         <section className="left-panel">
           <div className="account-details">
             <div className="account-details-dropdown">
-              <h2><strong>Account Details</strong></h2>
+              <h2>
+                <strong>Account Details</strong>
+              </h2>
               <select>
                 <option>TAPLUS BISNIS - 1234567890</option>
               </select>
@@ -76,7 +82,9 @@ export default function DetailMyCard() {
               <div className="account-header">
                 <div>
                   <h4>TAPLUS BISNIS</h4>
-                  <p className="acc-number"><strong>1234567890</strong></p>
+                  <p className="acc-number">
+                    <strong>1234567890</strong>
+                  </p>
                   <p className="acc-name">OKTAVIA QUBROI’A AYUNI</p>
                 </div>
                 <span className="badge">Main Account</span>
@@ -85,14 +93,20 @@ export default function DetailMyCard() {
               <p className="balance-title">Effective Balance</p>
               <div className="balance-container">
                 <h3>{showBalance ? "Rp 25.000.000" : "•••••••••"}</h3>
-                <span className="eye-icon" onClick={() => setShowBalance(!showBalance)}>
-                  {showBalance ? <EyeOff size={20} /> : <Eye size={20} />}
-                </span>
+                <div className="eye-icon-container">
+                  <span
+                    className="eye-icon"
+                    onClick={() => setShowBalance(!showBalance)}
+                  >
+                    {showBalance ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="warning-box">
-              ⚠️ Do not share card number, expiration date, or CVV/CVC code with anyone.
+              ⚠️ Do not share card number, expiration date, or CVV/CVC code with
+              anyone.
             </div>
           </div>
 
@@ -102,14 +116,20 @@ export default function DetailMyCard() {
             <div className="numbers">
               <div>
                 <h3>Rp17.580.062</h3>
-                <p><strong>Income</strong></p>
+                <p>
+                  <strong>Income</strong>
+                </p>
               </div>
               <div>
                 <h3>Rp10.580.062</h3>
-                <p><strong>Expenses</strong></p>
+                <p>
+                  <strong>Expenses</strong>
+                </p>
               </div>
             </div>
-            <p className="difference"><strong>A difference of Rp7.000.000</strong></p>
+            <p className="difference">
+              <strong>A difference of Rp7.000.000</strong>
+            </p>
 
             <div className="bar-chart">
               <div className="bar income-bar"></div>
@@ -127,7 +147,20 @@ export default function DetailMyCard() {
             </div>
 
             <div className="months">
-              {["May","June","July","Aug","Sept","Oct","Nov","Dec","Jan","Feb","Mar","Apr"].map((m) => (
+              {[
+                "May",
+                "June",
+                "July",
+                "Aug",
+                "Sept",
+                "Oct",
+                "Nov",
+                "Dec",
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+              ].map((m) => (
                 <button
                   key={m}
                   className={selectedMonth === m ? "active" : ""}
@@ -142,7 +175,9 @@ export default function DetailMyCard() {
               {transactions[selectedMonth]?.length ? (
                 transactions[selectedMonth].map((group, idx) => (
                   <div key={idx} className="transaction-group">
-                    <p className="transaction-date"><strong>{group.date}</strong></p>
+                    <p className="transaction-date">
+                      <strong>{group.date}</strong>
+                    </p>
                     <hr />
                     {group.items.map((item, i) => (
                       <div key={i} className="transaction-modern-item">
@@ -151,10 +186,17 @@ export default function DetailMyCard() {
                           <p className="transaction-detail">{item.detail}</p>
                         </div>
                         <div className="transaction-amount-modern">
-                          <span className={`amount ${item.amount.startsWith("+") ? "credit" : "debit"}`}>
+                          <span
+                            className={`amount ${
+                              item.amount.startsWith("+") ? "credit" : "debit"
+                            }`}
+                          >
                             {item.amount}
                           </span>
-                          <button className="split-btn" onClick={() => setShowSplitModal(true)}>
+                          <button
+                            className="split-btn"
+                            onClick={() => setShowSplitModal(true)}
+                          >
                             Split bill?
                           </button>
                         </div>
@@ -163,7 +205,9 @@ export default function DetailMyCard() {
                   </div>
                 ))
               ) : (
-                <p className="no-data">No transactions available for {selectedMonth}</p>
+                <p className="no-data">
+                  No transactions available for {selectedMonth}
+                </p>
               )}
             </div>
           </div>
