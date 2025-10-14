@@ -1,0 +1,29 @@
+@import "../../styles/variables.css";
+
+.savings-page {
+  padding: 120px 80px;
+  font-family: var(--font-main);
+  background: linear-gradient(to bottom right, #ffffff, #f8fffe);
+  min-height: 100vh;
+}
+
+.savings-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+
+.savings-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+.savings-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}

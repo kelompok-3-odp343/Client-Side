@@ -1,0 +1,31 @@
+:root {
+  /* === CORE COLORS === */
+  --primary: #16c1a8;       /* toska utama */
+  --primary-dark: #0e8d7e;
+  --secondary: #5edcc4;     /* toska muda */
+  --accent-orange: #ffa669; /* oranye di kartu/gradient */
+  --accent-yellow: #ffe8a0; /* untuk highlight/notification */
+  --danger: #d9534f;
+  --success: #00a884;
+  --warning: #ffc107;
+
+  /* === NEUTRALS === */
+  --text-dark: #222;
+  --text-gray: #555;
+  --text-muted: #777;
+  --border-light: #e0e0e0;
+  --bg-light: #ffffff;
+  --bg-gray: #f5f7f6;
+
+  /* === EFFECTS === */
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 6px 20px rgba(0, 0, 0, 0.12);
+  --radius: 8px;
+
+  /* === TYPOGRAPHY === */
+  --font-main: "Poppins", sans-serif;
+
+  /* === TRANSITIONS === */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}

@@ -1,0 +1,336 @@
+@import "../../styles/variables.css";
+@import "../../styles/common/layout.css";
+@import "../../styles/common/utilities.css";
+
+/* ======== PAGE ======== */
+.deposit-page {
+  background: #fff;
+  min-height: 100vh;
+  font-family: var(--font-main);
+}
+
+/* ======== LAYOUT UTAMA ======== */
+.deposit-container {
+  display: flex;
+  gap: 40px;
+  padding: 100px 80px 60px; /* offset dari navbar */
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ======== LEFT SIDE ======== */
+.deposit-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 420px;
+}
+
+.section-header .lg-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.section-header .lg-sub {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* ======== DEPOSIT SUMMARY CARD ======== */
+.deposit-summary-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+  width: 100%;
+  max-width: 460px; /* sejajar dengan kartu di bawah */
+  transition: var(--transition-normal);
+}
+
+.deposit-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* LEFT SIDE GRADIENT */
+.deposit-summary-left {
+  background: linear-gradient(to bottom, #ffe7ad 0%, #fff3cf 100%);
+  width: 35%;
+  min-width: 140px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.deposit-icon-circle img {
+  width: 70px;
+  height: auto;
+}
+
+/* RIGHT SIDE CONTENT */
+.deposit-summary-right {
+  flex: 1;
+  padding: 20px 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.summary-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: #777;
+  margin: 0;
+}
+
+.summary-balance {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.summary-divider {
+  width: 100%;
+  height: 1px;
+  background: #e2e2e2;
+  margin: 6px 0;
+}
+
+.summary-sub {
+  font-size: 13px;
+  color: #555;
+  margin: 0;
+}
+
+/* ======== YOUR DEPOSITS ======== */
+.your-deposit-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.deposit-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 460px; /* sejajar dengan card di atas */
+}
+
+/* ======== DEPOSIT CARD ======== */
+.deposit-card {
+  width: 220px;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  background: #fff;
+  box-shadow: var(--shadow-light);
+  transition: var(--transition-fast);
+}
+
+.deposit-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.deposit-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.deposit-balance {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 14px;
+}
+
+/* ======== CIRCLE DATE ======== */
+.circle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.circle-ring {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: conic-gradient(#f4e3b0 0deg, #f4e3b0 220deg, #bca159 220deg, #bca159 360deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.circle-inner {
+  background: #fff;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-inner .day {
+  font-size: 1rem;
+}
+
+.circle-inner .month {
+  font-size: 0.85rem;
+  color: #856f2c;
+}
+
+.circle-inner .year {
+  font-size: 0.8rem;
+  color: #bba76d;
+}
+
+/* ======== DEPOSIT INFO ======== */
+.deposit-info {
+  font-size: 0.85rem;
+}
+
+.deposit-info p {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+  color: #333;
+}
+
+.deposit-info span:first-child {
+  color: #777;
+}
+
+/* ======== RIGHT SIDE ======== */
+.deposit-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.download-icon {
+  color: #000;
+  cursor: pointer;
+}
+
+/* ======== MONTH BUTTONS ======== */
+.months {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0 12px;
+  justify-content: flex-start;
+}
+
+.month-btn {
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #f4f4f4;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.month-btn:hover {
+  background: #ffe9b0;
+}
+
+.month-btn.active {
+  background: #00a884;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 168, 132, 0.25);
+}
+
+/* ======== TRANSACTION LIST ======== */
+.transaction-list {
+  border-top: 1px solid #ddd;
+}
+
+.transaction-group {
+  margin-top: 18px;
+}
+
+.transaction-date {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.tx-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tx-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #888;
+}
+
+.tx-type {
+  font-weight: 600;
+  font-size: 14px;
+  color: #000;
+}
+
+.tx-detail {
+  font-size: 12px;
+  color: #999;
+}
+
+.tx-amount {
+  font-weight: 600;
+  font-size: 14px;
+  color: #222;
+}
+
+.no-tx {
+  color: #777;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
+}

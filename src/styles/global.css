@@ -1,0 +1,66 @@
+@import "./variables.css";
+@import "./common/animations.css";
+@import "./common/buttons.css";
+@import "./common/form.css";
+@import "./common/layout.css";
+@import "./common/utilities.css";
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  scroll-behavior: smooth;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  font-family: var(--font-main);
+}
+
+/* Headings & Text */
+h1, h2, h3, h4, h5 {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-gray);
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* Buttons and Inputs already covered by common/ */
+
+/* Utility containers */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: var(--text-gray);
+}

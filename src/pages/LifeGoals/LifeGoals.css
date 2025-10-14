@@ -1,0 +1,27 @@
+@import "../../styles/variables.css";
+
+.life-goals-page {
+  padding: 120px 80px;
+  font-family: var(--font-main);
+  background: linear-gradient(to bottom right, #ffffff, #f8fdfa);
+  min-height: 100vh;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: var(--text-sub);
+  margin-bottom: 35px;
+}
+
+.life-goal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+}

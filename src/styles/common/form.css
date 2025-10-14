@@ -1,0 +1,28 @@
+input, select, textarea {
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius);
+  outline: none;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: #fff;
+  transition: border-color var(--transition-normal);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+}
+
+/* Label & field grouping */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-gray);
+}

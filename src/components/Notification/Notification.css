@@ -1,0 +1,59 @@
+@import "../../styles/variables.css";
+@import "../../styles/common/animations.css";
+
+.notif-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: transparent;
+}
+
+/* PANEL */
+.notif-panel {
+  width: 340px;
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-medium);
+  padding: 18px;
+  z-index: 1000;
+  animation: fadeIn .18s ease-in-out;
+}
+
+.notif-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.notif-card {
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-soft);
+  transition: transform .12s, box-shadow .12s;
+  cursor: pointer;
+}
+
+.notif-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.notif-blue { background: #71d9d0; }
+.notif-yellow { background: #ffe8a0; }
+.notif-orange { background: #ffb183; }
+
+.notif-heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.notif-card p {
+  font-size: 14px;
+  color: var(--text-sub);
+  margin: 0;
+}
