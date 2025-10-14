@@ -219,9 +219,15 @@
   padding: 10px 0;
 }
 .detail-mycard .transaction-text p {
-  margin: 0;
+  margin-bottom: 10px;
   font-size: 13px;
 }
+
+.detail-mycard .transaction-detail {
+  color: #b8b8b8;
+  /* margin-top: 90px; */
+}
+
 .detail-mycard .amount.credit {
   color: #00a884;
   font-weight: 600;
