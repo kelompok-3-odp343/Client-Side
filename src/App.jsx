@@ -11,7 +11,7 @@ import Profile from "./pages/Profile";
 import OtpLogin from "./pages/OtpLogin";
 import PopupBlock from "./pages/PopupBlock";
 import CardSection from "./pages/CardSection"
-import DetailMyCard from "./pages/detailMyCard";
+import DetailMyCard from "./pages/DetailMyCard";
 
 export default function App() {
   const location = useLocation();
