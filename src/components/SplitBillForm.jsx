@@ -35,14 +35,15 @@ export default function SplitBillForm({ onClose, transaction }) {
             <strong>Transaction Date :</strong> {transaction.date}
           </p>
         </div>
-
-        <div className="bill-info">
-          <p>
-            <strong>Bill Name :</strong> {transaction.detail}
-          </p>
-          <p>
-            <strong>Total Bill :</strong> {transaction.amount}
-          </p>
+        <div className="bill-info-container">
+          <div className="bill-info">
+            <p>
+              <strong>Bill Name :</strong> {transaction.detail}
+            </p>
+            <p>
+              <strong>Total Bill :</strong> {transaction.amount}
+            </p>
+          </div>
         </div>
 
         <div className="participant-section">

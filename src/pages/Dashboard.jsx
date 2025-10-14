@@ -23,9 +23,12 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         if (API_BASE_URL) {
-          const resp = await fetch(`${API_BASE_URL}/api/v1/dashboard?user_id=${userId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const resp = await fetch(
+            `${API_BASE_URL}/api/v1/dashboard?user_id=${userId}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (!resp.ok) throw new Error("API error");
           const json = await resp.json();
           // expect server's structure; adapt if necessary
@@ -40,23 +43,42 @@ export default function Dashboard() {
               progress: 100,
               remaining: 2000000,
               potential: 32580062,
-              ongoing: 4
+              ongoing: 4,
             },
             time_deposits: { total_balance: 15000000, count_accounts: 2 },
             savings: [
-              { account_id: "ACCT_1", title: "Savings - TAPLUS BISNIS", total_balance: 12000000000 }
+              {
+                account_id: "ACCT_1",
+                title: "Savings - TAPLUS BISNIS",
+                total_balance: 12000000000,
+              },
             ],
             pension_funds: [],
             life_goals: [],
             cards: {
               active_count: 3,
               list: [
-                { account_id: "ACCT001", type: "TAPLUS BISNIS", account_number: "12345678910", effective_balance: 50000000 },
-                { account_id: "ACCT001", type: "TEST 1", account_number: "12345678910", effective_balance: 40000000 },
-                { account_id: "ACCT001", type: "TEST 2", account_number: "12345678910", effective_balance: 30000000 }
-              ]
+                {
+                  account_id: "ACCT001",
+                  type: "TAPLUS BISNIS",
+                  account_number: "12345678910",
+                  effective_balance: 50000000,
+                },
+                {
+                  account_id: "ACCT001",
+                  type: "TEST 1",
+                  account_number: "12345678910",
+                  effective_balance: 40000000,
+                },
+                {
+                  account_id: "ACCT001",
+                  type: "TEST 2",
+                  account_number: "12345678910",
+                  effective_balance: 30000000,
+                },
+              ],
             },
-            recent_trx_summary: { latest_items: [] }
+            recent_trx_summary: { latest_items: [] },
           });
         }
       } catch (error) {
@@ -65,16 +87,21 @@ export default function Dashboard() {
           meta: { user_id: "offline", name: "Offline User", currency: "IDR" },
           assets_total: { total: 10000000, extra_this_month: 0 },
           earnings_overview: { income: 8000000, expenses: 3000000 },
-          split: { progress: 60, remaining: 500000, potential: 15000000, ongoing: 2 },
+          split: {
+            progress: 60,
+            remaining: 500000,
+            potential: 15000000,
+            ongoing: 2,
+          },
           time_deposits: { total_balance: 15000000, count_accounts: 1 },
           savings: [],
           pension_funds: [],
           life_goals: [],
           cards: {
-            active_count: 0, list: [
-            ]
+            active_count: 0,
+            list: [],
           },
-          recent_trx_summary: { latest_items: [] }
+          recent_trx_summary: { latest_items: [] },
         });
       } finally {
         setLoading(false);
@@ -95,7 +122,7 @@ export default function Dashboard() {
     savings,
     pension_funds,
     life_goals,
-    cards
+    cards,
   } = data;
 
   // const cardsList = (cards?.list && cards.list.length) ? cards.list : DUMMY_CARDS;
@@ -107,8 +134,10 @@ export default function Dashboard() {
 
   const sliderRefScroll = sliderRef;
 
-  const scrollLeft = () => sliderRefScroll.current?.scrollBy({ left: -260, behavior: "smooth" });
-  const scrollRight = () => sliderRefScroll.current?.scrollBy({ left: 260, behavior: "smooth" });
+  const scrollLeft = () =>
+    sliderRefScroll.current?.scrollBy({ left: -260, behavior: "smooth" });
+  const scrollRight = () =>
+    sliderRefScroll.current?.scrollBy({ left: 260, behavior: "smooth" });
 
   const handleNavigate = (section) => navigate(`/${section}`);
 
@@ -116,7 +145,9 @@ export default function Dashboard() {
   const fmt = (v) => {
     try {
       return Number(v).toLocaleString("id-ID");
-    } catch { return v; }
+    } catch {
+      return v;
+    }
   };
 
   return (
@@ -134,7 +165,10 @@ export default function Dashboard() {
             </div>
             <div className="card-body">
               <h1>Rp{fmt(assets)}</h1>
-              <p className="muted">You made extra Rp{fmt(assets_total?.extra_this_month ?? 0)} this month</p>
+              <p className="muted">
+                You made extra Rp{fmt(assets_total?.extra_this_month ?? 0)} this
+                month
+              </p>
             </div>
           </div>
 
@@ -163,7 +197,9 @@ export default function Dashboard() {
               <div
                 className="donut"
                 style={{
-                  background: `conic-gradient(#36D1B3 ${splitProgress * 3.6}deg, #e6f0ef 0deg)`
+                  background: `conic-gradient(#36D1B3 ${
+                    splitProgress * 3.6
+                  }deg, #e6f0ef 0deg)`,
                 }}
               >
                 <div className="donut-center">{splitProgress}%</div>
@@ -172,16 +208,32 @@ export default function Dashboard() {
               <div className="split-info">
                 <div className="info-panel">
                   <div className="panel-top">
-                    <div className="panel-ttl">You have {split?.ongoing ?? 0} ongoing split bills</div>
-                    <div className="panel-sub">The remaining bill that can be collected is IDR Rp{fmt(split?.remaining ?? 0)}</div>
+                    <div className="panel-ttl">
+                      You have {split?.ongoing ?? 0} ongoing split bills
+                    </div>
+                    <div className="panel-sub">
+                      The remaining bill that can be collected is IDR Rp
+                      {fmt(split?.remaining ?? 0)}
+                    </div>
                   </div>
                   <div className="panel-bottom">
-                    <div className="potential">Your potential asset accumulation:</div>
-                    <div className="potential-value">Rp{fmt(split?.potential ?? 0)}</div>
-                    <a href="#" className="view-detail">View Detail</a>
+                    <div className="potential">
+                      Your potential asset accumulation:
+                    </div>
+                    <div className="potential-value">
+                      Rp{fmt(split?.potential ?? 0)}
+                    </div>
+                    <a href="#" className="view-detail">
+                      View Detail
+                    </a>
                   </div>
                 </div>
-                <button className="btn-add" onClick={() => handleNavigate("splitbill")}>+ Add a New Bill</button>
+                <button
+                  className="btn-add"
+                  onClick={() => handleNavigate("splitbill")}
+                >
+                  + Add a New Bill
+                </button>
               </div>
             </div>
           </div>
@@ -191,22 +243,37 @@ export default function Dashboard() {
         <section className="fund-pills">
           <button className="pill" onClick={() => handleNavigate("deposits")}>
             <div className="pill-title">Time Deposits</div>
-            <div className="pill-amount">Rp{fmt(time_deposits?.total_balance ?? 0)}</div>
+            <div className="pill-amount">
+              Rp{fmt(time_deposits?.total_balance ?? 0)}
+            </div>
           </button>
 
           <button className="pill" onClick={() => handleNavigate("savings")}>
             <div className="pill-title">Savings</div>
-            <div className="pill-amount">Rp{fmt((savings?.[0]?.total_balance) ?? 0)}</div>
+            <div className="pill-amount">
+              Rp{fmt(savings?.[0]?.total_balance ?? 0)}
+            </div>
           </button>
 
           <button className="pill" onClick={() => handleNavigate("lifegoals")}>
             <div className="pill-title">Life Goals</div>
-            <div className="pill-amount">Rp{fmt(life_goals?.reduce((s, g) => s + (g.current_savings || 0), 0) ?? 0)}</div>
+            <div className="pill-amount">
+              Rp
+              {fmt(
+                life_goals?.reduce((s, g) => s + (g.current_savings || 0), 0) ??
+                  0
+              )}
+            </div>
           </button>
 
           <button className="pill" onClick={() => handleNavigate("dplk")}>
             <div className="pill-title">Pension Funds</div>
-            <div className="pill-amount">Rp{fmt(pension_funds?.reduce((s, p) => s + (p.balance || 0), 0) ?? 0)}</div>
+            <div className="pill-amount">
+              Rp
+              {fmt(
+                pension_funds?.reduce((s, p) => s + (p.balance || 0), 0) ?? 0
+              )}
+            </div>
           </button>
         </section>
 
@@ -215,22 +282,39 @@ export default function Dashboard() {
           <div className="card cards-panel">
             <div className="cards-header">
               <h3>My Cards</h3>
-              <div className="cards-sub">Tap a card to see history and manage split bill</div>
+              <div className="cards-sub">
+                Tap a card to see history and manage split bill
+              </div>
             </div>
 
             <div className="slider-wrapper">
-              <button className="slider-btn left" onClick={scrollLeft}>&lt;</button>
+              <button className="slider-btn left" onClick={scrollLeft}>
+                &lt;
+              </button>
               <div className="card-slider" ref={sliderRef}>
                 {(cards?.list || []).length > 0 ? (
                   // console.log('xx', cards)
 
                   (cards.list || []).map((card, idx) => (
-                    <Link key={card.account_id ?? idx} to="/mycard" className="bank-card">
-                      <div className="card-top">{card.type ?? "ACCOUNT"} - {card.account_number ?? ""}</div>
+                    <Link
+                      key={card.account_id ?? idx}
+                      to="/detailmycard"
+                      className="bank-card"
+                    >
+                      <div className="card-top">
+                        {card.type ?? "ACCOUNT"} - {card.account_number ?? ""}
+                      </div>
                       <div className="card-body">
-                        <p className="masked">**** **** **** {String(card.account_number ?? "").slice(-4)}</p>
-                        <p className="holder">{card.account_holder_name ?? ""}</p>
-                        <h4>Rp{fmt(card.effective_balance ?? card.balance ?? 0)}</h4>
+                        <p className="masked">
+                          **** **** ****{" "}
+                          {String(card.account_number ?? "").slice(-4)}
+                        </p>
+                        <p className="holder">
+                          {card.account_holder_name ?? ""}
+                        </p>
+                        <h4>
+                          Rp{fmt(card.effective_balance ?? card.balance ?? 0)}
+                        </h4>
                       </div>
                     </Link>
                   ))
@@ -238,7 +322,9 @@ export default function Dashboard() {
                   <div className="bank-card empty-card">No active cards</div>
                 )}
               </div>
-              <button className="slider-btn right" onClick={scrollRight}>&gt;</button>
+              <button className="slider-btn right" onClick={scrollRight}>
+                &gt;
+              </button>
             </div>
           </div>
 
@@ -257,8 +343,22 @@ export default function Dashboard() {
               </div>
 
               <div className="bar-chart">
-                <div className="bar income-bar" style={{ height: `${Math.round((income / Math.max(1, income + expenses)) * 200)}px` }} />
-                <div className="bar expense-bar" style={{ height: `${Math.round((expenses / Math.max(1, income + expenses)) * 200)}px` }} />
+                <div
+                  className="bar income-bar"
+                  style={{
+                    height: `${Math.round(
+                      (income / Math.max(1, income + expenses)) * 200
+                    )}px`,
+                  }}
+                />
+                <div
+                  className="bar expense-bar"
+                  style={{
+                    height: `${Math.round(
+                      (expenses / Math.max(1, income + expenses)) * 200
+                    )}px`,
+                  }}
+                />
               </div>
             </div>
           </div>
