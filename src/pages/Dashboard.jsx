@@ -168,6 +168,7 @@ export default function Dashboard() {
     cards,
   } = data;
 
+
   // const cardsList = (cards?.list && cards.list.length) ? cards.list : DUMMY_CARDS;
 
   const income = earnings_overview?.income ?? 0;
@@ -283,39 +284,52 @@ export default function Dashboard() {
 
         {/* Fund pills (Time Deposits, Savings, Life Goals, Pension Funds) */}
         <section className="fund-pills">
-          <button className="pill" onClick={() => handleNavigate("deposits")}>
-            <div className="pill-title">Time Deposits</div>
-            <div className="pill-amount">
-              Rp{fmt(time_deposits?.total_balance ?? 0)}
+          <button className="pill" onClick={() => handleNavigate("deposits")} style={{backgroundColor: "#FFE8B0"}}>
+            <div className="pill-text">
+              <div className="pill-title">Time Deposits</div>
+              <div className="pill-amount">
+                Rp{fmt(time_deposits?.total_balance ?? 0)}
+              </div>
             </div>
+            <img className="pill-img"src="" alt="" />
           </button>
 
-          <button className="pill" onClick={() => handleNavigate("savings")}>
-            <div className="pill-title">Savings</div>
-            <div className="pill-amount">
-              Rp{fmt(savings?.[0]?.total_balance ?? 0)}
+          <button className="pill" onClick={() => handleNavigate("savings")} style={{backgroundColor: "#FFE8B0"}}>
+            <div className="pill-text">
+              <div className="pill-title">Savings</div>
+              <div className="pill-amount">
+                Rp{fmt(savings?.[0]?.total_balance ?? 0)}
+              </div>
             </div>
+            <img className="pill-img"src="" alt="" />
+
           </button>
 
-          <button className="pill" onClick={() => handleNavigate("lifegoals")}>
-            <div className="pill-title">Life Goals</div>
-            <div className="pill-amount">
-              Rp
-              {fmt(
-                life_goals?.reduce((s, g) => s + (g.current_savings || 0), 0) ??
-                0
-              )}
+          <button className="pill" onClick={() => handleNavigate("lifegoals")} style={{backgroundColor: "#FFE8B0"}}>
+            <div className="pill-text">
+              <div className="pill-title">Life Goals</div>
+              <div className="pill-amount">
+                Rp
+                {fmt(
+                  life_goals?.reduce((s, g) => s + (g.current_savings || 0), 0) ??
+                  0
+                )}
+              </div>
             </div>
+            <img className="pill-img"src="" alt="" />
           </button>
 
-          <button className="pill" onClick={() => handleNavigate("dplk")}>
-            <div className="pill-title">Pension Funds</div>
-            <div className="pill-amount">
-              Rp
-              {fmt(
-                pension_funds?.reduce((s, p) => s + (p.balance || 0), 0) ?? 0
-              )}
-            </div>
+          <button className="pill" onClick={() => handleNavigate("dplk")} style={{backgroundColor: "#FFE8B0"}}>
+            <div className="pill-text">
+              <div className="pill-title">Pension Funds</div>
+              <div className="pill-amount">
+                Rp
+                {fmt(
+                  pension_funds?.reduce((s, p) => s + (p.balance || 0), 0) ?? 0
+                )}
+              </div>
+            </div>  
+            <img className="pill-img"src="" alt="" />
           </button>
         </section>
 

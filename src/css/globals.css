@@ -268,9 +268,11 @@ body {
 /* Fund pills */
 .fund-pills {
   display: flex;
+  justify-content: center;
   gap: 14px;
   margin: 18px 0;
   flex-wrap: wrap;
+  min-width: 50vw;
 }
 
 .pill {
@@ -281,8 +283,30 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-direction: row;
   min-width: 180px;
+  gap: 2rem;
   background: rgba(255, 255, 255, 0.95);
+}
+
+.pill-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  text-align: left;
+  width: 170px;
+  /* margin-right: 10px; */
+}
+
+.pill-img {
+  width: 2.875rem;         /* 46px ≈ 2.875rem when 1rem = 16px */
+  height: 2.875rem;
+  display: inline-block;
+  object-fit: cover;
+  display: flex;
+  justify-content: flex-end;
+  border-radius: 50%;/* 5px ≈ 0.3125rem */
+  margin-left: 20px;
 }
 
 .pill .pill-title {
@@ -293,7 +317,7 @@ body {
 .pill .pill-amount {
   color: #0b3b36;
   font-weight: 700;
-  margin-left: 8px;
+  /* margin-left: 8px; */
 }
 
 .pill--td {
