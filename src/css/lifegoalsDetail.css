@@ -170,16 +170,35 @@ body {
 /* === HISTORY SECTION === */
 .history-panel {
   position: sticky;
-  top: 330px;
+  top: 200px;
   background: var(--bg);
   z-index: 12;
-  padding-top: 8px;
+  padding-top: 8px;      
+  margin-top: 8px;      
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;   
 }
 
 .panel-title {
   font-size: 16px;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin: 0;
+}
+
+.download-icon {
+  color: var(--text-main);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.download-icon:hover {
+  opacity: 0.6;
 }
 
 /* === MONTHS BAR === */
@@ -223,7 +242,7 @@ body {
   box-shadow: var(--shadow);
   padding: 18px 20px;
   margin-top: 12px;
-  height: calc(100vh - 480px); /* batas viewport agar pas di bawah bulan */
+  height: calc(100vh - 450px);
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
@@ -231,7 +250,6 @@ body {
   -webkit-mask-image: linear-gradient(to bottom, black 92%, transparent 100%);
 }
 
-/* Hilangkan scrollbar visual tapi tetap scrollable */
 .tx-list::-webkit-scrollbar {
   width: 0;
   background: transparent;

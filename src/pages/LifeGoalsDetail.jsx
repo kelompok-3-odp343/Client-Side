@@ -87,7 +87,25 @@ export default function LifeGoalDetail() {
             </section>
 
             <section className="history-panel">
-              <h3 className="panel-title">History</h3>
+              <div className="panel-header">
+                <h3 className="panel-title">Transaction History</h3>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="download-icon"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </div>
 
               <div className="months-row">
                 {months.map((m) => (
@@ -109,14 +127,18 @@ export default function LifeGoalDetail() {
                       <div key={i} className="tx-row">
                         <div className="tx-left">
                           <div className="tx-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.2"/></svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.2" />
+                            </svg>
                           </div>
                           <div className="tx-text">
                             <div className="tx-type">{tx.type}</div>
                             <div className="tx-sub">{tx.desc}</div>
                           </div>
                         </div>
-                        <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>{tx.amount}</div>
+                        <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
+                          {tx.amount}
+                        </div>
                       </div>
                     ))}
                   </div>
