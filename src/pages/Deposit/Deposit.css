@@ -214,10 +214,16 @@
   justify-content: space-between;
   margin: 4px 0;
   color: #333;
+  text-align: left;
 }
 
 .deposit-info span:first-child {
   color: #777;
+}
+
+.deposit-info p span:last-child {
+  text-align: right;
+  justify-self: end;
 }
 
 /* ======== RIGHT SIDE ======== */
@@ -231,6 +237,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.transaction-header .lg-title {
+  font-size: 20px;
 }
 
 .download-icon {
@@ -260,14 +270,14 @@
 }
 
 .month-btn:hover {
-  background: #ffe9b0;
+  background: #bca159;
 }
 
 .month-btn.active {
-  background: #00a884;
-  color: #fff;
+  background: #ffe9b0 !important;
+  color: #000 !important;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0, 168, 132, 0.25);
+  box-shadow: 0 2px 6px #bca159;
 }
 
 /* ======== TRANSACTION LIST ======== */
