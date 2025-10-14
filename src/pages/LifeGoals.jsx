@@ -69,7 +69,7 @@ export default function LifeGoals() {
       id: "vehicles",
       title: "Vehicles",
       desc: "Fuel your future ride",
-      color: "#ffd28a",
+      color: "#ffd367",
       current: 50000000,
       target: 100000000,
       progress: 50,
