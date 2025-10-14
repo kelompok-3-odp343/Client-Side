@@ -114,6 +114,9 @@
   align-items: center;
   /* justify-content: space-between; */
 }
+.detail-mycard .balance-container h3 {
+  margin: 0;
+}
 
 .detail-mycard .badge {
   background: #f3f3f3;

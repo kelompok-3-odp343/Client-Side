@@ -116,7 +116,7 @@
 
 .participant-row {
   display: grid;
-  grid-template-columns: 40px 1fr 1fr 30px;
+  grid-template-columns: 40px 1fr 1fr 50px;
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid #b3b3b3;
@@ -134,7 +134,12 @@
   outline: none;
 }
 
-.participant-row .add-btn {
+.splitbill-modal .btn-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.splitbill-modal .add-btn {
   padding: 0;
   background: none;
   border: none;
@@ -145,12 +150,30 @@
   justify-content: center;
   box-shadow: none;
 }
-
-.splitbill-modal .add-participant-btn:hover {
-  color: #000000;
+.splitbill-modal .rmv-btn {
+  padding: 0;
+  margin-left: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #00bfa6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
 }
 
-.participant-row .add-btn:hover {
+.splitbill-modal .add-btn:hover {
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+}
+.splitbill-modal .rmv-btn:hover {
   padding: 0;
   background: none;
   border: none;
@@ -161,11 +184,22 @@
   box-shadow: none;
 }
 
+.splitbill-modal .add-participant-btn:hover {
+  color: #000000;
+}
+
+.bi-dash-circle {
+  color: black;
+}
+.bi-dash-circle:hover {
+  color: #c00f0c;
+}
+
 .bi-plus-circle {
   color: black;
 }
 .bi-plus-circle:hover {
-  color: #c00f0c;
+  color: #6dddd0;
 }
 
 .add-participant-btn-container {

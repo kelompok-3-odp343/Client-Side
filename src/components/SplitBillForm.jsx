@@ -6,10 +6,21 @@ export default function SplitBillForm({ onClose, transaction }) {
   const [participants, setParticipants] = useState([
     { name: "Evan Edrin", amount: "Rp 15.000" },
   ]);
+  // const [isParticipantEmpty, setParticipantEmpty] = useState(true);
 
   const handleAddParticipant = () => {
     setParticipants([...participants, { name: "", amount: "" }]);
   };
+
+  // const handleSetParticipant = () => {
+  //   if (isParticipantEmpty == true) {
+  //     isParticipantEmpty == false;
+  //     setParticipantEmpty(isParticipantEmpty);
+  //   } else {
+  //     isParticipantEmpty == true;
+  //     setParticipantEmpty(isParticipantEmpty);
+  //   }
+  // };
 
   const handleChange = (index, field, value) => {
     const updated = [...participants];
@@ -75,14 +86,24 @@ export default function SplitBillForm({ onClose, transaction }) {
                   onChange={(e) => handleChange(i, "amount", e.target.value)}
                 />
                 {i === participants.length - 1 && (
-                  <button
-                    type="button"
-                    className="add-btn"
-                    onClick={handleAddParticipant}
-                  >
-                    {/* <Plus size={18} /> */}
-                    <i class="bi bi-plus-circle"></i>
-                  </button>
+                  <div className="btn-container">
+                    <button
+                      type="button"
+                      className="rmv-btn"
+                      onClick={handleAddParticipant}
+                    >
+                      {/* <Plus size={18} /> */}
+                      <i class="bi bi-dash-circle"></i>
+                    </button>
+                    <button
+                      type="button"
+                      className="add-btn"
+                      onClick={handleAddParticipant}
+                    >
+                      {/* <Plus size={18} /> */}
+                      <i class="bi bi-plus-circle"></i>
+                    </button>
+                  </div>
                 )}
               </div>
             ))}
