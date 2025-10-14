@@ -22,7 +22,7 @@ export default function LifeGoalDetail() {
     marriage: { title: "Marriage", desc: "Funding your new chapter", color: "#b18cff", icon: marriageIcon },
     home: { title: "Home", desc: "Saving for Memories Unmade", color: "#9c7edc", icon: homeIcon },
     gadget: { title: "Gadget", desc: "Smart saving for smart tech", color: "#6fd6c1", icon: gadgetIcon },
-    vehicles: { title: "Vehicles", desc: "Fuel your future ride", color: "#ffd28a", icon: vehicleIcon },
+    vehicles: { title: "Vehicles", desc: "Fuel your future ride", color: "#ffd367", icon: vehicleIcon },
   };
 
   const goal = location.state?.goal || goals[id] || goals.education;
