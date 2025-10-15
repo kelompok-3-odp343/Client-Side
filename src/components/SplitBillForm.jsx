@@ -4,13 +4,29 @@ import { Plus } from "lucide-react";
 
 export default function SplitBillForm({ onClose, transaction }) {
   const [participants, setParticipants] = useState([
-    { name: "Evan Edrin", amount: "Rp 15.000" },
+    {
+      id: Date.now(),
+      participantName: "Evan Edrin",
+      participantAmount: "Rp 15.000",
+    },
   ]);
+  const [participantName, setParticipantName] = useState();
+  const [participantAmount, setParticipantAmount] = useState();
   // const [isParticipantEmpty, setParticipantEmpty] = useState(true);
 
-  const handleAddParticipant = () => {
-    setParticipants([...participants, { name: "", amount: "" }]);
+  function handleAddParticipant(participant) {
+    setParticipants((participants) => [...participants, participant]);
+  }
+
+  const handleDeleteParticipant = (id) => {
+    setParticipants((participants) =>
+      participants.filter((participants) => participants.id !== id)
+    );
   };
+
+  // function handleDeleteItem(id) {
+  //   setItems((items) => items.filter((item) => item.id !== id));
+  // }
 
   // const handleSetParticipant = () => {
   //   if (isParticipantEmpty == true) {
@@ -22,17 +38,28 @@ export default function SplitBillForm({ onClose, transaction }) {
   //   }
   // };
 
-  const handleChange = (index, field, value) => {
-    const updated = [...participants];
-    updated[index][field] = value;
-    setParticipants(updated);
-  };
+  // const handleChange = (index, field, value) => {
+  //   const updated = [...participants];
+  //   updated[index][field] = value;
+  //   setParticipants(updated);
+  // };
 
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
-    alert("Split bill saved!");
-    onClose();
-  };
+
+    const newParticipant = {
+      id: Date.now(),
+      participantName,
+      participantAmount,
+    };
+
+    handleAddParticipant(newParticipant);
+
+    setParticipantAmount(0);
+    setParticipantName("");
+    // alert("Split bill saved!");
+    // onClose();
+  }
 
   return (
     <div className="splitbill-modal">
@@ -76,21 +103,23 @@ export default function SplitBillForm({ onClose, transaction }) {
                 <input
                   type="text"
                   placeholder="Enter name"
-                  value={p.name}
-                  onChange={(e) => handleChange(i, "name", e.target.value)}
+                  value={participantName}
+                  onChange={(e) => setParticipantName(e.target.value)}
+                  // onChange={(e) => handleChange(i, "name", e.target.value)}
                 />
                 <input
                   type="text"
                   placeholder="Rp..."
-                  value={p.amount}
-                  onChange={(e) => handleChange(i, "amount", e.target.value)}
+                  value={participantAmount}
+                  onChange={(e) => setParticipantAmount(Number(e.target.value))}
+                  // onChange={(e) => handleChange(i, "amount", e.target.value)}
                 />
                 {i === participants.length - 1 && (
                   <div className="btn-container">
                     <button
                       type="button"
                       className="rmv-btn"
-                      onClick={handleAddParticipant}
+                      onClick={handleDeleteParticipant}
                     >
                       {/* <Plus size={18} /> */}
                       <i class="bi bi-dash-circle"></i>
