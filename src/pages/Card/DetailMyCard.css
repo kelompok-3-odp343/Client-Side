@@ -1,50 +1,15 @@
-@import "../../styles/variables.css";
-
-/* === PAGE LAYOUT === */
 .detail-mycard {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background: #fff;
-  font-family: var(--font-main);
+  font-family: "Poppins", sans-serif;
+  position: relative;
+  z-index: 1; /* pastikan tidak menutupi modal */
 }
 
-/* === HEADER === */
-.detail-mycard .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 40px;
-  border-bottom: 1px solid #000;
-  background: #fff;
-}
-
-.detail-mycard .logo-text {
-  font-size: 22px;
-  font-weight: 700;
-  color: #000;
-  cursor: pointer;
-  user-select: none;
-  transition: 0.2s ease;
-}
-
-.detail-mycard .logo-text span {
-  color: var(--accent-teal);
-}
-
-.detail-mycard .logo-text:hover {
-  opacity: 0.8;
-  transform: scale(1.02);
-}
-
-.detail-mycard .header-icons {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-/* === MAIN SECTION === */
-.detail-mycard .main {
+/* ==== MAIN LAYOUT ==== */
+.main {
   display: flex;
   flex: 1;
   gap: 30px;
@@ -52,26 +17,40 @@
   background: #fff;
 }
 
-/* === LEFT PANEL === */
-.detail-mycard .left-panel {
+/* ==== LEFT PANEL ==== */
+.left-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 25px;
+  z-index: 1;
+  position: relative;
 }
 
-.detail-mycard .account-details h2 {
+/* ==== RIGHT PANEL ==== */
+.right-panel {
+  flex: 1.6;
+  border-radius: 12px;
+  padding-left: 35px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+  position: relative;
+}
+
+/* ==== ACCOUNT DETAILS ==== */
+.account-details h2 {
   font-size: 16px;
   font-weight: 600;
 }
 
-.detail-mycard .account-details-dropdown {
+.account-details-dropdown {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.detail-mycard .account-details-dropdown select {
+.account-details-dropdown select {
   width: 70%;
   padding: 5px;
   border: 1px solid #e2e8f0;
@@ -82,15 +61,21 @@
   cursor: pointer;
 }
 
-/* ACCOUNT CARD */
-.detail-mycard .account-card {
+/* ==== ACCOUNT CARD ==== */
+.account-card {
   background: linear-gradient(to bottom, #ffa669 0%, #fff 100%);
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   padding: 18px 22px;
-  box-shadow: var(--shadow-medium);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
-.detail-mycard .badge {
+.account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.badge {
   background: #f3f3f3;
   font-size: 11px;
   padding: 4px 8px;
@@ -99,8 +84,25 @@
   font-weight: 500;
 }
 
-/* WARNING BOX */
-.detail-mycard .warning-box {
+/* ==== BALANCE ==== */
+.balance-title {
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.balance-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eye-icon {
+  cursor: pointer;
+  color: #333;
+}
+
+/* ==== WARNING BOX ==== */
+.warning-box {
   background: #ffe8b0;
   padding: 10px;
   font-size: 12px;
@@ -109,17 +111,27 @@
   margin-top: 20px;
 }
 
-/* === EARNINGS SECTION === */
-.detail-mycard .earnings {
+/* ==== EARNINGS ==== */
+.earnings {
   background: #fff;
   border-radius: 12px;
-  box-shadow: var(--shadow-medium);
-  padding: 25px 25px 40px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  padding: 25px;
   margin-top: -10px;
   margin-bottom: 40px;
 }
 
-.detail-mycard .bar-chart {
+.earnings .numbers {
+  display: flex;
+  justify-content: space-between;
+}
+
+.difference {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.bar-chart {
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -127,101 +139,82 @@
   height: 120px;
 }
 
-.detail-mycard .income-bar {
+.income-bar {
   background: #00a884;
   height: 100px;
+  width: 40px;
   border-radius: 10px;
 }
 
-.detail-mycard .expense-bar {
+.expense-bar {
   background: #f2b38a;
   height: 65px;
+  width: 40px;
   border-radius: 10px;
 }
 
-/* === RIGHT PANEL === */
-.detail-mycard .right-panel {
-  flex: 1.6;
-  border-radius: 12px;
-  padding-left: 35px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* TRANSACTION HEADER */
-.detail-mycard .transaction-header {
+/* ==== TRANSACTIONS ==== */
+.transaction-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-/* MONTH BUTTONS */
-.detail-mycard .months {
+.months {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 15px;
-  width: 100%;
 }
 
-.detail-mycard .months button {
+.months button {
   border: none;
-  padding: 4px;
+  padding: 6px 12px;
   border-radius: 8px;
   background: #d9d9d9;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  flex: 1;
-  text-align: center;
-  min-width: 0;
   white-space: nowrap;
 }
 
-.detail-mycard .months button.active {
+.months button.active {
   background: #ffa669;
   color: #000;
   font-weight: 500;
 }
 
-/* TRANSACTION LIST */
-.detail-mycard .transaction-list-modern {
+.transaction-list-modern {
   flex: 1;
   overflow-y: auto;
   padding-right: 5px;
   max-height: calc(100vh - 250px);
 }
 
-.detail-mycard .transaction-group {
-  margin-bottom: 16px;
-}
-
-.detail-mycard .transaction-modern-item {
+.transaction-modern-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid #eee;
 }
 
-.detail-mycard .transaction-text p {
+.transaction-text p {
   margin: 0;
   font-size: 13px;
 }
 
-.detail-mycard .amount.credit {
-  color: var(--accent-green);
+.amount.credit {
+  color: #00a884;
   font-weight: 600;
 }
 
-.detail-mycard .amount.debit {
-  color: var(--accent-red);
+.amount.debit {
+  color: #e74c3c;
   font-weight: 600;
 }
 
-/* SPLIT BILL BUTTON */
-.detail-mycard .split-btn {
+.split-btn {
   background: #fff;
   border: 1px solid #6dddd0;
   color: #6dddd0;
@@ -229,20 +222,33 @@
   padding: 4px 10px;
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.25s ease, color 0.25s ease;
+  z-index: 10;
+  position: relative;
 }
 
-.detail-mycard .split-btn:hover {
+.split-btn:hover {
   background: #6dddd0;
   color: #fff;
 }
 
-/* SCROLLBAR */
-.detail-mycard .transaction-list-modern::-webkit-scrollbar {
+/* ==== SCROLLBAR ==== */
+.transaction-list-modern::-webkit-scrollbar {
   width: 6px;
 }
 
-.detail-mycard .transaction-list-modern::-webkit-scrollbar-thumb {
+.transaction-list-modern::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 10px;
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 1024px) {
+  .main {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .right-panel {
+    padding-left: 0;
+  }
 }

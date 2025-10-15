@@ -1,17 +1,25 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Notification.css";
+import { fetchNotifications } from "../../data/notifications";
 
 export default function NotificationPanel({ visible, anchorRef }) {
   const panelRef = useRef(null);
+  const [notifications, setNotifications] = useState([]);
 
+  // === Ambil data langsung tanpa delay visual ===
+  useEffect(() => {
+    if (visible) {
+      fetchNotifications().then(setNotifications).catch(() => setNotifications([]));
+    }
+  }, [visible]);
+
+  // === Posisi panel dinamis ===
   useEffect(() => {
     if (visible && panelRef.current && anchorRef?.current) {
       const bellRect = anchorRef.current.getBoundingClientRect();
       const panel = panelRef.current;
-
-      const top = bellRect.bottom + 10; // sedikit di bawah lonceng
-      const left = bellRect.right - panel.offsetWidth; // sejajar kanan lonceng
-
+      const top = bellRect.bottom + 10;
+      const left = bellRect.right - panel.offsetWidth;
       panel.style.position = "fixed";
       panel.style.top = `${top}px`;
       panel.style.left = `${left}px`;
@@ -24,20 +32,25 @@ export default function NotificationPanel({ visible, anchorRef }) {
     <div ref={panelRef} className="notif-panel fade-in">
       <h3 className="notif-title">Notifications</h3>
 
-      <div className="notif-card notif-blue">
-        <h4 className="notif-heading">October Special Promo!</h4>
-        <p>Enjoy up to 20% cashback for transactions at selected merchants.</p>
-      </div>
-
-      <div className="notif-card notif-yellow">
-        <h4 className="notif-heading">Weekend Deals</h4>
-        <p>Use your debit card at the mall and enjoy discounts up to IDR 300,000.</p>
-      </div>
-
-      <div className="notif-card notif-orange">
-        <h4 className="notif-heading">Free Interbank Transfers</h4>
-        <p>Enjoy free interbank transfer fees until 20 May 2027.</p>
-      </div>
+      {notifications.length === 0 ? (
+        <p className="notif-empty">No notifications available</p>
+      ) : (
+        notifications.map((notif, i) => (
+          <div key={i} className={`notif-card ${getColorClass(notif.type)}`}>
+            <h4 className="notif-heading">{notif.title}</h4>
+            <p>{notif.message}</p>
+          </div>
+        ))
+      )}
     </div>
   );
+}
+
+function getColorClass(type) {
+  switch (type) {
+    case "info": return "notif-blue";
+    case "promo": return "notif-yellow";
+    case "alert": return "notif-orange";
+    default: return "notif-blue";
+  }
 }

@@ -1,11 +1,20 @@
-import React, { useState } from "react";
-import "./SplitBill.css";
+import React, { useState, useEffect } from "react";
+import "./SplitBillForm.css";
 import { Plus } from "lucide-react";
+import { fetchTransactionDetails, saveSplitBill } from "../../data/splitbill";
 
-export default function SplitBillForm({ onClose, transaction }) {
+export default function SplitBillForm({ onClose, transactionId }) {
+  const [transaction, setTransaction] = useState(null);
   const [participants, setParticipants] = useState([
     { name: "Evan Edrin", amount: "Rp 15.000" },
   ]);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (transactionId) {
+      fetchTransactionDetails(transactionId).then(setTransaction);
+    }
+  }, [transactionId]);
 
   const handleAddParticipant = () => {
     setParticipants([...participants, { name: "", amount: "" }]);
@@ -17,11 +26,23 @@ export default function SplitBillForm({ onClose, transaction }) {
     setParticipants(updated);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Split bill saved!");
-    onClose();
+    if (!transaction) return;
+
+    setIsSaving(true);
+    try {
+      await saveSplitBill({
+        transactionId: transaction.id,
+        participants,
+      });
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (!transaction) return null;
 
   return (
     <div className="splitbill-modal">
@@ -30,35 +51,28 @@ export default function SplitBillForm({ onClose, transaction }) {
         <hr />
         <div className="transaction-info">
           <div className="transaction-info-left-panel">
-            <p>
-              <strong>Transaction ID :</strong> {transaction.id}
-            </p>
+            <p><strong>Transaction ID :</strong> {transaction.id}</p>
           </div>
           <div className="transaction-info-right-panel">
-            <p>
-              <strong>Transaction Date :</strong> {transaction.date}
-            </p>
-          </div>
-        </div>
-        <div className="bill-info-container">
-          <div className="bill-info">
-            <p>
-              <strong>Bill Name :</strong> {transaction.detail}
-            </p>
-            <p>
-              <strong>Total Bill :</strong> {transaction.amount}
-            </p>
+            <p><strong>Transaction Date :</strong> {transaction.date}</p>
           </div>
         </div>
 
-        <div className="participant-secition-container">
-          {" "}
+        <div className="bill-info-container">
+          <div className="bill-info">
+            <p><strong>Bill Name :</strong> {transaction.detail}</p>
+            <p><strong>Total Bill :</strong> {transaction.amount}</p>
+          </div>
+        </div>
+
+        <div className="participant-section-wrapper">
           <div className="participant-section">
             <div className="participant-header">
               <span>No</span>
               <span>Bill Members</span>
               <span>Amount Per Member</span>
             </div>
+
             {participants.map((p, i) => (
               <div key={i} className="participant-row">
                 <span>{i + 1}</span>
@@ -88,9 +102,13 @@ export default function SplitBillForm({ onClose, transaction }) {
           </div>
         </div>
 
-        <div className="add-participant-btn-container">
-          <button className="add-participant-btn" onClick={handleSubmit}>
-            Add Participant
+        <div className="splitbill-btn-container">
+          <button
+            className="splitbill-btn"
+            onClick={handleSubmit}
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving..." : "Save Split Bill"}
           </button>
         </div>
       </div>

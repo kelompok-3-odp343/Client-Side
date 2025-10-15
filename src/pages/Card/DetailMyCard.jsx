@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
-import SplitBillForm from "../../components/SplitBill/SplitBill";
+import SplitBillForm from "../../components/SplitBill/SplitBillForm";
 import "./DetailMyCard.css";
 import { EyeOff, Eye, Filter } from "lucide-react";
 import { fetchCardDetails, fetchCardTransactions } from "../../data/card";
@@ -143,7 +143,13 @@ export default function DetailMyCard() {
                               ? `+Rp${item.trx_amount.toLocaleString()}`
                               : `-Rp${Math.abs(item.trx_amount).toLocaleString()}`}
                           </span>
-                          <button className="split-btn" onClick={() => setShowSplitModal(true)}>
+                          <button
+                            className="split-btn"
+                            onClick={() => {
+                              console.log("Split button clicked");
+                              setShowSplitModal(true);
+                            }}
+                          >
                             Split bill?
                           </button>
                         </div>

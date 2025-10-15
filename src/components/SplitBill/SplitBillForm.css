@@ -1,36 +1,58 @@
-@import "../../styles/variables.css";
-
-/* === MODAL WRAPPER === */
+/* === OVERLAY MODAL === */
 .splitbill-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
+  inset: 0; /* shorthand: top, right, bottom, left = 0 */
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
+  z-index: 999999; /* di atas semua elemen */
+  animation: fadeIn 0.2s ease-out;
 }
 
 /* === CONTAINER === */
 .splitbill-container {
-  background: #fff;
-  border-radius: var(--radius-lg);
-  padding: 24px 28px;
-  width: 943px;
-  height: 664px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px 32px;
+  width: 920px;
+  max-width: 95%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  position: fixed; /* jaga di tengah */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100000;
+  animation: popup 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popup {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 /* === TITLE === */
-.splitbill-modal .title {
+.splitbill-container .title {
   text-align: center;
-  margin-top: 10px;
-  margin-bottom: 25px;
-  font-size: 30px;
+  margin-bottom: 24px;
+  font-size: 26px;
   font-weight: 700;
+  color: #111;
 }
 
 /* === TRANSACTION INFO === */
@@ -38,62 +60,37 @@
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
+  margin-bottom: 18px;
+  color: #000;
 }
 
 .transaction-info-left-panel {
-  margin-left: 75px;
+  margin-left: 60px;
 }
 
 .transaction-info-right-panel {
-  margin-right: 75px;
-}
-
-.transaction-info-left-panel p,
-.transaction-info-right-panel p {
-  color: var(--text-main);
-}
-
-.transaction-type {
-  font-size: 14px;
-  font-weight: 600;
-  color: #222;
-}
-
-/* === TRANSACTION ITEM === */
-.transaction-modern-item {
-  display: flex;
-  justify-content: space-between;
-}
-
-.transaction-amount-modern {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  margin-right: 60px;
 }
 
 /* === BILL INFO === */
-.detail-mycard .bill-info-container {
+.bill-info-container {
   display: flex;
   justify-content: center;
+  margin-bottom: 18px;
 }
 
 .bill-info {
-  width: 741px;
-  height: 121px;
+  width: 720px;
   background: linear-gradient(to bottom, #6dddd0, #ffffff);
   border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 18px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  padding: 12px 18px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .bill-info p {
   margin: 6px 0;
   font-size: 15px;
-  color: var(--text-main);
+  color: #000;
 }
 
 /* === PARTICIPANT SECTION === */
@@ -103,12 +100,12 @@
 }
 
 .participant-section {
-  height: 262px;
-  width: 738px;
+  width: 720px;
   border: 1px solid #9ae0d2;
   border-radius: 8px;
-  padding: 12px 14px;
+  padding: 14px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  background: #fff;
 }
 
 .participant-header {
@@ -140,7 +137,6 @@
   outline: none;
 }
 
-/* === ADD BUTTON === */
 .add-btn {
   background: none;
   border: none;
@@ -151,36 +147,44 @@
   justify-content: center;
 }
 
-/* === ADD PARTICIPANT BUTTON === */
+/* === BUTTON === */
 .add-participant-btn-container {
   display: flex;
   justify-content: flex-end;
+  margin-top: 20px;
 }
 
 .add-participant-btn {
-  justify-content: center;
-  margin-right: 75px;
-  margin-top: 20px;
-  width: 275px;
-  border: 1px solid #6dddd0;
-  background-color: #6dddd0;
-  color: #fff;
+  background: transparent;
+  border: 2px solid #00a884;
+  color: #00a884;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 14px;
-  transition: background 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+  font-size: 15px;
+  padding: 10px 24px;
+  transition: all 0.2s ease;
 }
 
 .add-participant-btn:hover {
-  background-color: #5ac6bd;
+  background-color: #00a884;
+  color: #fff;
 }
 
-/* === DISABLED STATE === */
-.add-participant-btn:disabled {
-  background-color: #cfd1d1;
-  border-color: #cfd1d1;
-  color: #777;
-  cursor: not-allowed;
-  opacity: 0.7;
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .splitbill-container {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .bill-info,
+  .participant-section {
+    width: 100%;
+  }
+
+  .transaction-info-left-panel,
+  .transaction-info-right-panel {
+    margin: 0;
+  }
 }

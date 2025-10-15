@@ -57,3 +57,18 @@
   color: var(--text-sub);
   margin: 0;
 }
+
+.notif-empty {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-sub);
+  margin: 8px 0;
+}
+
+.notif-error {
+  color: #dc2626;
+}
+
+.notif-empty {
+  color: #777;
+}
