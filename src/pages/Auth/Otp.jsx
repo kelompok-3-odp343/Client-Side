@@ -1,13 +1,12 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { verifyOtp, clearBlockedUser } from "../../data/auth";
 import "./Otp.css";
-import { verifyOtpApi, blockUser } from "../../data/auth";
 
 export default function OtpLogin() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [message, setMessage] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
-  const [attempts, setAttempts] = useState(0);
   const navigate = useNavigate();
   const inputsRef = useRef([]);
 
@@ -21,37 +20,39 @@ export default function OtpLogin() {
   };
 
   const handleVerify = async () => {
-    const code = otp.join("");
-    try {
-      const result = await verifyOtpApi(code);
-      if (result.success) {
-        setMessage("✅ OTP Verified!");
-        setTimeout(() => navigate("/dashboard"), 1000);
-      }
-    } catch {
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
-      if (newAttempts >= 3) {
-        const email = localStorage.getItem("userEmail") || "unknown@demo.com";
-        await blockUser(email); // <── simpan status blokir sebelum navigate
-        setMessage("🚫 Too many failed attempts. Redirecting...");
-        setTimeout(() => navigate("/popupblock"), 1000);
-      } else {
-        setMessage(`❌ Invalid OTP. Attempt ${newAttempts}/3.`);
-        setOtp(["", "", "", "", "", ""]);
-        inputsRef.current[0].focus();
-        setTimeout(() => setMessage(""), 2500);
-      }
+    const otp_ref = localStorage.getItem("otp_ref");
+    const otp_code = otp.join("");
+
+    const res = await verifyOtp({ otp_ref, otp_code });
+
+    if (res.status) {
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
+      localStorage.removeItem("otp_ref"); // penting agar tidak tersisa data lama
+      clearBlockedUser();
+
+      setMessage("✅ OTP Verified!");
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true }); // GUNAKAN replace agar tidak balik ke login
+      }, 1000);
+    } else if (res.blocked) {
+      setMessage(res.message);
+      setTimeout(() => navigate("/popupblock", { replace: true }), 1200);
+    } else {
+      setMessage(res.message);
+      setOtp(["", "", "", "", "", ""]);
+      inputsRef.current[0].focus();
+      setTimeout(() => setMessage(""), 2500);
     }
   };
 
   const handleResend = () => {
     if (resendTimer > 0) return;
     setResendTimer(30);
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       setResendTimer((prev) => {
         if (prev <= 1) {
-          clearInterval(interval);
+          clearInterval(timer);
           return 0;
         }
         return prev - 1;
@@ -61,7 +62,7 @@ export default function OtpLogin() {
 
   return (
     <div className="auth-background">
-      <div className="otp-box fade-in">
+      <div className="auth-box fade-in">
         <div className="logo">
           <i className="fas fa-door-open"></i>
           <h1>

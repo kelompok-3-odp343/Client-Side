@@ -1,45 +1,4 @@
-@import "../../styles/variables.css";
-@import "../../styles/common/buttons.css";
-@import "../../styles/common/animations.css";
-@import "../../styles/common/form.css";
-
-/* ===== LAYOUT ===== */
-.otp-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.otp-box {
-  background: #fff;
-  border: 2px solid #b2f0e9;
-  border-radius: 10px;
-  width: 380px;
-  padding: 40px 35px;
-  text-align: center;
-  box-shadow: var(--shadow-soft);
-}
-
-/* ===== LOGO ===== */
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.logo i {
-  font-size: 50px;
-  color: var(--primary);
-}
-
-.logo h1 {
-  font-size: 30px;
-  font-weight: 700;
-  color: #333;
-}
+@import "./AuthShared.css";
 
 /* ===== TEXT ===== */
 .otp-title {
@@ -54,7 +13,7 @@
   margin-bottom: 25px;
 }
 
-/* ===== INPUTS ===== */
+/* ===== OTP INPUT BOXES ===== */
 .otp-inputs {
   display: flex;
   justify-content: center;
@@ -67,8 +26,8 @@
   height: 52px;
   text-align: center;
   font-size: 20px;
-  border: 2px solid var(--border-light);
-  border-radius: var(--radius);
+  border: 2px solid var(--border-light, #dcdcdc);
+  border-radius: 6px;
   color: #444;
   font-weight: 600;
   background: #fff;
@@ -76,31 +35,31 @@
 }
 
 .otp-inputs input:focus {
-  border-color: var(--primary);
+  border-color: var(--primary, #00bfa6);
   transform: scale(1.05);
 }
 
 /* ===== BUTTON ===== */
 .otp-btn {
   width: 100%;
-  background: var(--secondary);
+  background: var(--secondary, #c2f3eb);
   color: #333;
   padding: 12px;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-normal);
-  margin-top: 5px;
+  transition: 0.3s;
+  border: none;
 }
 
 .otp-btn:hover {
-  background: var(--primary);
+  background: var(--primary, #00bfa6);
   color: #fff;
 }
 
-/* ===== LINKS ===== */
+/* ===== MESSAGE & RESEND ===== */
 .otp-message {
-  color: var(--danger);
+  color: #d9534f;
   font-size: 13px;
   margin: 12px 0;
 }
@@ -112,14 +71,14 @@
 }
 
 .otp-resend-link {
-  color: var(--primary);
+  color: var(--primary, #00bfa6);
   text-decoration: underline;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .otp-resend-link:hover {
-  color: var(--primary-dark);
+  color: #0e8d7e;
 }
 
 .otp-resend-link.disabled {
@@ -127,15 +86,16 @@
   pointer-events: none;
 }
 
+/* ===== BACK LINK ===== */
 .otp-back {
   margin-top: 22px;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary, #00bfa6);
   cursor: pointer;
   font-size: 14px;
   transition: color 0.2s;
 }
 
 .otp-back:hover {
-  color: var(--primary-dark);
+  color: #0e8d7e;
 }

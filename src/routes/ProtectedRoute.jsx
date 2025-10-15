@@ -2,12 +2,13 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 
 /**
- * ProtectedRoute: mencegah akses ke halaman tertentu jika user belum login.
+ * ProtectedRoute: block access if user not authenticated
  */
 export default function ProtectedRoute({ children }) {
-  const user = localStorage.getItem("userEmail"); 
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
 
-  if (!user) {
+  if (!token || !user || token === "null" || token === "undefined") {
     return <Navigate to="/" replace />;
   }
 

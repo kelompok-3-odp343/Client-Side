@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser, clearBlockedUser } from "../../data/auth";
 import "./Login.css";
-import { loginApi } from "../../data/auth";
 
 export default function Login() {
   const [userId, setUserId] = useState("");
@@ -10,6 +10,10 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    clearBlockedUser();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,23 +25,23 @@ export default function Login() {
     setLoading(true);
     setMessage("");
 
-    try {
-      const { email } = await loginApi(userId, password);
-      localStorage.setItem("userEmail", email);
+    const res = await loginUser({ user_id: userId, password });
+    setLoading(false);
+
+    if (res.status) {
+      localStorage.setItem("otp_ref", res.otp_ref);
       navigate("/otpLogin");
-    } catch (err) {
-      setMessage("❌ " + err.message);
+    } else {
+      setMessage(res.message);
       setUserId("");
       setPassword("");
       setTimeout(() => setMessage(""), 2500);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <div className="auth-background">
-      <div className="login-box fade-in">
+      <div className="auth-box fade-in">
         <div className="logo">
           <i className="fas fa-door-open"></i>
           <h1>

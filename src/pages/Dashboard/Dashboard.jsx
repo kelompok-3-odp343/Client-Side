@@ -11,31 +11,32 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let userId = localStorage.getItem("userId") || "dummyUser123";
-    localStorage.setItem("userId", userId);
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const userId = user?.id || "USR001";
 
-    const getData = async () => {
+    const loadData = async () => {
       try {
-        const result = await fetchDashboardData(userId);
-        setData(result);
+        const res = await fetchDashboardData(userId);
+        if (res?.status === false) throw new Error(res.message);
+        setData(res.data || res);
       } catch (err) {
-        console.error("Error fetching dashboard data:", err);
+        console.error("Dashboard error:", err);
         setData(null);
       } finally {
         setLoading(false);
       }
     };
 
-    getData();
+    loadData();
   }, []);
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
-  if (!data) return <div className="empty">No data found</div>;
+  if (!data) return <div className="empty">No data available</div>;
 
   const {
     assets_total,
     earnings_overview,
-    split,
+    split_bill,
     time_deposits,
     savings,
     pension_funds,
@@ -43,32 +44,36 @@ export default function Dashboard() {
     cards,
   } = data;
 
-  const income = earnings_overview?.income ?? 0;
-  const expenses = earnings_overview?.expenses ?? 0;
-  const assets = assets_total?.total ?? 0;
-  const splitProgress = split?.progress ?? 0;
+  const fmt = (v) => {
+    try {
+      return Number(v).toLocaleString("id-ID");
+    } catch {
+      return v;
+    }
+  };
 
-  const fmt = (v) => Number(v).toLocaleString("id-ID");
+  const scroll = (offset) => {
+    sliderRef.current?.scrollBy({ left: offset, behavior: "smooth" });
+  };
 
-  const scrollLeft = () => sliderRef.current?.scrollBy({ left: -260, behavior: "smooth" });
-  const scrollRight = () => sliderRef.current?.scrollBy({ left: 260, behavior: "smooth" });
   const handleNavigate = (section) => navigate(`/${section}`);
 
   return (
     <div className="dashboard-page">
       <Navbar />
-
       <main className="dashboard-main">
         <h2 className="page-title">Dashboard</h2>
 
-        {/* Top grid */}
+        {/* --- TOP SECTION --- */}
         <section className="top-grid">
           <div className="card card-gradient assets-card">
-            <div className="card-head"><h3>Assets Total</h3></div>
+            <div className="card-head">
+              <h3>Total Assets</h3>
+            </div>
             <div className="card-body">
-              <h1>Rp{fmt(assets)}</h1>
+              <h1>Rp{fmt(assets_total?.total ?? 0)}</h1>
               <p className="muted">
-                You made extra Rp{fmt(assets_total?.extra_this_month ?? 0)} this month
+                Extra this month: Rp{fmt(assets_total?.extra_this_month ?? 0)}
               </p>
             </div>
           </div>
@@ -77,15 +82,21 @@ export default function Dashboard() {
             <h3>Income & Expenses</h3>
             <div className="small-cards">
               <div className="small-card small-card--income">
-                <div className="small-title">+ Rp{fmt(income)}</div>
+                <div className="small-title">
+                  + Rp{fmt(earnings_overview?.income ?? 0)}
+                </div>
                 <div className="small-sub">Total income this month</div>
               </div>
               <div className="small-card small-card--expense">
-                <div className="small-title">- Rp{fmt(expenses)}</div>
+                <div className="small-title">
+                  - Rp{fmt(earnings_overview?.expenses ?? 0)}
+                </div>
                 <div className="small-sub">Total expenses this month</div>
               </div>
               <div className="small-card small-card--receivable">
-                <div className="small-title">+ Rp{fmt(income)}</div>
+                <div className="small-title">
+                  + Rp{fmt(earnings_overview?.receivable ?? 0)}
+                </div>
                 <div className="small-sub">Total receivable this month</div>
               </div>
             </div>
@@ -97,29 +108,40 @@ export default function Dashboard() {
               <div
                 className="donut"
                 style={{
-                  background: `conic-gradient(#36D1B3 ${splitProgress * 3.6}deg, #e6f0ef 0deg)`,
+                  background: `conic-gradient(#36D1B3 ${
+                    (split_bill?.summary?.total_paid /
+                      (split_bill?.summary?.total_split_bill || 1)) *
+                    360
+                  }deg, #e6f0ef 0deg)`,
                 }}
               >
-                <div className="donut-center">{splitProgress}%</div>
+                <div className="donut-center">
+                  {Math.round(
+                    ((split_bill?.summary?.total_paid || 0) /
+                      (split_bill?.summary?.total_split_bill || 1)) *
+                      100
+                  )}
+                  %
+                </div>
               </div>
-
               <div className="split-info">
                 <div className="info-panel">
-                  <div className="panel-top">
-                    <div className="panel-ttl">
-                      You have {split?.ongoing ?? 0} ongoing split bills
-                    </div>
-                    <div className="panel-sub">
-                      The remaining bill that can be collected is IDR Rp{fmt(split?.remaining ?? 0)}
-                    </div>
+                  <div className="panel-ttl">
+                    {split_bill?.summary?.total_split_bill ?? 0} total bills
                   </div>
-                  <div className="panel-bottom">
-                    <div className="potential">Your potential asset accumulation:</div>
-                    <div className="potential-value">Rp{fmt(split?.potential ?? 0)}</div>
-                    <a href="#" className="view-detail">View Detail</a>
+                  <div className="panel-sub">
+                    Remaining bill: Rp
+                    {fmt(split_bill?.summary?.remaining_bill ?? 0)}
+                  </div>
+                  <div className="panel-sub">
+                    Potential accumulation: Rp
+                    {fmt(split_bill?.summary?.potential_accumulation ?? 0)}
                   </div>
                 </div>
-                <button className="btn-add" onClick={() => handleNavigate("splitbill")}>
+                <button
+                  className="btn-add"
+                  onClick={() => handleNavigate("splitbill")}
+                >
                   + Add a New Bill
                 </button>
               </div>
@@ -127,63 +149,94 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Fund pills */}
+        {/* --- FUNDS SECTION --- */}
         <section className="fund-pills">
-          <button className="pill" onClick={() => handleNavigate("deposits")} style={{ backgroundColor: "#FFE8B0" }}>
+          <button
+            className="pill"
+            onClick={() => handleNavigate("deposits")}
+            style={{ backgroundColor: "#FFE8B0" }}
+          >
             <div className="pill-text">
               <div className="pill-title">Time Deposits</div>
-              <div className="pill-amount">Rp{fmt(time_deposits?.total_balance ?? 0)}</div>
-            </div>
-          </button>
-
-          <button className="pill" onClick={() => handleNavigate("savings")} style={{ backgroundColor: "#FFE8B0" }}>
-            <div className="pill-text">
-              <div className="pill-title">Savings</div>
-              <div className="pill-amount">Rp{fmt(savings?.[0]?.total_balance ?? 0)}</div>
-            </div>
-          </button>
-
-          <button className="pill" onClick={() => handleNavigate("lifegoals")} style={{ backgroundColor: "#FFE8B0" }}>
-            <div className="pill-text">
-              <div className="pill-title">Life Goals</div>
               <div className="pill-amount">
-                Rp{fmt(life_goals?.reduce((s, g) => s + (g.current_savings || 0), 0) ?? 0)}
+                Rp{fmt(time_deposits?.total_balance ?? 0)}
               </div>
             </div>
           </button>
 
-          <button className="pill" onClick={() => handleNavigate("pension")} style={{ backgroundColor: "#FFE8B0" }}>
+          <button
+            className="pill"
+            onClick={() => handleNavigate("savings")}
+            style={{ backgroundColor: "#FFE8B0" }}
+          >
+            <div className="pill-text">
+              <div className="pill-title">Savings</div>
+              <div className="pill-amount">
+                Rp{fmt(savings?.[0]?.total_balance ?? 0)}
+              </div>
+            </div>
+          </button>
+
+          <button
+            className="pill"
+            onClick={() => handleNavigate("lifegoals")}
+            style={{ backgroundColor: "#FFE8B0" }}
+          >
+            <div className="pill-text">
+              <div className="pill-title">Life Goals</div>
+              <div className="pill-amount">
+                Rp{fmt(life_goals?.[0]?.total_balance ?? 0)}
+              </div>
+            </div>
+          </button>
+
+          <button
+            className="pill"
+            onClick={() => handleNavigate("pension")}
+            style={{ backgroundColor: "#FFE8B0" }}
+          >
             <div className="pill-text">
               <div className="pill-title">Pension Funds</div>
               <div className="pill-amount">
-                Rp{fmt(pension_funds?.reduce((s, p) => s + (p.balance || 0), 0) ?? 0)}
+                Rp{fmt(pension_funds?.[0]?.total_balance ?? 0)}
               </div>
             </div>
           </button>
         </section>
 
-        {/* Cards + Earnings */}
+        {/* --- CARDS & EARNINGS --- */}
         <section className="bottom-grid">
           <div className="card cards-panel">
             <div className="cards-header">
               <h3>My Cards</h3>
-              <div className="cards-sub">Tap a card to see history and manage split bill</div>
+              <div className="cards-sub">
+                Tap a card to see history and manage split bill
+              </div>
             </div>
 
             <div className="slider-wrapper">
-              <button className="slider-btn left" onClick={scrollLeft}>&lt;</button>
+              <button className="slider-btn left" onClick={() => scroll(-260)}>
+                &lt;
+              </button>
               <div className="card-slider" ref={sliderRef}>
                 {(cards?.list || []).length > 0 ? (
                   cards.list.map((card, idx) => (
-                    <Link key={card.account_id ?? idx} to="/detailmycard" className="bank-card">
+                    <Link
+                      key={card.account_id ?? idx}
+                      to="/detailmycard"
+                      className="bank-card"
+                    >
                       <div className="card-top">
                         {card.type ?? "ACCOUNT"} - {card.account_number ?? ""}
                       </div>
                       <div className="card-body">
                         <p className="masked">
-                          **** **** **** {String(card.account_number ?? "").slice(-4)}
+                          **** **** ****{" "}
+                          {String(card.account_number ?? "").slice(-4)}
                         </p>
-                        <h4>Rp{fmt(card.effective_balance ?? card.balance ?? 0)}</h4>
+                        <h4>
+                          Rp{fmt(card.effective_balance ?? card.balance ?? 0)}
+                        </h4>
                       </div>
                     </Link>
                   ))
@@ -191,7 +244,9 @@ export default function Dashboard() {
                   <div className="bank-card empty-card">No active cards</div>
                 )}
               </div>
-              <button className="slider-btn right" onClick={scrollRight}>&gt;</button>
+              <button className="slider-btn right" onClick={() => scroll(260)}>
+                &gt;
+              </button>
             </div>
           </div>
 
@@ -200,11 +255,15 @@ export default function Dashboard() {
             <div className="earnings-charts">
               <div className="earn-summary">
                 <div className="earn-cell">
-                  <div className="earn-value">Rp{fmt(income)}</div>
+                  <div className="earn-value">
+                    Rp{fmt(earnings_overview?.income ?? 0)}
+                  </div>
                   <div className="earn-label">Income</div>
                 </div>
                 <div className="earn-cell">
-                  <div className="earn-value">Rp{fmt(expenses)}</div>
+                  <div className="earn-value">
+                    Rp{fmt(earnings_overview?.expenses ?? 0)}
+                  </div>
                   <div className="earn-label">Expenses</div>
                 </div>
               </div>
@@ -212,11 +271,31 @@ export default function Dashboard() {
               <div className="bar-chart">
                 <div
                   className="bar income-bar"
-                  style={{ height: `${Math.round((income / Math.max(1, income + expenses)) * 200)}px` }}
+                  style={{
+                    height: `${Math.round(
+                      ((earnings_overview?.income ?? 0) /
+                        Math.max(
+                          1,
+                          (earnings_overview?.income ?? 0) +
+                            (earnings_overview?.expenses ?? 0)
+                        )) *
+                        200
+                    )}px`,
+                  }}
                 />
                 <div
                   className="bar expense-bar"
-                  style={{ height: `${Math.round((expenses / Math.max(1, income + expenses)) * 200)}px` }}
+                  style={{
+                    height: `${Math.round(
+                      ((earnings_overview?.expenses ?? 0) /
+                        Math.max(
+                          1,
+                          (earnings_overview?.income ?? 0) +
+                            (earnings_overview?.expenses ?? 0)
+                        )) *
+                        200
+                    )}px`,
+                  }}
                 />
               </div>
             </div>
