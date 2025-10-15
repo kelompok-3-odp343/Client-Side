@@ -8,7 +8,8 @@
 .deposit-container {
   display: flex;
   gap: 40px;
-  padding: 100px 80px 60px; /* offset dari navbar */
+  padding: 100px 80px 60px;
+  /* offset dari navbar */
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -44,7 +45,8 @@
   overflow: hidden;
   border: 1px solid #e5e5e5;
   width: 100%;
-  max-width: 460px; /* sejajar dengan kartu di bawah */
+  max-width: 460px;
+  /* sejajar dengan kartu di bawah */
   transition: all 0.2s ease;
   margin-top: -26px;
 }
@@ -125,7 +127,8 @@
   gap: 16px;
   flex-wrap: wrap;
   width: 100%;
-  max-width: 460px; /* sejajar dengan card di atas */
+  max-width: 460px;
+  /* sejajar dengan card di atas */
   margin-top: -15px;
 }
 
@@ -272,10 +275,10 @@
 }
 
 .month-btn.active {
-  background: #ffe9b0 ;
-  color: #000 ;
+  background: #ffe9b0;
+  color: #000;
   font-weight: 600;
-  box-shadow: 0 2px 6px #bca159 ;
+  box-shadow: 0 2px 6px #bca159;
 }
 
 /* ======== TRANSACTION LIST ======== */
