@@ -87,7 +87,9 @@ export default function DetailMyCard() {
                   </p>
                   <p className="acc-name">OKTAVIA QUBROI’A AYUNI</p>
                 </div>
-                <span className="badge">Main Account</span>
+                <div className="account-card-badge">
+                  <span>Main Account</span>
+                </div>
               </div>
 
               <p className="balance-title">Effective Balance</p>
