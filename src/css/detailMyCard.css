@@ -54,6 +54,46 @@
   gap: 25px;
 }
 
+.detail-mycard .account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.detail-mycard .acc-number {
+  color: #000000;
+  font-size: 13px;
+  font-weight: 500;
+}
+.detail-mycard .acc-name {
+  margin: 0;
+  margin-bottom: 40px;
+  color: #000;
+}
+
+.detail-mycard .balance-title {
+  font-size: 12px;
+  color: #777;
+  margin-top: 14px;
+}
+
+.detail-mycard .balance-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-mycard .balance-container h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.detail-mycard .eye-icon {
+  cursor: pointer;
+  color: #333;
+}
+
 .detail-mycard .account-details h2 {
   font-size: 16px;
   font-weight: 600;
@@ -75,17 +115,18 @@
 }
 
 .detail-mycard .account-card {
-  background: linear-gradient(to bottom, #ffa669 0%, #fff 100%);
+  background: linear-gradient(to bottom, #ffa669 0%, #ffffff 100%);
   border-radius: 12px;
   padding: 18px 22px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  color: white;
 }
 
-.detail-mycard .badge {
-  background: #f3f3f3;
+.detail-mycard .account-card-badge {
+  background: #ffeadb;
   font-size: 11px;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 8px;
+  border-radius: 8px;
   color: #333;
   font-weight: 500;
 }
@@ -109,22 +150,80 @@
   margin-top: -10px;
   margin-bottom: 40px;
 }
+
+.detail-mycard .numbers {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.detail-mycard.numbers div {
+  text-align: center;
+  flex: 1;
+}
+.detail-mycard .numbers h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+.detail-mycard .numbers p {
+  font-size: 0.9rem;
+  color: #000000;
+}
+
+.detail-mycard .difference {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #333;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
 .detail-mycard .bar-chart {
   display: flex;
   justify-content: center;
   align-items: flex-end;
   gap: 60px;
   height: 120px;
+  margin-top: 10px;
+  padding-bottom: 5px;
 }
+
+.detail-mycard .bar {
+  width: 45px;
+  border-radius: 10px;
+  transition: height 0.3s ease, background 0.3s ease;
+}
+
 .detail-mycard .income-bar {
-  background: #00a884;
+  background: #6dddd0;
   height: 100px;
-  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 168, 132, 0.3);
 }
+
 .detail-mycard .expense-bar {
-  background: #f2b38a;
+  background: #ffbc8e;
   height: 65px;
-  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(242, 179, 138, 0.3);
+}
+
+.detail-mycard:hover .income-bar {
+  height: 105px;
+}
+
+.detail-mycard:hover .expense-bar {
+  height: 70px;
+}
+.detail-mycard {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  padding: 25px 25px 40px 25px;
+  margin-top: -10px; /* naikin posisi card */
+  margin-bottom: 40px; /* jarak bawah secukupnya */
 }
 
 /* RIGHT PANEL */
