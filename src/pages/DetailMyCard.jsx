@@ -93,14 +93,12 @@ export default function DetailMyCard() {
               <p className="balance-title">Effective Balance</p>
               <div className="balance-container">
                 <h3>{showBalance ? "Rp 25.000.000" : "•••••••••"}</h3>
-                <div className="eye-icon-container">
-                  <span
-                    className="eye-icon"
-                    onClick={() => setShowBalance(!showBalance)}
-                  >
-                    {showBalance ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </span>
-                </div>
+                <span
+                  className="eye-icon"
+                  onClick={() => setShowBalance(!showBalance)}
+                >
+                  {showBalance ? <EyeOff size={20} /> : <Eye size={20} />}
+                </span>
               </div>
             </div>
 

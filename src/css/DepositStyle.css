@@ -1,200 +1,342 @@
-.dashboard {
-    background-color: #fff;
-    min-height: 100vh;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 32px;
-    border-bottom: 1px solid #ccc;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 15px;
-  }
-  
-  .logo img {
-    width: 32px;
-  }
-  
-  .logo h1 {
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0;
-  }
-  
-  .logo span {
-    color: #0aa89f;
-  }
-  .header-icons {
-    display: flex;
-    gap: 18px;
-    color: #333;
-  }
-  
-  .main {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    padding: 40px 48px;
-  }
-  
-  .left h2,
-  .right h2 {
-    font-weight: 700;
-    font-size: 18px;
-  }
-  
-  .subtitle {
-    font-size: 14px;
-    color: #777;
-    margin-bottom: 16px;
-  }
-  
-  /* balance card */
-  .balance-card {
-    display: flex;
-    background: #fff8e0;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 32px;
-    align-items: center;
-    box-shadow: 0 0 4px rgba(0,0,0,0.05);
-  }
-  
-  .balance-icon img {
-    width: 72px;
-    height: 72px;
-  }
-  
-  .balance-info {
-    margin-left: 16px;
-  }
-  
-  .balance-amount {
-    font-size: 26px;
-    font-weight: 700;
-  }
-  
-  .your-deposit-title {
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-  
-  /* ===== NEW DESIGN FOR DEPOSIT CARD ===== */
+.deposit-page {
+  background: #fff;
+  font-family: "Poppins", sans-serif;
+  min-height: 100vh;
+}
 
-.deposit-card-new {
-    width: 260px;
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 14px;
-    padding: 20px 24px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-    text-align: center;
-    transition: all 0.2s ease;
-  }
-  
-  .deposit-card-new:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-  
-  .deposit-title {
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin-bottom: 4px;
-    color: #000;
-  }
-  
-  .deposit-balance-label {
-    color: #555;
-    font-size: 0.85rem;
-  }
-  
-  .deposit-balance-amount {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 14px;
-  }
-  
-  /* Circle Date Style */
-  .circle-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-  
-  .circle-ring {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: conic-gradient(
-      #f4e3b0 0deg,
-      #f4e3b0 220deg,
-      #bca159 220deg,
-      #bca159 360deg
-    );
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .circle-inner-text {
-    position: absolute;
-    background: #fff;
-    border-radius: 50%;
-    width: 78px;
-    height: 78px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-weight: 600;
-    color: #3b3b3b;
-  }
-  
-  .circle-inner-text .day {
-    font-size: 1rem;
-  }
-  
-  .circle-inner-text .month {
-    font-size: 0.85rem;
-    color: #856f2c;
-  }
-  
-  .circle-inner-text .year {
-    font-size: 0.8rem;
-    color: #bba76d;
-  }
-  
-  /* Divider */
-  .deposit-divider {
-    border: none;
-    border-top: 1px solid #ddd;
-    margin: 10px 0 14px;
-  }
-  
-  /* Info Section */
-  .deposit-info {
-    font-size: 0.85rem;
-    color: #333;
-  }
-  
-  .deposit-info p {
-    display: flex;
-    justify-content: space-between;
-    margin: 4px 0;
-  }
-  
-  .deposit-info span:first-child {
-    color: #555;
-  }
-  
-  
+/* ======== LAYOUT UTAMA ======== */
+.deposit-container {
+  display: flex;
+  gap: 40px;
+  padding: 100px 80px 60px; /* offset dari navbar */
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ======== LEFT SIDE ======== */
+.deposit-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 420px;
+}
+
+.section-header .lg-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.section-header .lg-sub {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* ======== DEPOSIT SUMMARY CARD ======== */
+.deposit-summary-card.fancy {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+  width: 100%;
+  max-width: 460px; /* sejajar dengan kartu di bawah */
+  transition: all 0.2s ease;
+}
+
+.deposit-summary-card.fancy:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* KIRI: bidang warna melengkung */
+.deposit-summary-left {
+  background: linear-gradient(to bottom, #ffe7ad 0%, #fff3cf 100%);
+  width: 35%;
+  min-width: 140px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.deposit-icon-circle img {
+  width: 70px;
+  height: auto;
+}
+
+/* KANAN: konten teks */
+.deposit-summary-right {
+  flex: 1;
+  padding: 20px 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.summary-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: #777;
+  margin: 0;
+}
+
+.summary-balance {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.summary-divider {
+  width: 100%;
+  height: 1px;
+  background: #e2e2e2;
+  margin: 6px 0;
+}
+
+.summary-sub {
+  font-size: 13px;
+  color: #555;
+  margin: 0;
+}
+
+/* ======== YOUR DEPOSITS ======== */
+.your-deposit-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.deposit-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 460px; /* sejajar dengan card di atas */
+}
+
+/* ======== DEPOSIT CARD ======== */
+.deposit-card {
+  width: 220px;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: 0.2s ease;
+}
+
+.deposit-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.deposit-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.deposit-balance {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 14px;
+}
+
+/* ======== CIRCLE DATE ======== */
+.circle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.circle-ring {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: conic-gradient(#f4e3b0 0deg, #f4e3b0 220deg, #bca159 220deg, #bca159 360deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.circle-inner {
+  background: #fff;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-inner .day {
+  font-size: 1rem;
+}
+
+.circle-inner .month {
+  font-size: 0.85rem;
+  color: #856f2c;
+}
+
+.circle-inner .year {
+  font-size: 0.8rem;
+  color: #bba76d;
+}
+
+/* ======== DEPOSIT INFO ======== */
+.deposit-info {
+  font-size: 0.85rem;
+}
+
+.deposit-info p {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+  color: #333;
+  text-align: left;
+}
+
+.deposit-info span:first-child {
+  color: #777;
+}
+
+.deposit-info p span:last-child {
+  text-align: right;
+  justify-self: end;
+}
+
+/* ======== RIGHT SIDE ======== */
+.deposit-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transaction-header .lg-title {
+  font-size: 20px;
+}
+
+.download-icon {
+  color: #000;
+  cursor: pointer;
+}
+
+/* ======== MONTH BUTTONS ======== */
+.months {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0 12px;
+  justify-content: flex-start;
+}
+
+.month-btn {
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #f4f4f4;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.month-btn:hover {
+  background: #bca159;
+}
+
+.month-btn.active {
+  background: #ffe9b0 !important;
+  color: #000 !important;
+  font-weight: 600;
+  box-shadow: 0 2px 6px #bca159;
+}
+
+/* ======== TRANSACTION LIST ======== */
+.transaction-list {
+  border-top: 1px solid #ddd;
+}
+
+.transaction-group {
+  margin-top: 18px;
+}
+
+.transaction-date {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.tx-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tx-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #888;
+}
+
+.tx-type {
+  font-weight: 600;
+  font-size: 14px;
+  color: #000;
+}
+
+.tx-detail {
+  font-size: 12px;
+  color: #999;
+}
+
+.tx-amount {
+  font-weight: 600;
+  font-size: 14px;
+  color: #222;
+}
+
+/* ======== NO TRANSACTION TEXT ======== */
+.no-tx {
+  color: #777;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
+}

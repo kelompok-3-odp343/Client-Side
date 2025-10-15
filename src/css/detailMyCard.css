@@ -81,43 +81,6 @@
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
-.detail-mycard .account-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-}
-.detail-mycard .acc-number {
-  color: #000000;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.detail-mycard .acc-name {
-  color: #222;
-  font-weight: 151;
-  font-size: 13px;
-  margin-top: 2px;
-}
-
-.detail-mycard .balance-title {
-  font-size: 15px;
-  color: #000000;
-  margin-top: 14px;
-}
-
-.detail-mycard .eye-icon-container {
-  align-items: center;
-}
-
-.detail-mycard .balance-container {
-  display: flex;
-  align-items: center;
-  /* justify-content: space-between; */
-}
-.detail-mycard .balance-container h3 {
-  margin: 0;
-}
-
 .detail-mycard .badge {
   background: #f3f3f3;
   font-size: 11px;
@@ -222,15 +185,9 @@
   padding: 10px 0;
 }
 .detail-mycard .transaction-text p {
-  margin-bottom: 10px;
+  margin: 0;
   font-size: 13px;
 }
-
-.detail-mycard .transaction-detail {
-  color: #b8b8b8;
-  /* margin-top: 90px; */
-}
-
 .detail-mycard .amount.credit {
   color: #00a884;
   font-weight: 600;
