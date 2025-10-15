@@ -11,26 +11,16 @@ export default function SavingsDashboard() {
   ];
 
   const [selectedMonth, setSelectedMonth] = useState("May");
-  const [depositsData, setDepositsData] = useState(null);
+  const [savingsData, setSavingsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
 
-  // Dummy data
-  const dummyDeposits = {
+  /** ---------- DUMMY DATA ---------- **/
+  const dummySavings = {
     totalBalance: 30000000,
     totalCount: 2,
-    deposits: [
-      {
-        id: 1,
-        title: "Taplus Pegawai BNI",
-        norekening: 1234567899,
-        balance: 7000000,
-      },
-      {
-        id: 2,
-        title: "Taplus Bisnis",
-        norekening: 9876543211,
-        balance: 20000000,
-      },
+    savings: [
+      { id: 1, title: "Taplus Pegawai BNI", norekening: 1234567899, balance: 7000000 },
+      { id: 2, title: "Taplus Bisnis", norekening: 9876543211, balance: 20000000 },
     ],
   };
 
@@ -41,56 +31,88 @@ export default function SavingsDashboard() {
     { date: "2 June 2025", month: "June", type: "Taplus Bisnis", detail: "Transfer", amount: "-Rp5.000.000" },
   ];
 
+  /** ---------- FUNCTION: FETCH DATA FROM BACKEND ---------- **/
+  const fetchSavingsData = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/savings"); // contoh endpoint backend
+      if (!response.ok) throw new Error("Failed to fetch savings data");
+      const data = await response.json();
+      setSavingsData(data);
+    } catch (error) {
+      console.warn("⚠️ Backend not available, using dummy savings data:", error.message);
+      setSavingsData(dummySavings);
+    }
+  };
+
+  const fetchTransactions = async (month) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/transactions?month=${month}`);
+      if (!response.ok) throw new Error("Failed to fetch transactions");
+      const data = await response.json();
+      setTransactions(data);
+    } catch (error) {
+      console.warn(`⚠️ Backend not available, using dummy transactions for ${month}:`, error.message);
+      const filtered = dummyTransactions.filter((tx) => tx.month === month);
+      setTransactions(filtered);
+    }
+  };
+
+  /** ---------- USE EFFECT ---------- **/
   useEffect(() => {
-    setDepositsData(dummyDeposits);
-    // Filter transaksi sesuai bulan yang diklik
-    const filtered = dummyTransactions.filter((tx) => tx.month === selectedMonth);
-    setTransactions(filtered);
+    fetchSavingsData();
+  }, []);
+
+  useEffect(() => {
+    fetchTransactions(selectedMonth);
   }, [selectedMonth]);
 
-  // Group transaksi by date
+  /** ---------- GROUP TRANSACTIONS BY DATE ---------- **/
   const groupedTransactions = transactions.reduce((acc, tx) => {
     acc[tx.date] = acc[tx.date] ? [...acc[tx.date], tx] : [tx];
     return acc;
   }, {});
 
   return (
-    <div className="deposit-page">
+    <div className="savings-page">
       <Navbar />
 
-      <main className="deposit-container">
+      <main className="savings-container">
         {/* LEFT PANEL */}
-        <section className="deposit-left">
+        <section className="savings-left">
           <div className="section-header">
             <h2 className="lg-title">Savings Information</h2>
             <p className="lg-sub">Track your transaction history and payment information</p>
           </div>
 
-          <div className="deposit-summary-card fancy">
+          <div className="savings-summary-card fancy">
             <div className="savings-summary-left">
-              <div className="deposit-icon-circle">
+              <div className="savings-icon-circle">
                 <img src={savingsIcon} alt="Savings Icon" />
               </div>
             </div>
-            <div className="deposit-summary-right">
+            <div className="savings-summary-right">
               <h3 className="summary-title">Your Savings</h3>
               <p className="summary-label">Total Balance</p>
-              <p className="summary-balance">Rp{depositsData?.totalBalance.toLocaleString()}</p>
+              <p className="summary-balance">
+                Rp{(savingsData?.totalBalance || 0).toLocaleString()}
+              </p>
               <div className="summary-divider" />
-              <p className="summary-sub">You have {depositsData?.totalCount} Account Numbers</p>
+              <p className="summary-sub">
+                You have {savingsData?.totalCount || 0} Account Numbers
+              </p>
             </div>
           </div>
 
-          <h3 className="your-deposit-title">Your Savings Accounts</h3>
-          <div className="deposit-grid">
-            {depositsData?.deposits?.map((d) => (
-              <SavingsCard key={d.id} {...d} />
+          <h3 className="your-savings-title">Your Savings Accounts</h3>
+          <div className="savings-grid">
+            {savingsData?.savings?.map((s) => (
+              <SavingsCard key={s.id} {...s} />
             ))}
           </div>
         </section>
 
         {/* RIGHT PANEL */}
-        <section className="deposit-right">
+        <section className="savings-right">
           <div className="transaction-header">
             <h2 className="lg-title">Transaction History</h2>
             <Download className="download-icon" />
@@ -142,13 +164,13 @@ export default function SavingsDashboard() {
 
 /* Savings Card */
 function SavingsCard({ title, norekening, balance }) {
-    return (
-      <div className="deposit-card">
-        <h4 className="deposit-title">{title}</h4>
-        <p className="deposit-number">{norekening}</p>
-        <p className="deposit-balance">
-          Effective balance: <strong>Rp{balance.toLocaleString()}</strong>
-        </p>
-      </div>
-    );
-  }
+  return (
+    <div className="savings-card">
+      <h4 className="savings-title">{title}</h4>
+      <p className="savings-number">{norekening}</p>
+      <p className="savings-balance">
+        Effective balance: <strong>Rp{balance.toLocaleString()}</strong>
+      </p>
+    </div>
+  );
+}
