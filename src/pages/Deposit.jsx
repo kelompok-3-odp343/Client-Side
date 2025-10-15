@@ -128,7 +128,9 @@ export default function Deposits() {
                           <p className="tx-detail">{tx.detail}</p>
                         </div>
                       </div>
-                      <p className="tx-amount">{tx.amount}</p>
+                      <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
+                      {tx.amount}
+                      </div>
                     </div>
                   ))}
                 </div>
