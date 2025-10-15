@@ -67,7 +67,7 @@ export default function SavingsDashboard() {
           </div>
 
           <div className="deposit-summary-card fancy">
-            <div className="deposit-summary-left">
+            <div className="savings-summary-left">
               <div className="deposit-icon-circle">
                 <img src={savingsIcon} alt="Savings Icon" />
               </div>
@@ -123,7 +123,9 @@ export default function SavingsDashboard() {
                           <p className="tx-detail">{tx.detail}</p>
                         </div>
                       </div>
-                      <p className="tx-amount">{tx.amount}</p>
+                      <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
+                        {tx.amount}
+                      </div>
                     </div>
                   ))}
                 </div>

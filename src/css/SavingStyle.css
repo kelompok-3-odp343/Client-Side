@@ -55,7 +55,7 @@
   
   /* KIRI: bidang warna melengkung */
   .savings-summary-left {
-    background: linear-gradient(to bottom, #ffe7ad 0%, #fff3cf 100%);
+    background: linear-gradient(to bottom, #ffe7ad 0%, #BAA5E7 100%);
     width: 35%;
     min-width: 140px;
     height: 100%;
@@ -321,6 +321,14 @@
     font-weight: 600;
     font-size: 14px;
     color: #222;
+  }
+
+  .tx-amount.pos {
+    color: #16a34a;
+  }
+  
+  .tx-amount.neg {
+    color: #dc2626;
   }
   
   /* ======== NO TRANSACTION TEXT ======== */

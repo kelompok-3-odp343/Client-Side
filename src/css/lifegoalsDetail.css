@@ -18,7 +18,8 @@ body {
 
 /* === MAIN CONTAINER === */
 .lg-main {
-  padding: 96px 64px 40px; /* beri jarak aman dari navbar */
+  padding: 96px 64px 40px;
+  /* beri jarak aman dari navbar */
   max-width: 1220px;
   margin: 0 auto;
   display: flex;
@@ -38,7 +39,8 @@ body {
   width: fit-content;
   transition: background 0.2s;
   position: sticky;
-  top: 84px; /* fix: tepat di bawah navbar */
+  top: 84px;
+  /* fix: tepat di bawah navbar */
   z-index: 15;
   background: var(--bg);
 }
@@ -65,8 +67,9 @@ body {
 
 /* === HEADER (TITLE + SUBTITLE) === */
 .section-header {
-  position: sticky;
-  top: 132px; /* berhenti tepat di bawah back button */
+  /* position: sticky; */
+  top: 132px;
+  /* berhenti tepat di bawah back button */
   background: var(--bg);
   z-index: 14;
   padding-bottom: 4px;
@@ -94,7 +97,8 @@ body {
   border-radius: 10px;
   box-shadow: var(--shadow);
   position: sticky;
-  top: 190px; /* tepat di bawah title/subtitle */
+  top: 190px;
+  /* tepat di bawah title/subtitle */
   z-index: 13;
 }
 
@@ -173,15 +177,15 @@ body {
   top: 200px;
   background: var(--bg);
   z-index: 12;
-  padding-top: 8px;      
-  margin-top: 8px;      
+  padding-top: 8px;
+  margin-top: 8px;
 }
 
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;   
+  margin-bottom: 10px;
 }
 
 .panel-title {
@@ -256,7 +260,7 @@ body {
 }
 
 /* TRANSACTION ITEMS */
-.tx-group + .tx-group {
+.tx-group+.tx-group {
   margin-top: 18px;
 }
 
@@ -323,7 +327,8 @@ body {
 /* === RIGHT COLUMN (FIXED) === */
 .info-column {
   position: sticky;
-  top: 120px; /* sejajar navbar bawah */
+  top: 120px;
+  /* sejajar navbar bawah */
   align-self: start;
   height: fit-content;
 }
