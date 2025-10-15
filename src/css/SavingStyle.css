@@ -131,10 +131,10 @@
   
   /* ======== DEPOSIT CARD ======== */
   .savings-card {
-    width: 220px;
+    width: 420px;
     border: 1px solid #e5e5e5;
     border-radius: 12px;
-    padding: 20px;
+    padding: 10px;
     text-align: center;
     background: #fff;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
@@ -147,12 +147,20 @@
   }
   
   .savings-title {
+    text-align: left;
     font-weight: 600;
     font-size: 15px;
     margin-bottom: 6px;
   }
+  .savings-number {
+    text-align: left;
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 14px;
+  }
   
   .savings-balance {
+    text-align: left;
     font-size: 13px;
     color: #333;
     margin-bottom: 14px;
