@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import "../css/DepositStyle.css";
 import { Download } from "lucide-react";
 import depositIcon from "../assets/images/deposit-icon.png";
+import { getTimeDeposits } from "../api/timeDeposits";
 
 export default function Deposits() {
   const months = [
@@ -14,31 +15,41 @@ export default function Deposits() {
   const [depositsData, setDepositsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
 
-  // Dummy data
-  const dummyDeposits = {
-    totalBalance: 5000000,
-    totalCount: 2,
-    deposits: [
-      {
-        id: 1,
-        title: "Short Term",
-        balance: 2000000,
-        interest: "0.4%",
-        opening: "28 October 2025",
-        period: "3 months",
-        date: "28 Nov 2025",
-      },
-      {
-        id: 2,
-        title: "Long Term",
-        balance: 3000000,
-        interest: "0.4%",
-        opening: "28 October 2025",
-        period: "3 months",
-        date: "28 Nov 2025",
-      },
-    ],
-  };
+
+  const dataDeposit = async () => {
+    try {
+      const responseData = await getTimeDeposits("USR001");
+      const resApi = responseData.data
+
+      const formattedData = {
+        totalBalance: resApi.total_balance,
+        totalCount: resApi.count_accounts,
+        deposits: resApi.items.map((item) => ({
+          id: item.item_id,
+          title: `Account ${item.deposit_account_number}`,
+          balance: item.balance,
+          interest: `${item.interest_rate}%`,
+          opening: new Date(item.maturity_date).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }),
+          period: `${item.tenor_months} months`,
+          date: new Date(item.maturity_date).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }),
+          status: item.status,
+        })),
+      };
+
+      setDepositsData(formattedData);
+    } catch (err) {
+      console.error("test", err);
+
+    }
+  }
 
   const dummyTransactions = [
     { date: "31 May 2025", month: "May", type: "Long Term", detail: "Admin fee", amount: "-Rp1.000" },
@@ -47,18 +58,18 @@ export default function Deposits() {
   ];
 
   // Function ambil data
-  const fetchDeposits = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/deposits");
-      if (!res.ok) throw new Error("Failed to fetch deposits");
-      const data = await res.json();
-      setDepositsData(data);
-      console.log("✅ Data deposits diambil dari backend");
-    } catch (error) {
-      console.warn("⚠️ Backend tidak aktif, gunakan dummyDeposits");
-      setDepositsData(dummyDeposits);
-    }
-  };
+  // const fetchDeposits = async () => {
+  //   try {
+  //     const res = await fetch("http://localhost:5000/api/deposits");
+  //     if (!res.ok) throw new Error("Failed to fetch deposits");
+  //     const data = await res.json();
+  //     setDepositsData(data);
+  //     console.log("✅ Data deposits diambil dari backend");
+  //   } catch (error) {
+  //     console.warn("⚠️ Backend tidak aktif, gunakan dummyDeposits");
+  //     setDepositsData(dummyDeposits);
+  //   }
+  // };
 
   const fetchTransactions = async (month) => {
     try {
@@ -76,7 +87,7 @@ export default function Deposits() {
 
   // gunakan use effect
   useEffect(() => {
-    fetchDeposits();
+    dataDeposit();
     fetchTransactions(selectedMonth);
   }, [selectedMonth]);
 
