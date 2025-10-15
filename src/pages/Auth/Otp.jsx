@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Otp.css";
+import { verifyOtpApi, blockUser } from "../../data/auth";
 
 export default function OtpLogin() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -19,17 +20,22 @@ export default function OtpLogin() {
     if (value && index < 5) inputsRef.current[index + 1].focus();
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const code = otp.join("");
-    if (code === "123456") {
-      setMessage("✅ OTP Verified!");
-      setTimeout(() => navigate("/dashboard"), 1000);
-    } else {
+    try {
+      const result = await verifyOtpApi(code);
+      if (result.success) {
+        setMessage("✅ OTP Verified!");
+        setTimeout(() => navigate("/dashboard"), 1000);
+      }
+    } catch {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
       if (newAttempts >= 3) {
+        const email = localStorage.getItem("userEmail") || "unknown@demo.com";
+        await blockUser(email); // <── simpan status blokir sebelum navigate
         setMessage("🚫 Too many failed attempts. Redirecting...");
-        setTimeout(() => navigate("/popupblock"), 1500);
+        setTimeout(() => navigate("/popupblock"), 1000);
       } else {
         setMessage(`❌ Invalid OTP. Attempt ${newAttempts}/3.`);
         setOtp(["", "", "", "", "", ""]);

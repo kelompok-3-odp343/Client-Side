@@ -3,6 +3,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import "./Deposit.css";
 import { Download } from "lucide-react";
 import depositIcon from "../../assets/images/deposit-icon.png";
+import { fetchDeposits, fetchDepositTransactions } from "../../data/deposit";
 
 export default function Deposits() {
   const months = [
@@ -13,47 +14,31 @@ export default function Deposits() {
   const [selectedMonth, setSelectedMonth] = useState("May");
   const [depositsData, setDepositsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
-
-  // Dummy data
-  const dummyDeposits = {
-    totalBalance: 5000000,
-    totalCount: 2,
-    deposits: [
-      {
-        id: 1,
-        title: "Short Term",
-        balance: 2000000,
-        interest: "0.4%",
-        opening: "28 October 2025",
-        period: "3 months",
-        date: "28 Nov 2025",
-      },
-      {
-        id: 2,
-        title: "Long Term",
-        balance: 3000000,
-        interest: "0.4%",
-        opening: "28 October 2025",
-        period: "3 months",
-        date: "28 Nov 2025",
-      },
-    ],
-  };
-
-  const dummyTransactions = [
-    { date: "31 May 2025", month: "May", type: "Long Term", detail: "Admin fee", amount: "-Rp1.000" },
-    { date: "31 May 2025", month: "May", type: "Short Term", detail: "Management fee", amount: "-Rp7" },
-    { date: "30 May 2025", month: "May", type: "Short Term", detail: "Deposits", amount: "-Rp3.500" },
-  ];
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setDepositsData(dummyDeposits);
-    // Filter transaksi sesuai bulan yang diklik
-    const filtered = dummyTransactions.filter((tx) => tx.month === selectedMonth);
-    setTransactions(filtered);
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const userId = localStorage.getItem("userId") || "dummyUser123"; // ← pindah ke sini
+        const deposits = await fetchDeposits(userId);
+        const tx = await fetchDepositTransactions(userId, selectedMonth);
+        setDepositsData(deposits);
+        setTransactions(tx);
+      } catch (err) {
+        console.error("Deposit data fetch failed:", err);
+        setDepositsData({ totalBalance: 0, totalCount: 0, deposits: [] });
+        setTransactions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, [selectedMonth]);
 
-  // Group transaksi by date
+  if (loading) return <div className="loading">Loading deposits...</div>;
+
   const groupedTransactions = transactions.reduce((acc, tx) => {
     acc[tx.date] = acc[tx.date] ? [...acc[tx.date], tx] : [tx];
     return acc;
@@ -80,17 +65,25 @@ export default function Deposits() {
             <div className="deposit-summary-right">
               <h3 className="summary-title">Time Deposits</h3>
               <p className="summary-label">Total Balance</p>
-              <p className="summary-balance">Rp{depositsData?.totalBalance.toLocaleString()}</p>
+              <p className="summary-balance">
+                Rp{depositsData?.totalBalance.toLocaleString()}
+              </p>
               <div className="summary-divider" />
-              <p className="summary-sub">You have {depositsData?.totalCount} Time Deposits</p>
+              <p className="summary-sub">
+                You have {depositsData?.totalCount} Time Deposits
+              </p>
             </div>
           </div>
 
           <h3 className="your-deposit-title">Your Time Deposits</h3>
           <div className="deposit-grid">
-            {depositsData?.deposits?.map((d) => (
-              <DepositCard key={d.id} {...d} />
-            ))}
+            {depositsData?.deposits?.length > 0 ? (
+              depositsData.deposits.map((d) => (
+                <DepositCard key={d.id} {...d} />
+              ))
+            ) : (
+              <p>No deposit accounts found.</p>
+            )}
           </div>
         </section>
 
@@ -134,7 +127,9 @@ export default function Deposits() {
                 </div>
               ))
             ) : (
-              <p className="no-tx">No transactions available for {selectedMonth}</p>
+              <p className="no-tx">
+                No transactions available for {selectedMonth}
+              </p>
             )}
           </div>
         </section>

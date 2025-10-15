@@ -1,8 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Profile.css";
 import Navbar from "../../components/Navbar/Navbar";
+import { fetchUserProfile } from "../../data/profile";
 
 export default function Profile() {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      setLoading(true);
+      try {
+        const userId = localStorage.getItem("userId") || "dummyUser123";
+        const data = await fetchUserProfile(userId);
+        setProfile(data);
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProfile();
+  }, []);
+
+  const handleSignOut = () => {
+    localStorage.clear();
+    window.location.href = "/";
+  };
+
+  if (loading) return <div className="loading">Loading profile...</div>;
+  if (!profile) return <div className="error">Profile not available.</div>;
+
   return (
     <div className="profile-page">
       <Navbar />
@@ -13,13 +42,13 @@ export default function Profile() {
           <div className="avatar">
             <i className="fas fa-user"></i>
           </div>
-          <h2 className="user-name">Ulion Pardede</h2>
+          <h2 className="user-name">{profile.name}</h2>
 
           <div className="cif-card">
             <i className="fas fa-id-card"></i>
             <div>
               <p className="label">CIF</p>
-              <p className="value">9285711829</p>
+              <p className="value">{profile.cif}</p>
             </div>
           </div>
         </section>
@@ -33,7 +62,7 @@ export default function Profile() {
               <i className="fas fa-user"></i>
               <div>
                 <p className="label">Name</p>
-                <p className="value">Ulion Pardede</p>
+                <p className="value">{profile.name}</p>
               </div>
             </div>
 
@@ -41,7 +70,7 @@ export default function Profile() {
               <i className="fas fa-calendar-alt"></i>
               <div>
                 <p className="label">Date of Birth</p>
-                <p className="value">28 August 1995</p>
+                <p className="value">{profile.dob}</p>
               </div>
             </div>
 
@@ -49,7 +78,7 @@ export default function Profile() {
               <i className="fas fa-envelope"></i>
               <div>
                 <p className="label">Email Address</p>
-                <p className="value">ulion99pardede@gmail.com</p>
+                <p className="value">{profile.email}</p>
               </div>
             </div>
 
@@ -57,16 +86,13 @@ export default function Profile() {
               <i className="fas fa-phone"></i>
               <div>
                 <p className="label">Phone Number</p>
-                <p className="value">082376180082</p>
+                <p className="value">{profile.phone}</p>
               </div>
             </div>
           </div>
 
           <div className="signout-container">
-            <button
-              className="signout-btn"
-              onClick={() => (window.location.href = "/")}
-            >
+            <button className="signout-btn" onClick={handleSignOut}>
               Sign Out
             </button>
           </div>

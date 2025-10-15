@@ -1,9 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Block.css";
+import { getBlockedUser, clearBlockedUser } from "../../data/auth";
 
 export default function PopupBlock() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const blocked = getBlockedUser();
+      if (!blocked) navigate("/"); // redirect kalau belum diblokir
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [navigate]);
+
+  const handleBack = () => {
+    clearBlockedUser();
+    navigate("/");
+  };
 
   return (
     <div className="auth-background">
@@ -27,7 +41,7 @@ export default function PopupBlock() {
           Please try again later or contact support for assistance.
         </p>
 
-        <button className="block-btn" onClick={() => navigate("/")}>
+        <button className="block-btn" onClick={handleBack}>
           Back to Sign In
         </button>
       </div>

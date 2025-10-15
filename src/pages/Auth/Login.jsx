@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
+import { loginApi } from "../../data/auth";
 
 export default function Login() {
   const [userId, setUserId] = useState("");
@@ -20,26 +21,17 @@ export default function Login() {
     setLoading(true);
     setMessage("");
 
-    await new Promise((r) => setTimeout(r, 800));
-    const dummyUsers = [
-      { userId: "admin", password: "12345", email: "admin@demo.com" },
-      { userId: "test", password: "abcd", email: "test@demo.com" },
-    ];
-
-    const user = dummyUsers.find(
-      (u) => u.userId === userId && u.password === password
-    );
-
-    setLoading(false);
-
-    if (user) {
-      localStorage.setItem("userEmail", user.email);
+    try {
+      const { email } = await loginApi(userId, password);
+      localStorage.setItem("userEmail", email);
       navigate("/otpLogin");
-    } else {
-      setMessage("❌ Invalid User ID or Password.");
+    } catch (err) {
+      setMessage("❌ " + err.message);
       setUserId("");
       setPassword("");
       setTimeout(() => setMessage(""), 2500);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,7 +68,9 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <i
-              className={`far ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-eye`}
+              className={`far ${
+                showPassword ? "fa-eye-slash" : "fa-eye"
+              } toggle-eye`}
               onClick={() => setShowPassword(!showPassword)}
             ></i>
           </div>

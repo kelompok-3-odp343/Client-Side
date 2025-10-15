@@ -1,53 +1,61 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import "./LifeGoalsDetail.css";
-
-import graduationIcon from "../../assets/images/education.png";
-import vacationIcon from "../../assets/images/vacation.png";
-import marriageIcon from "../../assets/images/marriage.png";
-import homeIcon from "../../assets/images/home.png";
-import gadgetIcon from "../../assets/images/gadget.png";
-import vehicleIcon from "../../assets/images/vehicle.png";
+import { fetchLifeGoalDetail } from "../../data/lifeGoalsDetail";
 
 export default function LifeGoalDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedMonth, setSelectedMonth] = useState("May");
+  const [goalDetail, setGoalDetail] = useState(null);
+  const [transactions, setTransactions] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const goals = {
-    education: { title: "Education", desc: "Save for brighter dawn", color: "#71d9d0", icon: graduationIcon },
-    vacations: { title: "Vacations", desc: "Your Passport to New Memories", color: "#ffd367", icon: vacationIcon },
-    marriage: { title: "Marriage", desc: "Funding your new chapter", color: "#9c7edc", icon: marriageIcon },
-    home: { title: "Home", desc: "Saving for Memories Unmade", color: "#9c7edc", icon: homeIcon },
-    gadget: { title: "Gadget", desc: "Smart saving for smart tech", color: "#6dddd0", icon: gadgetIcon },
-    vehicles: { title: "Vehicles", desc: "Fuel your future ride", color: "#ffd367", icon: vehicleIcon },
+  const goal = location.state?.goal || {
+    id,
+    title: "Life Goal",
+    desc: "Grow your dreams with consistent saving",
+    color: "#71d9d0",
+    progress: 0,
+    current: 0,
+    target: 0,
   };
 
-  const goal = location.state?.goal || goals[id] || goals.education;
+  const months = ["May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"];
 
-  const months = ["May","Jun","Jul","Aug","Sept","Oct","Nov","Dec","Jan","Feb","Mar","Apr"];
-  const transactions = {
-    May: [
-      { date: "31 May 2025", items: [
-        { type: "Others", desc: "Interest", amount: "+5.000" },
-        { type: "Others", desc: "Tax", amount: "-Rp1.000" },
-      ]},
-      { date: "25 May 2025", items: [
-        { type: "Autodebit", desc: "Life Goals Deposit", amount: "+Rp2.000.000" },
-      ]},
-      { date: "5 May 2025", items: [
-        { type: "Top Up", desc: "Life Goals Deposit", amount: "+Rp250.000" },
-      ]},
-    ],
-  };
+  useEffect(() => {
+    const loadGoal = async () => {
+      setLoading(true);
+      try {
+        const userId = localStorage.getItem("userId") || "dummyUser123";
+        const res = await fetchLifeGoalDetail(userId, id);
+        setGoalDetail(res.detail);
+        setTransactions(res.transactions);
+      } catch (err) {
+        console.error("Failed to fetch goal detail:", err);
+        setGoalDetail(null);
+        setTransactions({});
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadGoal();
+  }, [id]);
+
+  if (loading) return <div className="loading">Loading goal details...</div>;
+  if (!goalDetail) return <div className="error">Goal not found</div>;
+
+  const progressPct = Math.round((goalDetail.current_savings / goalDetail.target) * 100);
 
   return (
     <div className="lg-container" style={{ "--theme": goal.color }}>
       <Navbar />
       <main className="lg-main">
-        <button className="lg-back" onClick={() => navigate("/lifegoals")}>← Back to Life Goals</button>
+        <button className="lg-back" onClick={() => navigate("/lifegoals")}>
+          ← Back to Life Goals
+        </button>
 
         <div className="lg-grid">
           {/* LEFT COLUMN */}
@@ -76,11 +84,14 @@ export default function LifeGoalDetail() {
 
                 <div className="top-progress">
                   <div className="progress-track">
-                    <div className="progress-fill" style={{ width: "50%", background: "var(--theme)" }} />
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${progressPct}%`, background: "var(--theme)" }}
+                    />
                   </div>
                   <div className="progress-values">
-                    <span>Rp50.000.000</span>
-                    <span>Rp100.000.000</span>
+                    <span>Rp{goalDetail.current_savings.toLocaleString()}</span>
+                    <span>Rp{goalDetail.target.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -142,7 +153,7 @@ export default function LifeGoalDetail() {
                       </div>
                     ))}
                   </div>
-                ))}
+                )) || <p>No transactions found</p>}
               </div>
             </section>
           </div>
@@ -154,20 +165,32 @@ export default function LifeGoalDetail() {
             <div className="info-card">
               <h4 className="info-heading">Life Goals Detail</h4>
               <div className="info-grid">
-                <div className="label">Life Goals Account</div><div className="value">1234567890</div>
-                <div className="label">Estimated Accumulated Funds</div><div className="value">Rp50.000.000</div>
-                <div className="label">Initial Deposit</div><div className="value">Rp100.000</div>
-                <div className="label">Annual Interest Rate</div><div className="value">3%</div>
-                <div className="label">Duration</div><div className="value">5 years</div>
-                <div className="label">Creation Date</div><div className="value">25 May 2023</div>
+                <div className="label">Life Goals Account</div>
+                <div className="value">{goalDetail.account_number}</div>
+                <div className="label">Estimated Accumulated Funds</div>
+                <div className="value">
+                  Rp{goalDetail.estimated_funds.toLocaleString()}
+                </div>
+                <div className="label">Initial Deposit</div>
+                <div className="value">
+                  Rp{goalDetail.initial_deposit.toLocaleString()}
+                </div>
+                <div className="label">Annual Interest Rate</div>
+                <div className="value">{goalDetail.annual_interest}</div>
+                <div className="label">Duration</div>
+                <div className="value">{goalDetail.duration}</div>
+                <div className="label">Creation Date</div>
+                <div className="value">{goalDetail.created_at}</div>
               </div>
 
               <div className="divider" />
 
               <h4 className="info-heading small">Disbursement Details</h4>
               <div className="info-grid">
-                <div className="label">Disbursement Date</div><div className="value">25 May 2028</div>
-                <div className="label">Disbursement Account</div><div className="value">1234567890</div>
+                <div className="label">Disbursement Date</div>
+                <div className="value">{goalDetail.disbursement_date}</div>
+                <div className="label">Disbursement Account</div>
+                <div className="value">{goalDetail.disbursement_account}</div>
               </div>
             </div>
           </aside>
