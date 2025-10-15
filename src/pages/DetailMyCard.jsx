@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import SplitBillForm from "../components/SplitBillForm";
 import "../css/detailMyCard.css";
 import Navbar from "../components/Navbar";
-import { EyeOff, Eye, Settings, Bell, User, Filter } from "lucide-react";
+import { EyeOff, Eye, Filter } from "lucide-react";
 
 export default function DetailMyCard() {
   const [selectedMonth, setSelectedMonth] = useState("May");
@@ -187,9 +187,8 @@ export default function DetailMyCard() {
                         </div>
                         <div className="transaction-amount-modern">
                           <span
-                            className={`amount ${
-                              item.amount.startsWith("+") ? "credit" : "debit"
-                            }`}
+                            className={`amount ${item.amount.startsWith("+") ? "credit" : "debit"
+                              }`}
                           >
                             {item.amount}
                           </span>
@@ -213,17 +212,18 @@ export default function DetailMyCard() {
           </div>
         </section>
       </main>
-
       {showSplitModal && (
-        <SplitBillForm
-          onClose={() => setShowSplitModal(false)}
-          transaction={{
-            id: "ldx01231231sadawq",
-            date: "31 May 2025",
-            detail: "Warung Kak Udin",
-            amount: "Rp25.000",
-          }}
-        />
+        <div className="modal-overlay">
+          <SplitBillForm
+            onClose={() => setShowSplitModal(false)}
+            transaction={{
+              id: "ldx01231231sadawq",
+              date: "31 May 2025",
+              detail: "Warung Kak Udin",
+              amount: "Rp25.000",
+            }}
+          />
+        </div>
       )}
     </div>
   );

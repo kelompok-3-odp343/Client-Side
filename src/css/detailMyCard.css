@@ -23,9 +23,11 @@
   user-select: none;
   transition: 0.2s ease;
 }
+
 .detail-mycard .logo-text span {
   color: #75d1c7;
 }
+
 .detail-mycard .logo-text:hover {
   opacity: 0.8;
   transform: scale(1.02);
@@ -44,6 +46,7 @@
   gap: 30px;
   padding: 25px 40px;
   background: #fff;
+  margin-top: 5rem;
 }
 
 /* LEFT PANEL */
@@ -65,6 +68,7 @@
   font-size: 13px;
   font-weight: 500;
 }
+
 .detail-mycard .acc-name {
   margin: 0;
   margin-bottom: 40px;
@@ -81,7 +85,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  align-items: center;
 }
 
 .detail-mycard .balance-container h3 {
@@ -98,11 +101,13 @@
   font-size: 16px;
   font-weight: 600;
 }
+
 .detail-mycard .account-details-dropdown {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .detail-mycard .account-details-dropdown select {
   width: 70%;
   padding: 5px;
@@ -157,10 +162,12 @@
   align-items: flex-start;
   margin-bottom: 8px;
 }
+
 .detail-mycard.numbers div {
   text-align: center;
   flex: 1;
 }
+
 .detail-mycard .numbers h3 {
   font-size: 1.1rem;
   font-weight: 700;
@@ -199,7 +206,7 @@
 }
 
 .detail-mycard .income-bar {
-  background: #ffe9b0;
+  background: #00a884;
   height: 100px;
   box-shadow: 0 2px 6px rgba(0, 168, 132, 0.3);
 }
@@ -217,14 +224,6 @@
 .detail-mycard:hover .expense-bar {
   height: 70px;
 }
-.detail-mycard {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  padding: 25px 25px 40px 25px;
-  margin-top: -10px; /* naikin posisi card */
-  margin-bottom: 40px; /* jarak bawah secukupnya */
-}
 
 /* RIGHT PANEL */
 .detail-mycard .right-panel {
@@ -241,30 +240,38 @@
   align-items: center;
   margin-bottom: 20px;
 }
+
 .detail-mycard .months {
   display: flex;
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 15px;
   width: 100%;
+  flex-wrap: wrap;
 }
+
 .detail-mycard .months button {
   border: none;
-  padding: 4px;
+  padding: 6px 10px;
   border-radius: 8px;
   background: #d9d9d9;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  flex: 1;
+  flex: 1 0 22%;
   text-align: center;
   min-width: 0;
   white-space: nowrap;
 }
+
 .detail-mycard .months button.active {
-  background: #ffa669;
-  color: #000;
+  background: #ffe9b0;
+  color: #fff;
   font-weight: 500;
+}
+
+.detail-mycard .months button:hover {
+  background: #ffe9b0;
 }
 
 .detail-mycard .transaction-list-modern {
@@ -273,6 +280,7 @@
   padding-right: 5px;
   max-height: calc(100vh - 250px);
 }
+
 .detail-mycard .transaction-group {
   margin-bottom: 16px;
 }
@@ -283,18 +291,22 @@
   align-items: center;
   padding: 10px 0;
 }
+
 .detail-mycard .transaction-text p {
   margin: 0;
   font-size: 13px;
 }
+
 .detail-mycard .amount.credit {
   color: #00a884;
   font-weight: 600;
 }
+
 .detail-mycard .amount.debit {
   color: #e74c3c;
   font-weight: 600;
 }
+
 .detail-mycard .split-btn {
   background: #fff;
   border: 1px solid #6dddd0;
@@ -304,6 +316,7 @@
   border-radius: 10px;
   cursor: pointer;
 }
+
 .detail-mycard .split-btn:hover {
   background: #6dddd0;
   color: #fff;
@@ -313,7 +326,270 @@
 .detail-mycard .transaction-list-modern::-webkit-scrollbar {
   width: 6px;
 }
+
 .detail-mycard .transaction-list-modern::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 10px;
+}
+
+/* -------------------- RESPONSIVE -------------------- */
+
+/* Tablet (<= 1024px) */
+@media (max-width: 1024px) {
+  .detail-mycard .main {
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .detail-mycard .left-panel,
+  .detail-mycard .right-panel {
+    width: 100%;
+    padding: 0;
+  }
+
+  .detail-mycard .account-card {
+    text-align: left;
+  }
+
+  .detail-mycard .months button {
+    flex: 1 0 28%;
+    font-size: 11px;
+  }
+}
+
+/* Mobile (<= 768px) */
+@media (max-width: 768px) {
+  .detail-mycard .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 20px;
+  }
+
+  .detail-mycard .logo-text {
+    font-size: 18px;
+  }
+
+  .detail-mycard .main {
+    flex-direction: column;
+    padding: 15px;
+    margin-top: 3rem;
+  }
+
+  .detail-mycard .account-details-dropdown h2 {
+    font-size: 14px;
+  }
+
+  .detail-mycard .account-details-dropdown select {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .detail-mycard .balance-container h3 {
+    font-size: 16px;
+  }
+
+  .detail-mycard .numbers h3 {
+    font-size: 1rem;
+  }
+
+  .detail-mycard .months {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .detail-mycard .months button {
+    flex: 1 0 30%;
+    font-size: 11px;
+    padding: 5px;
+  }
+
+  .detail-mycard .transaction-modern-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .detail-mycard .transaction-amount-modern {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .detail-mycard .split-btn {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  .detail-mycard .bar {
+    width: 35px;
+  }
+
+  .detail-mycard .bar-chart {
+    gap: 40px;
+  }
+}
+
+/* Small Mobile (<= 480px) */
+@media (max-width: 480px) {
+  .detail-mycard .header {
+    padding: 8px 15px;
+  }
+
+  .detail-mycard .main {
+    padding: 10px;
+  }
+
+  .detail-mycard .months button {
+    flex: 1 0 45%;
+    font-size: 10px;
+  }
+
+  .detail-mycard .account-card {
+    padding: 14px 16px;
+  }
+
+  .detail-mycard .transaction-modern-item {
+    font-size: 12px;
+  }
+}
+
+.transaction-list-modern {
+  animation: fadeSlideUp 0.5s ease;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.transaction-modern-item {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInItem 0.4s ease forwards;
+}
+
+.transaction-modern-item:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.transaction-modern-item:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.transaction-modern-item:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.transaction-modern-item:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.transaction-modern-item:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+@keyframes fadeInItem {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.account-card,
+.earnings {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.account-card:hover,
+.earnings:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.months button {
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.months button:hover {
+  transform: scale(1.05);
+}
+
+.split-btn {
+  transition: all 0.25s ease;
+}
+
+.split-btn:hover {
+  transform: scale(1.03);
+}
+
+.right-panel {
+  animation: fadeInPanel 0.4s ease;
+}
+
+@keyframes fadeInPanel {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+  animation: fadeInOverlay 0.4s ease;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-overlay>* {
+  z-index: 10000;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
