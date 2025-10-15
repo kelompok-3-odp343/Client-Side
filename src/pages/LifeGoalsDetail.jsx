@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../css/lifegoalsDetail.css";
 
@@ -12,7 +12,6 @@ import vehicleIcon from "../assets/images/vehicle.png";
 
 export default function LifeGoalDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const [selectedMonth, setSelectedMonth] = useState("May");
 
@@ -47,8 +46,6 @@ export default function LifeGoalDetail() {
     <div className="lg-container" style={{ "--theme": goal.color }}>
       <Navbar />
       <main className="lg-main">
-        <button className="lg-back" onClick={() => navigate("/lifegoals")}>← Back to Life Goals</button>
-
         <div className="lg-grid">
           {/* LEFT COLUMN */}
           <div className="left-column">

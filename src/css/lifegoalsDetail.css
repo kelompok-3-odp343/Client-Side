@@ -17,6 +17,7 @@
 .lg-main {
   flex: 1;
   padding: 1.5rem 3rem;
+  padding-top: 100px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
