@@ -319,7 +319,7 @@ export default function Dashboard() {
             <img className="pill-img"src="" alt="" />
           </button>
 
-          <button className="pill" onClick={() => handleNavigate("dplk")} style={{backgroundColor: "#FFE8B0"}}>
+          <button className="pill" onClick={() => handleNavigate("pensionfunds")} style={{backgroundColor: "#FFE8B0"}}>
             <div className="pill-text">
               <div className="pill-title">Pension Funds</div>
               <div className="pill-amount">
