@@ -67,7 +67,7 @@ export default function SavingsDashboard() {
           </div>
 
           <div className="deposit-summary-card fancy">
-            <div className="deposit-summary-left">
+            <div className="savings-summary-left">
               <div className="deposit-icon-circle">
                 <img src={savingsIcon} alt="Savings Icon" />
               </div>
