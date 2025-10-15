@@ -1,5 +1,4 @@
-// Simulasi endpoint untuk Life Goals
-
+// Simulated API endpoint: /api/funds/{user_id}/life-goals
 import graduationIcon from "../assets/images/education.png";
 import vacationIcon from "../assets/images/vacation.png";
 import marriageIcon from "../assets/images/marriage.png";
@@ -9,13 +8,9 @@ import vehicleIcon from "../assets/images/vehicle.png";
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/**
- * Ambil semua life goals milik user.
- * @param {string} userId
- * @returns {Promise<Array>}
- */
 export async function fetchLifeGoals(userId) {
   await delay(300);
+
   return [
     {
       id: "education",

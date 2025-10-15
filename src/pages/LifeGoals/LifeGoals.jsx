@@ -1,33 +1,25 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../../components/Navbar/Navbar";
 import { useNavigate } from "react-router-dom";
-import "./LifeGoals.css";
+import Navbar from "../../components/Navbar/Navbar";
 import LifeGoalCard from "../../components/LifeGoalsCard/LifeGoalsCard";
+import "./LifeGoals.css";
 import { fetchLifeGoals } from "../../data/lifeGoals";
 
 export default function LifeGoals() {
   const navigate = useNavigate();
   const [goals, setGoals] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const userId = user?.id || "USR001";
+
     const loadGoals = async () => {
-      setLoading(true);
-      try {
-        const userId = localStorage.getItem("userId") || "dummyUser123";
-        const data = await fetchLifeGoals(userId);
-        setGoals(data);
-      } catch (err) {
-        console.error("Failed to fetch life goals:", err);
-        setGoals([]);
-      } finally {
-        setLoading(false);
-      }
+      const data = await fetchLifeGoals(userId);
+      setGoals(data);
     };
+
     loadGoals();
   }, []);
-
-  if (loading) return <div className="loading">Loading life goals...</div>;
 
   return (
     <div className="life-goals-page">
@@ -36,17 +28,15 @@ export default function LifeGoals() {
       <p className="section-subtitle">Small saves fuel big dreams</p>
 
       <div className="life-goal-grid">
-        {goals.length > 0 ? (
-          goals.map((goal) => (
-            <LifeGoalCard
-              key={goal.id}
-              goal={goal}
-              onClick={() => navigate(`/lifegoal/${goal.id}`, { state: { goal } })}
-            />
-          ))
-        ) : (
-          <p>No life goals found.</p>
-        )}
+        {goals.map((goal) => (
+          <LifeGoalCard
+            key={goal.id}
+            goal={goal}
+            onClick={() =>
+              navigate(`/lifegoal/${goal.id}`, { state: { goal } })
+            }
+          />
+        ))}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import "./LifeGoalsDetail.css";
@@ -11,43 +11,23 @@ export default function LifeGoalDetail() {
   const [selectedMonth, setSelectedMonth] = useState("May");
   const [goalDetail, setGoalDetail] = useState(null);
   const [transactions, setTransactions] = useState({});
-  const [loading, setLoading] = useState(true);
-
-  const goal = location.state?.goal || {
-    id,
-    title: "Life Goal",
-    desc: "Grow your dreams with consistent saving",
-    color: "#71d9d0",
-    progress: 0,
-    current: 0,
-    target: 0,
-  };
-
-  const months = ["May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"];
 
   useEffect(() => {
-    const loadGoal = async () => {
-      setLoading(true);
-      try {
-        const userId = localStorage.getItem("userId") || "dummyUser123";
-        const res = await fetchLifeGoalDetail(userId, id);
-        setGoalDetail(res.detail);
-        setTransactions(res.transactions);
-      } catch (err) {
-        console.error("Failed to fetch goal detail:", err);
-        setGoalDetail(null);
-        setTransactions({});
-      } finally {
-        setLoading(false);
-      }
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const userId = user?.id || "USR001";
+
+    const loadDetail = async () => {
+      const res = await fetchLifeGoalDetail(userId, id);
+      setGoalDetail(res.detail);
+      setTransactions(res.transactions);
     };
-    loadGoal();
+
+    loadDetail();
   }, [id]);
 
-  if (loading) return <div className="loading">Loading goal details...</div>;
-  if (!goalDetail) return <div className="error">Goal not found</div>;
+  const goal = location.state?.goal || { color: "#71d9d0", title: id };
 
-  const progressPct = Math.round((goalDetail.current_savings / goalDetail.target) * 100);
+  if (!goalDetail) return <div>Loading goal details...</div>;
 
   return (
     <div className="lg-container" style={{ "--theme": goal.color }}>
@@ -58,10 +38,9 @@ export default function LifeGoalDetail() {
         </button>
 
         <div className="lg-grid">
-          {/* LEFT COLUMN */}
           <div className="left-column">
             <header className="section-header">
-              <h1 className="lg-title">Life Goals Progress</h1>
+              <h1 className="lg-title">{goal.title} Progress</h1>
               <p className="lg-sub">Small saves fuel big dreams</p>
             </header>
 
@@ -86,12 +65,19 @@ export default function LifeGoalDetail() {
                   <div className="progress-track">
                     <div
                       className="progress-fill"
-                      style={{ width: `${progressPct}%`, background: "var(--theme)" }}
+                      style={{
+                        width: `${
+                          (goalDetail.current_savings / goalDetail.target) * 100
+                        }%`,
+                        background: "var(--theme)",
+                      }}
                     />
                   </div>
                   <div className="progress-values">
-                    <span>Rp{goalDetail.current_savings.toLocaleString()}</span>
-                    <span>Rp{goalDetail.target.toLocaleString()}</span>
+                    <span>
+                      Rp{goalDetail.current_savings.toLocaleString("id-ID")}
+                    </span>
+                    <span>Rp{goalDetail.target.toLocaleString("id-ID")}</span>
                   </div>
                 </div>
               </div>
@@ -119,7 +105,7 @@ export default function LifeGoalDetail() {
               </div>
 
               <div className="months-row">
-                {months.map((m) => (
+                {Object.keys(transactions).map((m) => (
                   <button
                     key={m}
                     className={`month-pill ${selectedMonth === m ? "active" : ""}`}
@@ -137,23 +123,23 @@ export default function LifeGoalDetail() {
                     {group.items.map((tx, i) => (
                       <div key={i} className="tx-row">
                         <div className="tx-left">
-                          <div className="tx-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.2" />
-                            </svg>
-                          </div>
+                          <div className="tx-icon" />
                           <div className="tx-text">
                             <div className="tx-type">{tx.type}</div>
                             <div className="tx-sub">{tx.desc}</div>
                           </div>
                         </div>
-                        <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
+                        <div
+                          className={`tx-amount ${
+                            tx.amount.startsWith("-") ? "neg" : "pos"
+                          }`}
+                        >
                           {tx.amount}
                         </div>
                       </div>
                     ))}
                   </div>
-                )) || <p>No transactions found</p>}
+                ))}
               </div>
             </section>
           </div>
@@ -169,11 +155,11 @@ export default function LifeGoalDetail() {
                 <div className="value">{goalDetail.account_number}</div>
                 <div className="label">Estimated Accumulated Funds</div>
                 <div className="value">
-                  Rp{goalDetail.estimated_funds.toLocaleString()}
+                  Rp{goalDetail.estimated_funds.toLocaleString("id-ID")}
                 </div>
                 <div className="label">Initial Deposit</div>
                 <div className="value">
-                  Rp{goalDetail.initial_deposit.toLocaleString()}
+                  Rp{goalDetail.initial_deposit.toLocaleString("id-ID")}
                 </div>
                 <div className="label">Annual Interest Rate</div>
                 <div className="value">{goalDetail.annual_interest}</div>

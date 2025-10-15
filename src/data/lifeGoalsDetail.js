@@ -1,14 +1,5 @@
-// src/data/lifeGoalsDetail.js
-// Simulasi endpoint detail dan transaksi Life Goals
-
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/**
- * Ambil detail dan transaksi life goal spesifik.
- * @param {string} userId
- * @param {string} goalId
- * @returns {Promise<{detail: object, transactions: object}>}
- */
 export async function fetchLifeGoalDetail(userId, goalId) {
   await delay(300);
 

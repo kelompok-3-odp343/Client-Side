@@ -1,36 +1,24 @@
 import React, { useEffect, useState } from "react";
-import "./Profile.css";
 import Navbar from "../../components/Navbar/Navbar";
+import "./Profile.css";
 import { fetchUserProfile } from "../../data/profile";
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const userId = user?.id || "USR001";
+
     const loadProfile = async () => {
-      setLoading(true);
-      try {
-        const userId = localStorage.getItem("userId") || "dummyUser123";
-        const data = await fetchUserProfile(userId);
-        setProfile(data);
-      } catch (err) {
-        console.error("Failed to fetch profile:", err);
-        setProfile(null);
-      } finally {
-        setLoading(false);
-      }
+      const data = await fetchUserProfile(userId);
+      setProfile(data);
     };
+
     loadProfile();
   }, []);
 
-  const handleSignOut = () => {
-    localStorage.clear();
-    window.location.href = "/";
-  };
-
-  if (loading) return <div className="loading">Loading profile...</div>;
-  if (!profile) return <div className="error">Profile not available.</div>;
+  if (!profile) return <div>Loading profile...</div>;
 
   return (
     <div className="profile-page">
@@ -58,46 +46,38 @@ export default function Profile() {
           <h2 className="section-title">Personal Information</h2>
 
           <div className="info-grid">
-            <div className="info-box">
-              <i className="fas fa-user"></i>
-              <div>
-                <p className="label">Name</p>
-                <p className="value">{profile.name}</p>
-              </div>
-            </div>
-
-            <div className="info-box">
-              <i className="fas fa-calendar-alt"></i>
-              <div>
-                <p className="label">Date of Birth</p>
-                <p className="value">{profile.dob}</p>
-              </div>
-            </div>
-
-            <div className="info-box">
-              <i className="fas fa-envelope"></i>
-              <div>
-                <p className="label">Email Address</p>
-                <p className="value">{profile.email}</p>
-              </div>
-            </div>
-
-            <div className="info-box">
-              <i className="fas fa-phone"></i>
-              <div>
-                <p className="label">Phone Number</p>
-                <p className="value">{profile.phone}</p>
-              </div>
-            </div>
+            <InfoBox icon="fas fa-user" label="Name" value={profile.name} />
+            <InfoBox icon="fas fa-calendar-alt" label="Date of Birth" value={profile.dob} />
+            <InfoBox icon="fas fa-envelope" label="Email Address" value={profile.email} />
+            <InfoBox icon="fas fa-phone" label="Phone Number" value={profile.phone} />
           </div>
 
           <div className="signout-container">
-            <button className="signout-btn" onClick={handleSignOut}>
+            <button
+              className="signout-btn"
+              onClick={() => {
+                localStorage.removeItem("userEmail");
+                localStorage.removeItem("user");
+                window.location.href = "/";
+              }}
+            >
               Sign Out
             </button>
           </div>
         </section>
       </main>
+    </div>
+  );
+}
+
+function InfoBox({ icon, label, value }) {
+  return (
+    <div className="info-box">
+      <i className={icon}></i>
+      <div>
+        <p className="label">{label}</p>
+        <p className="value">{value}</p>
+      </div>
     </div>
   );
 }

@@ -5,42 +5,36 @@ import { Download } from "lucide-react";
 import depositIcon from "../../assets/images/deposit-icon.png";
 import { fetchDeposits, fetchDepositTransactions } from "../../data/deposit";
 
-export default function Deposits() {
+export default function DepositsDashboard() {
   const months = [
     "May", "June", "July", "Aug", "Sept", "Oct",
     "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"
   ];
 
   const [selectedMonth, setSelectedMonth] = useState("May");
-  const [depositsData, setDepositsData] = useState(null);
+  const [depositData, setDepositData] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const userId = localStorage.getItem("userId") || "dummyUser123"; // ← pindah ke sini
-        const deposits = await fetchDeposits(userId);
-        const tx = await fetchDepositTransactions(userId, selectedMonth);
-        setDepositsData(deposits);
-        setTransactions(tx);
-      } catch (err) {
-        console.error("Deposit data fetch failed:", err);
-        setDepositsData({ totalBalance: 0, totalCount: 0, deposits: [] });
-        setTransactions([]);
-      } finally {
-        setLoading(false);
-      }
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const userId = user?.id || "USR001";
+
+    const loadDeposits = async () => {
+      const res = await fetchDeposits(userId);
+      setDepositData(res.data);
     };
 
-    loadData();
+    const loadTransactions = async () => {
+      const res = await fetchDepositTransactions(userId, selectedMonth);
+      setTransactions(res.data);
+    };
+
+    loadDeposits();
+    loadTransactions();
   }, [selectedMonth]);
 
-  if (loading) return <div className="loading">Loading deposits...</div>;
-
   const groupedTransactions = transactions.reduce((acc, tx) => {
-    acc[tx.date] = acc[tx.date] ? [...acc[tx.date], tx] : [tx];
+    acc[tx.trx_date] = acc[tx.trx_date] ? [...acc[tx.trx_date], tx] : [tx];
     return acc;
   }, {});
 
@@ -56,34 +50,32 @@ export default function Deposits() {
             <p className="lg-sub">Lock the Rate, Unlock the Growth</p>
           </div>
 
-          <div className="deposit-summary-card fancy">
-            <div className="deposit-summary-left">
-              <div className="deposit-icon-circle">
-                <img src={depositIcon} alt="Deposit Icon" />
+          {depositData && (
+            <div className="deposit-summary-card fancy">
+              <div className="deposit-summary-left">
+                <div className="deposit-icon-circle">
+                  <img src={depositIcon} alt="Deposit Icon" />
+                </div>
+              </div>
+              <div className="deposit-summary-right">
+                <h3 className="summary-title">{depositData.title}</h3>
+                <p className="summary-label">Total Balance</p>
+                <p className="summary-balance">
+                  Rp{depositData.total_balance.toLocaleString()}
+                </p>
+                <div className="summary-divider" />
+                <p className="summary-sub">
+                  You have {depositData.count_accounts} Time Deposits
+                </p>
               </div>
             </div>
-            <div className="deposit-summary-right">
-              <h3 className="summary-title">Time Deposits</h3>
-              <p className="summary-label">Total Balance</p>
-              <p className="summary-balance">
-                Rp{depositsData?.totalBalance.toLocaleString()}
-              </p>
-              <div className="summary-divider" />
-              <p className="summary-sub">
-                You have {depositsData?.totalCount} Time Deposits
-              </p>
-            </div>
-          </div>
+          )}
 
           <h3 className="your-deposit-title">Your Time Deposits</h3>
           <div className="deposit-grid">
-            {depositsData?.deposits?.length > 0 ? (
-              depositsData.deposits.map((d) => (
-                <DepositCard key={d.id} {...d} />
-              ))
-            ) : (
-              <p>No deposit accounts found.</p>
-            )}
+            {depositData?.items?.map((d) => (
+              <DepositCard key={d.id} {...d} />
+            ))}
           </div>
         </section>
 
@@ -117,19 +109,22 @@ export default function Deposits() {
                       <div className="tx-left">
                         <div className="tx-icon">★</div>
                         <div className="tx-text">
-                          <p className="tx-type">{tx.type}</p>
-                          <p className="tx-detail">{tx.detail}</p>
+                          <p className="tx-type">{tx.trx_type}</p>
+                          <p className="tx-detail">{tx.trx_note}</p>
                         </div>
                       </div>
-                      <p className="tx-amount">{tx.amount}</p>
+                      <p className="tx-amount">
+                        {Number(tx.trx_amount).toLocaleString("id-ID", {
+                          style: "currency",
+                          currency: "IDR",
+                        })}
+                      </p>
                     </div>
                   ))}
                 </div>
               ))
             ) : (
-              <p className="no-tx">
-                No transactions available for {selectedMonth}
-              </p>
+              <p className="no-tx">No transactions available for {selectedMonth}</p>
             )}
           </div>
         </section>
@@ -139,28 +134,41 @@ export default function Deposits() {
 }
 
 /* Deposit Card */
-function DepositCard({ title, balance, date, interest, opening, period }) {
-  const [day, month, year] = date.split(" ");
+function DepositCard({
+  sub_cat,
+  balance,
+  maturity_date,
+  interest_rate,
+  created_time,
+  tenor_months,
+}) {
+  const maturity = new Date(maturity_date);
+  const open = new Date(created_time);
+
   return (
     <div className="deposit-card">
-      <h4 className="deposit-title">{title}</h4>
-      <p className="deposit-balance">Balance: Rp{balance.toLocaleString()}</p>
+      <h4 className="deposit-title">{sub_cat}</h4>
+      <p className="deposit-balance">
+        Balance: Rp{balance.toLocaleString()}
+      </p>
 
       <div className="circle-container">
         <div className="circle-ring">
           <div className="circle-inner">
-            <span className="day">{day}</span>
-            <span className="month">{month}</span>
-            <span className="year">{year}</span>
+            <span className="day">{maturity.getDate()}</span>
+            <span className="month">
+              {maturity.toLocaleString("default", { month: "short" })}
+            </span>
+            <span className="year">{maturity.getFullYear()}</span>
           </div>
         </div>
       </div>
 
       <hr />
       <div className="deposit-info">
-        <p><span>Interest</span><span>{interest}</span></p>
-        <p><span>Opening date</span><span>{opening}</span></p>
-        <p><span>Period</span><span>{period}</span></p>
+        <p><span>Interest</span><span>{interest_rate}%</span></p>
+        <p><span>Opening date</span><span>{open.toLocaleDateString()}</span></p>
+        <p><span>Period</span><span>{tenor_months} months</span></p>
       </div>
     </div>
   );

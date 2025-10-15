@@ -1,12 +1,6 @@
-// Simulasi endpoint profil user
-
+// Simulated API endpoint for user profile
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/**
- * Ambil data profil user.
- * @param {string} userId
- * @returns {Promise<object>}
- */
 export async function fetchUserProfile(userId) {
   await delay(300);
   return {

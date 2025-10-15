@@ -18,7 +18,7 @@ import LifeGoalDetail from "../pages/LifeGoals/LifeGoalsDetail";
 // Deposits, Savings, Pension
 import DepositsDashboard from "../pages/Deposit/Deposit";
 import Savings from "../pages/Savings/Savings";
-import Pension from "../pages/Pension/Pension";
+import Pension from "../pages/Pension/PensionFunds";
 
 // Cards
 import DetailMyCard from "../pages/Card/DetailMyCard";
