@@ -10,7 +10,7 @@ import DepositsDashboard from "./pages/Deposit";
 import Profile from "./pages/Profile";
 import OtpLogin from "./pages/OtpLogin";
 import PopupBlock from "./pages/PopupBlock";
-import CardSection from "./pages/CardSection"
+import CardSection from "./pages/CardSection";
 import DetailMyCard from "./pages/DetailMyCard";
 import SavingsDashboard from "./pages/Savings";
 import PensionFunds from "./pages/PensionFunds";
