@@ -3,24 +3,20 @@
   position: fixed;
   top: 0;
   left: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 1000;
-  background: transparent;
+  background: #ffffff;
   font-family: "Poppins", sans-serif;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-bottom: #000 1px solid;
 }
 
 .navbar-content {
-  width: 98%;
-  margin-top: 15px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 14px;
+  max-width: 1400px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 14px 40px;
 }
 
 /* LEFT */
@@ -40,6 +36,7 @@
   font-size: 22px;
   font-weight: 700;
   color: #000;
+  letter-spacing: 0.5px;
 }
 
 .o1,
@@ -47,7 +44,6 @@
   color: #00b7a5;
 }
 
-/* RIGHT */
 .navbar-right {
   display: flex;
   align-items: center;
@@ -59,9 +55,15 @@
   color: #333;
   cursor: pointer;
   transition: color 0.3s;
-  position: relative;
 }
 
 .nav-icon:hover {
   color: #00b7a5;
+}
+
+.notif-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 900;
 }
