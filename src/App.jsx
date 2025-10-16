@@ -14,6 +14,7 @@ import CardSection from "./pages/CardSection"
 import DetailMyCard from "./pages/DetailMyCard";
 import SavingsDashboard from "./pages/Savings";
 import PensionFunds from "./pages/PensionFunds";
+import SplitBill from "./pages/SplitBill.jsx";
 
 export default function App() {
   const location = useLocation();
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/detailmycard" element={<DetailMyCard />} />
         <Route path="/savings" element={<SavingsDashboard />} />
         <Route path="/pensionfunds" element={<PensionFunds />} />
+        <Route path="/splitbill" element={<SplitBill />} />
       </Routes>
     </AnimatePresence>
   );

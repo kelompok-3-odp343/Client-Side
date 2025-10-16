@@ -266,14 +266,15 @@ export default function Dashboard() {
                     <div className="potential-value">
                       Rp{fmt(split?.potential ?? 0)}
                     </div>
-                    <a href="#" className="view-detail">
+                    <a href="#" className="view-detail"
+                      onClick={() => handleNavigate("splitbill")}>
                       View Detail
                     </a>
                   </div>
                 </div>
                 <button
                   className="btn-add"
-                  onClick={() => handleNavigate("splitbill")}
+                  onClick={() => handleNavigate("detailMyCard")}
                 >
                   + Add a New Bill
                 </button>
