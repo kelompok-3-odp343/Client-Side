@@ -22,19 +22,6 @@ export default function SavingsDashboard() {
     { date: "2 June 2025", month: "June", type: "Taplus Bisnis", detail: "Transfer", amount: "-Rp5.000.000" },
   ];
 
-  /** ---------- FUNCTION: FETCH DATA FROM BACKEND ---------- **/
-  const fetchSavingsData = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/savings"); // contoh endpoint backend
-      if (!response.ok) throw new Error("Failed to fetch savings data");
-      const data = await response.json();
-      setSavingsData(data);
-    } catch (error) {
-      console.warn("⚠️ Backend not available, using dummy savings data:", error.message);
-      setSavingsData(dummySavings);
-    }
-  };
-
   const saving = async () => {
     try {
       const userId = "USR001";

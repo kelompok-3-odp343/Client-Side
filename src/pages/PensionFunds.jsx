@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import "../css/pensionfunds.css"; // Pastikan untuk mengganti CSS jika diperlukan
 import { Download } from "lucide-react";
 import pensionfunds from "../assets/images/pension.png"; // Bisa diganti dengan ikon yang sesuai untuk dana pensiun
+import { getPensionFunds } from '../api/pensionFundsService';
 
 export default function PensionFunds() {
   const months = [
@@ -14,27 +15,37 @@ export default function PensionFunds() {
   const [pensionFundsData, setPensionFundsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
 
-  // Dummy data untuk Pension Funds
-  const dummyPensionFunds = {
-    totalBalance: 5000000, // Saldo total dana pensiun
-    totalCount: 2, // Jumlah akun dana pensiun
-    pensionFunds: [
-      {
-        id: 1,
-        title: "Simponi Likuid",
-        accountNumber: "1234567890",
-        balance: 323000,
-        growth: "-0.7%",
-      },
-      {
-        id: 2,
-        title: "Simponi Likuid Syariah",
-        accountNumber: "1234567891",
-        balance: 323000,
-        growth: "+0.7%",
-      },
-    ],
-  };
+  const pension = async () => {
+    try {
+      const userId = "USR001";
+      const response = await getPensionFunds(userId);
+
+      const funds = Array.isArray(response.data) ? response.data : [];
+
+      const totalBalance = funds.reduce(
+        (sum, f) => sum + f.total_balance,
+        0
+      );
+
+      const pensionFunds = funds.flatMap((f, index) =>
+        f.items.map((item) => ({
+          id: index + 1,
+          title: f.title,
+          accountNumber: item.deposit_account_number,
+          balance: item.balance,
+          growth: index % 2 === 0 ? "+0.6%" : "+0.4%",
+        }))
+      );
+
+      setPensionFundsData({
+        totalBalance,
+        totalCount: pensionFunds.length,
+        pensionFunds,
+      });
+    } catch (error) {
+      console.error("error", error);
+    }
+  }
 
   const dummyTransactions = [
     { date: "31 May 2025", month: "May", type: "Simponi Likuid", detail: "Admin fee", amount: "-Rp1.000" },
@@ -43,7 +54,7 @@ export default function PensionFunds() {
   ];
 
   useEffect(() => {
-    setPensionFundsData(dummyPensionFunds);
+    pension();
     // Filter transaksi sesuai bulan yang dipilih
     const filtered = dummyTransactions.filter((tx) => tx.month === selectedMonth);
     setTransactions(filtered);
