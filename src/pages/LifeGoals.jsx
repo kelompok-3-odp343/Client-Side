@@ -1,81 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import "../css/lifegoals.css";
 import LifeGoalCard from "../components/LifeGoalsCard";
-
-import graduationIcon from "../assets/images/education.png";
-import vacationIcon from "../assets/images/vacation.png";
-import marriageIcon from "../assets/images/marriage.png";
-import homeIcon from "../assets/images/home.png";
-import gadgetIcon from "../assets/images/gadget.png";
-import vehicleIcon from "../assets/images/vehicle.png";
+import { fetchLifeGoals } from "../api/lifeGoalsApi";
+import LIFE_GOALS_META from "../constants/lifeGoalsMeta";
 
 export default function LifeGoals() {
   const navigate = useNavigate();
+  const [goals, setGoals] = useState([]);
+  const [disbursementAccount, setDisbursementAccount] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const goals = [
-    {
-      id: "education",
-      title: "Education",
-      desc: "Invest in Your Brightest Future",
-      color: "#71d9d0",
-      current: 50000000,
-      target: 100000000,
-      progress: 50,
-      icon: graduationIcon,
-    },
-    {
-      id: "vacations",
-      title: "Vacations",
-      desc: "Your Passport to New Memories",
-      color: "#ffd367",
-      current: 80000000,
-      target: 100000000,
-      progress: 80,
-      icon: vacationIcon,
-    },
-    {
-      id: "marriage",
-      title: "Marriage",
-      desc: "Funding your new chapter",
-      color: "#9c7edc",
-      current: 50000000,
-      target: 100000000,
-      progress: 50,
-      icon: marriageIcon,
-    },
-    {
-      id: "home",
-      title: "Home",
-      desc: "Saving for Memories Unmade",
-      color: "#9c7edc",
-      current: 50000000,
-      target: 100000000,
-      progress: 50,
-      icon: homeIcon,
-    },
-    {
-      id: "gadget",
-      title: "Gadget",
-      desc: "Smart saving for smart tech",
-      color: "#6dddd0",
-      current: 50000000,
-      target: 100000000,
-      progress: 50,
-      icon: gadgetIcon,
-    },
-    {
-      id: "vehicles",
-      title: "Vehicles",
-      desc: "Fuel your future ride",
-      color: "#ffd367",
-      current: 50000000,
-      target: 100000000,
-      progress: 50,
-      icon: vehicleIcon,
-    },
-  ];
+  useEffect(() => {
+    async function loadGoals() {
+      setLoading(true);
+      const data = await fetchLifeGoals("USER001");
+      const merged = data.goals.map((g) => {
+        const meta = LIFE_GOALS_META[g.goal_id];
+        const progress = g.target ? Math.round((g.current / g.target) * 100) : 0;
+        return { ...meta, ...g, progress };
+      });
+      setDisbursementAccount(data.disbursement_account);
+      setGoals(merged);
+      setLoading(false);
+    }
+    loadGoals();
+  }, []);
+
+  if (loading) return <div className="loading">Loading Life Goals...</div>;
 
   return (
     <div className="life-goals-page">
@@ -86,9 +39,13 @@ export default function LifeGoals() {
       <div className="life-goal-grid">
         {goals.map((goal) => (
           <LifeGoalCard
-            key={goal.id}
+            key={goal.goal_id}
             goal={goal}
-            onClick={() => navigate(`/lifegoal/${goal.id}`)}
+            onClick={() =>
+              navigate(`/lifegoal/${goal.goal_id}`, {
+                state: { goal, disbursementAccount },
+              })
+            }
           />
         ))}
       </div>
