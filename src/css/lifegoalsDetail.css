@@ -308,9 +308,10 @@
 .info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  row-gap: 0.5rem;
+  row-gap: 0.35rem;
   column-gap: 0.5rem;
   font-size: 13px;
+  line-height: 1.25;
 }
 
 .label {
@@ -325,7 +326,7 @@
 .divider {
   height: 1px;
   background: var(--border);
-  margin: 1rem 0;
+  margin: 0.9rem 0;
 }
 
 /* RESPONSIVE */
