@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import "../css/SavingStyle.css";
 import { Download } from "lucide-react";
 import savingsIcon from "../assets/images/savings-icon.png";
+import { getSavingsData } from '../api/savingsService';
 
 export default function SavingsDashboard() {
   const months = [
@@ -13,16 +14,6 @@ export default function SavingsDashboard() {
   const [selectedMonth, setSelectedMonth] = useState("May");
   const [savingsData, setSavingsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
-
-  /** ---------- DUMMY DATA ---------- **/
-  const dummySavings = {
-    totalBalance: 30000000,
-    totalCount: 2,
-    savings: [
-      { id: 1, title: "Taplus Pegawai BNI", norekening: 1234567899, balance: 7000000 },
-      { id: 2, title: "Taplus Bisnis", norekening: 9876543211, balance: 20000000 },
-    ],
-  };
 
   const dummyTransactions = [
     { date: "31 May 2025", month: "May", type: "Taplus Pegawai BNI", detail: "QRIS", amount: "-Rp15.000" },
@@ -44,6 +35,37 @@ export default function SavingsDashboard() {
     }
   };
 
+  const saving = async () => {
+    try {
+      const userId = "USR001";
+      const response = await getSavingsData(userId);
+
+      const accounts = Array.isArray(response.data) ? response.data : [];
+
+      const totalBalance = accounts.reduce(
+        (sum, acc) => sum + acc.total_balance,
+        0
+      );
+
+      const savings = accounts.flatMap((acc, index) =>
+        acc.items.map((item) => ({
+          id: index + 1,
+          title: item.account_name,
+          norekening: item.account_number,
+          balance: item.effective_balance,
+        }))
+      );
+
+      setSavingsData({
+        totalBalance,
+        totalCount: savings.length,
+        savings,
+      });
+    } catch (error) {
+      console.error("error", error);
+    }
+  }
+
   const fetchTransactions = async (month) => {
     try {
       const response = await fetch(`http://localhost:8080/api/transactions?month=${month}`);
@@ -59,7 +81,7 @@ export default function SavingsDashboard() {
 
   /** ---------- USE EFFECT ---------- **/
   useEffect(() => {
-    fetchSavingsData();
+    saving();
   }, []);
 
   useEffect(() => {
