@@ -1,23 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import "../css/SplitBill.css";
-import SPLIT_BILL_DUMMY_DATA from "../data/dummy";
-
-function normalizeBill(b) {
-  // clone
-  const bill = {
-    ...b,
-    members: (b.members || []).map((m) => ({
-      ...m,
-      amount: typeof m.amount === "string" ? Number(m.amount.replace(/[^\d.-]/g, "")) : Number(m.amount || 0),
-      status: m.status || "Unpaid",
-    })),
-  };
-  bill.remaining_bill = bill.members
-    .filter((m) => m.status !== "Paid")
-    .reduce((s, m) => s + (Number(m.amount) || 0), 0);
-  return bill;
-}
+import { fetchSplitBills } from "../api/splitBillApi"; 
 
 export default function SplitBill() {
   const [bills, setBills] = useState([]);
@@ -27,36 +11,17 @@ export default function SplitBill() {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    async function fetchSplitBills() {
+    async function loadData() {
       setLoading(true);
-      try {
-        const res = await fetch("/api/split-bill/detail/SB001", {
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!res.ok) {
-          setBills(SPLIT_BILL_DUMMY_DATA.map(normalizeBill));
-        } else {
-          const data = await res.json();
-          if (data.status && data.data) {
-            // if API returns single split_bill object or list adapt accordingly
-            const arr = Array.isArray(data.data) ? data.data : [data.data];
-            setBills(arr.map(normalizeBill));
-          } else {
-            setBills(SPLIT_BILL_DUMMY_DATA.map(normalizeBill));
-          }
-        }
-      } catch {
-        setBills(SPLIT_BILL_DUMMY_DATA.map(normalizeBill));
-      } finally {
-        setLoading(false);
-      }
+      const data = await fetchSplitBills(); // 
+      setBills(data);
+      setLoading(false);
     }
-    fetchSplitBills();
+    loadData();
   }, []);
 
   const handleViewDetail = (bill, color) => {
-    const normalized = normalizeBill(bill);
-    setSelectedBill(normalized);
+    setSelectedBill(bill);
     setSelectedColor(color);
     setShowModal(true);
   };
@@ -68,18 +33,26 @@ export default function SplitBill() {
 
   const handleTogglePaid = (index) => {
     if (!selectedBill) return;
+
     const updated = {
       ...selectedBill,
       members: selectedBill.members.map((m, idx) =>
-        idx === index ? { ...m, status: m.status === "Paid" ? "Unpaid" : "Paid" } : m
+        idx === index
+          ? { ...m, status: m.status === "Paid" ? "Unpaid" : "Paid" }
+          : m
       ),
     };
+
     updated.remaining_bill = updated.members
       .filter((m) => m.status !== "Paid")
       .reduce((s, m) => s + (Number(m.amount) || 0), 0);
 
     setSelectedBill(updated);
-    setBills((prev) => prev.map((b) => (b.split_bill_id === updated.split_bill_id ? updated : b)));
+    setBills((prev) =>
+      prev.map((b) =>
+        b.split_bill_id === updated.split_bill_id ? updated : b
+      )
+    );
   };
 
   const cardColors = ["#6dddd0", "#9c7edc", "#ffd367"];
@@ -99,15 +72,24 @@ export default function SplitBill() {
             const col = i % 3;
             const color = cardColors[(row + col) % cardColors.length];
             const membersToShow = bill.members.slice(0, 3);
-            const extraCount = Math.max(0, bill.members.length - membersToShow.length);
+            const extraCount = Math.max(
+              0,
+              bill.members.length - membersToShow.length
+            );
 
             return (
-              <div key={bill.split_bill_id} className="sb-card" style={{ "--color": color }}>
+              <div
+                key={bill.split_bill_id}
+                className="sb-card"
+                style={{ "--color": color }}
+              >
                 <div className="sb-card-header">
                   <h3>{bill.split_bill_title}</h3>
                   <p>
                     <span>Total Bill</span>
-                    <span className="amount">Rp {bill.total_bill.toLocaleString("id-ID")}</span>
+                    <span className="amount">
+                      Rp {bill.total_bill.toLocaleString("id-ID")}
+                    </span>
                   </p>
                 </div>
 
@@ -116,7 +98,12 @@ export default function SplitBill() {
                     <div
                       className="progress-fill"
                       style={{
-                        width: `${(bill.members.filter((m) => m.status === "Paid").length / Math.max(1, bill.members.length)) * 100}%`,
+                        width: `${
+                          (bill.members.filter((m) => m.status === "Paid")
+                            .length /
+                            Math.max(1, bill.members.length)) *
+                          100
+                        }%`,
                       }}
                     />
                   </div>
@@ -128,14 +115,25 @@ export default function SplitBill() {
                       <span>{m.member_name}</span>
                       <span>
                         Rp{Number(m.amount).toLocaleString("id-ID")}{" "}
-                        <span className={`status ${m.status === "Paid" ? "paid" : "unpaid"}`}>{m.status}</span>
+                        <span
+                          className={`status ${
+                            m.status === "Paid" ? "paid" : "unpaid"
+                          }`}
+                        >
+                          {m.status}
+                        </span>
                       </span>
                     </div>
                   ))}
-                  {extraCount > 0 && <div className="sb-member-more">+{extraCount} more</div>}
+                  {extraCount > 0 && (
+                    <div className="sb-member-more">+{extraCount} more</div>
+                  )}
                 </div>
 
-                <button className="view-btn" onClick={() => handleViewDetail(bill, color)}>
+                <button
+                  className="view-btn"
+                  onClick={() => handleViewDetail(bill, color)}
+                >
                   View Detail
                 </button>
               </div>
@@ -145,18 +143,33 @@ export default function SplitBill() {
 
         {showModal && selectedBill && (
           <div className="sb-modal-backdrop" onClick={handleCloseModal}>
-            <div className="sb-modal" onClick={(e) => e.stopPropagation()} style={{ borderTop: `6px solid ${selectedColor}` }}>
+            <div
+              className="sb-modal"
+              onClick={(e) => e.stopPropagation()}
+              style={{ borderTop: `6px solid ${selectedColor}` }}
+            >
               <h2 className="modal-title" style={{ color: selectedColor }}>
                 {selectedBill.split_bill_title}
               </h2>
               <p className="modal-meta">
-                {new Date(selectedBill.created_time).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "medium" })} WIB
+                {new Date(selectedBill.created_time).toLocaleString("id-ID", {
+                  dateStyle: "medium",
+                  timeStyle: "medium",
+                })}{" "}
+                WIB
               </p>
               <p className="modal-ref">Ref ID: {selectedBill.ref_id}</p>
 
-              <div className="modal-total" style={{ background: `linear-gradient(to right, ${selectedColor}, #fff)` }}>
+              <div
+                className="modal-total"
+                style={{
+                  background: `linear-gradient(to right, ${selectedColor}, #fff)`,
+                }}
+              >
                 <span>Total Bill</span>
-                <span>Rp {selectedBill.total_bill.toLocaleString("id-ID")}</span>
+                <span>
+                  Rp {selectedBill.total_bill.toLocaleString("id-ID")}
+                </span>
               </div>
 
               <div className="modal-list scrollable">
@@ -165,18 +178,25 @@ export default function SplitBill() {
                   <div key={i} className="modal-row">
                     <span>{m.member_name}</span>
                     <span>
-                      {m.status === "Paid" ? "+" : "-"} Rp{Number(m.amount).toLocaleString("id-ID")}
+                      {m.status === "Paid" ? "+" : "-"} Rp
+                      {Number(m.amount).toLocaleString("id-ID")}
                       <br />
                       <button
                         className="mark-btn"
                         style={{
                           borderColor: selectedColor,
-                          color: m.status === "Paid" ? "#fff" : selectedColor,
-                          backgroundColor: m.status === "Paid" ? selectedColor : "transparent",
+                          color:
+                            m.status === "Paid" ? "#fff" : selectedColor,
+                          backgroundColor:
+                            m.status === "Paid"
+                              ? selectedColor
+                              : "transparent",
                         }}
                         onClick={() => handleTogglePaid(i)}
                       >
-                        {m.status === "Paid" ? "Mark as Unpaid" : "Mark as Paid"}
+                        {m.status === "Paid"
+                          ? "Mark as Unpaid"
+                          : "Mark as Paid"}
                       </button>
                     </span>
                   </div>
@@ -185,10 +205,20 @@ export default function SplitBill() {
 
               <div className="modal-footer">
                 <span>Remaining Bill</span>
-                <span>Rp {Number(selectedBill.remaining_bill).toLocaleString("id-ID")}</span>
+                <span>
+                  Rp {Number(selectedBill.remaining_bill).toLocaleString("id-ID")}
+                </span>
               </div>
 
-              <button className="close-btn" style={{ backgroundColor: selectedColor, color: "#fff", border: "none" }} onClick={handleCloseModal}>
+              <button
+                className="close-btn"
+                style={{
+                  backgroundColor: selectedColor,
+                  color: "#fff",
+                  border: "none",
+                }}
+                onClick={handleCloseModal}
+              >
                 Close
               </button>
             </div>
