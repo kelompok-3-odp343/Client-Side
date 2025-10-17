@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/components/split-bill-form.css";
+import SplitBillFormCancel from "./SplitBillFormCancel"; // popup component
 import { Plus } from "lucide-react";
 
 export default function SplitBillForm({ onClose, transaction }) {
@@ -10,42 +11,23 @@ export default function SplitBillForm({ onClose, transaction }) {
       participantAmount: "Rp 15.000",
     },
   ]);
-  const [participantName, setParticipantName] = useState();
-  const [participantAmount, setParticipantAmount] = useState();
-  // const [isParticipantEmpty, setParticipantEmpty] = useState(true);
+
+  const [participantName, setParticipantName] = useState("");
+  const [participantAmount, setParticipantAmount] = useState("");
+  const [showCancelPopup, setShowCancelPopup] = useState(false);
 
   function handleAddParticipant(participant) {
-    setParticipants((participants) => [...participants, participant]);
+    setParticipants((prev) => [...prev, participant]);
   }
 
   const handleDeleteParticipant = (id) => {
-    setParticipants((participants) =>
-      participants.filter((participants) => participants.id !== id)
-    );
+    setParticipants((prev) => prev.filter((p) => p.id !== id));
   };
-
-  // function handleDeleteItem(id) {
-  //   setItems((items) => items.filter((item) => item.id !== id));
-  // }
-
-  // const handleSetParticipant = () => {
-  //   if (isParticipantEmpty == true) {
-  //     isParticipantEmpty == false;
-  //     setParticipantEmpty(isParticipantEmpty);
-  //   } else {
-  //     isParticipantEmpty == true;
-  //     setParticipantEmpty(isParticipantEmpty);
-  //   }
-  // };
-
-  // const handleChange = (index, field, value) => {
-  //   const updated = [...participants];
-  //   updated[index][field] = value;
-  //   setParticipants(updated);
-  // };
 
   function handleSubmit(e) {
     e.preventDefault();
+
+    if (!participantName || !participantAmount) return;
 
     const newParticipant = {
       id: Date.now(),
@@ -54,11 +36,8 @@ export default function SplitBillForm({ onClose, transaction }) {
     };
 
     handleAddParticipant(newParticipant);
-
-    setParticipantAmount(0);
+    setParticipantAmount("");
     setParticipantName("");
-    // alert("Split bill saved!");
-    // onClose();
   }
 
   return (
@@ -66,6 +45,8 @@ export default function SplitBillForm({ onClose, transaction }) {
       <div className="splitbill-container">
         <h2 className="title">Split Bill Form</h2>
         <hr />
+
+        {/* Transaction Info */}
         <div className="transaction-info">
           <div className="transaction-info-left-panel">
             <p>
@@ -78,6 +59,8 @@ export default function SplitBillForm({ onClose, transaction }) {
             </p>
           </div>
         </div>
+
+        {/* Bill Info */}
         <div className="bill-info-container">
           <div className="bill-info">
             <p>
@@ -89,48 +72,51 @@ export default function SplitBillForm({ onClose, transaction }) {
           </div>
         </div>
 
+        {/* Participant Section */}
         <div className="participant-secition-container">
-          {" "}
           <div className="participant-section">
             <div className="participant-header">
               <span>No</span>
               <span>Bill Members</span>
               <span>Amount Per Member</span>
             </div>
+
             {participants.map((p, i) => (
-              <div key={i} className="participant-row">
+              <div key={p.id} className="participant-row">
                 <span>{i + 1}</span>
                 <input
                   type="text"
                   placeholder="Enter name"
                   value={participantName}
                   onChange={(e) => setParticipantName(e.target.value)}
-                  // onChange={(e) => handleChange(i, "name", e.target.value)}
                 />
                 <input
                   type="text"
                   placeholder="Rp..."
                   value={participantAmount}
-                  onChange={(e) => setParticipantAmount(Number(e.target.value))}
-                  // onChange={(e) => handleChange(i, "amount", e.target.value)}
+                  onChange={(e) => setParticipantAmount(e.target.value)}
                 />
                 {i === participants.length - 1 && (
                   <div className="btn-container">
                     <button
                       type="button"
                       className="rmv-btn"
-                      onClick={handleDeleteParticipant}
+                      onClick={() => handleDeleteParticipant(p.id)}
                     >
-                      {/* <Plus size={18} /> */}
-                      <i class="bi bi-dash-circle"></i>
+                      <i className="bi bi-dash-circle"></i>
                     </button>
                     <button
                       type="button"
                       className="add-btn"
-                      onClick={handleAddParticipant}
+                      onClick={() =>
+                        handleAddParticipant({
+                          id: Date.now(),
+                          participantName: "",
+                          participantAmount: "",
+                        })
+                      }
                     >
-                      {/* <Plus size={18} /> */}
-                      <i class="bi bi-plus-circle"></i>
+                      <i className="bi bi-plus-circle"></i>
                     </button>
                   </div>
                 )}
@@ -139,8 +125,12 @@ export default function SplitBillForm({ onClose, transaction }) {
           </div>
         </div>
 
+        {/* Buttons */}
         <div className="add-participant-btn-container">
-          <button className="cancel-add-participant" onClick={onClose}>
+          <button
+            className="cancel-add-participant"
+            onClick={() => setShowCancelPopup(true)}
+          >
             Cancel
           </button>
           <button className="add-participant-btn" onClick={handleSubmit}>
@@ -148,6 +138,14 @@ export default function SplitBillForm({ onClose, transaction }) {
           </button>
         </div>
       </div>
+
+      {/* Popup Cancel */}
+      {showCancelPopup && (
+        <SplitBillFormCancel
+          onConfirm={onClose} // keluar dari form
+          onCancel={() => setShowCancelPopup(false)} // kembali ke form
+        />
+      )}
     </div>
   );
 }

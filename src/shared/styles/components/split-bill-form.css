@@ -185,7 +185,7 @@
 }
 
 .splitbill-modal .add-participant-btn:hover {
-  color: #000000;
+  color: #fff;
 }
 
 .bi-dash-circle {
@@ -224,7 +224,7 @@
 
 .cancel-add-participant:hover {
   background-color: #c00f0c;
-  color: #000000;
+  color: #fff;
 }
 
 .add-participant-btn {
