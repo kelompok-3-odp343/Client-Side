@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/components/navbar.css";
 import NotificationPanel from "./NotificationPanel";
@@ -7,6 +7,20 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [showNotif, setShowNotif] = useState(false);
   const bellRef = useRef(null);
+
+  useEffect(() => {
+    if (!showNotif) return;
+
+    function handleOutside(e) {
+      if (bellRef.current?.contains(e.target)) return;
+      if (document.querySelector(".notif-panel")?.contains(e.target)) return;
+      setShowNotif(false);
+    }
+
+    document.addEventListener("pointerdown", handleOutside);
+    return () => document.removeEventListener("pointerdown", handleOutside);
+  }, [showNotif]);
+
 
   return (
     <>
@@ -26,7 +40,8 @@ export default function Navbar() {
               className="fas fa-bell nav-icon"
               onClick={(e) => {
                 e.stopPropagation();
-                setShowNotif((prev) => !prev);
+                e.nativeEvent.stopImmediatePropagation();   // <-- ADD THIS
+                setShowNotif(prev => !prev);
               }}
             ></i>
 
@@ -40,10 +55,7 @@ export default function Navbar() {
 
       {showNotif && (
         <>
-          <div
-            className="notif-overlay"
-            onClick={() => setShowNotif(false)}
-          />
+          {/* <div className="notif-overlay" /> */}
           <NotificationPanel visible={showNotif} anchorRef={bellRef} />
         </>
       )}

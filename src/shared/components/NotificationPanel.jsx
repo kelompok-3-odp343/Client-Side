@@ -9,8 +9,8 @@ export default function NotificationPanel({ visible, anchorRef }) {
       const bellRect = anchorRef.current.getBoundingClientRect();
       const panel = panelRef.current;
 
-      const top = bellRect.bottom + 10; // sedikit di bawah lonceng
-      const left = bellRect.right - panel.offsetWidth; // sejajar kanan lonceng
+      const top = bellRect.bottom + 10;
+      const left = bellRect.right - panel.offsetWidth;
 
       panel.style.position = "fixed";
       panel.style.top = `${top}px`;
@@ -21,7 +21,7 @@ export default function NotificationPanel({ visible, anchorRef }) {
   if (!visible) return null;
 
   return (
-    <div ref={panelRef} className="notif-panel fade-in">
+    <div ref={panelRef} className="notif-panel fade-in" onClick={(e) => e.stopPropagation()}>
       <h3 className="notif-title">Notifications</h3>
 
       <div className="notif-card notif-blue">
