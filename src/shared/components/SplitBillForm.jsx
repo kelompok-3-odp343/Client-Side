@@ -30,7 +30,7 @@ export default function SplitBillForm({ onClose, transaction }) {
 
   const remainingAmount = totalBill - totalParticipantAmount;
 
-  // 🔒 Kunci scroll background saat modal terbuka
+  // 🔒 Kunci scroll background saat modal aktif
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -38,7 +38,7 @@ export default function SplitBillForm({ onClose, transaction }) {
     };
   }, []);
 
-  // 🎯 Fokus otomatis pada input baru
+  // 🎯 Fokus otomatis ke input baru
   useEffect(() => {
     const last = participants[participants.length - 1];
     if (lastAddedId.current && last && lastAddedId.current === last.id) {
@@ -98,9 +98,19 @@ export default function SplitBillForm({ onClose, transaction }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setErrorMessage("");
+
+    const emptyName = participants.find(
+      (p) => !p.participantName.trim() || !p.participantAmount.trim()
+    );
+
+    if (emptyName) {
+      setErrorMessage("Nama peserta dan jumlah harus diisi sebelum menyimpan.");
+      return;
+    }
 
     if (totalParticipantAmount !== totalBill) {
-      setErrorMessage("Total pembagian harus sama dengan total tagihan sebelum disimpan.");
+      setErrorMessage("Total pembagian belum sesuai dengan total tagihan.");
       return;
     }
 
@@ -135,8 +145,6 @@ export default function SplitBillForm({ onClose, transaction }) {
   const hasEmptyFields = participants.some(
     (p) => !p.participantName.trim() || !p.participantAmount.trim()
   );
-
-  const disableSave = isSaving || remainingAmount !== 0 || hasEmptyFields;
 
   return (
     <div className="splitbill-modal" role="dialog" aria-modal="true">
@@ -244,10 +252,10 @@ export default function SplitBillForm({ onClose, transaction }) {
           <button
             className="add-participant-btn"
             onClick={handleSubmit}
-            disabled={disableSave}
+            disabled={isSaving}
             style={{
-              opacity: disableSave ? 0.6 : 1,
-              cursor: disableSave ? "not-allowed" : "pointer",
+              opacity: isSaving ? 0.6 : 1,
+              cursor: isSaving ? "not-allowed" : "pointer",
             }}
           >
             {isSaving ? "Saving..." : "Save Split"}
