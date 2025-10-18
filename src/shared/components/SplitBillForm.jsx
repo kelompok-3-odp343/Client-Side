@@ -86,7 +86,7 @@ export default function SplitBillForm({ onClose, transaction }) {
 
       if (newTotal > totalBill) {
         setErrorMessage(
-          `Jumlah total pembagian melebihi nilai tagihan (${formatRp(totalBill.toString())}).`
+          `Unsplit amount exceeds the total bill (${formatRp(totalBill.toString())}).`
         );
         return prev;
       }
@@ -105,12 +105,12 @@ export default function SplitBillForm({ onClose, transaction }) {
     );
 
     if (emptyName) {
-      setErrorMessage("Nama peserta dan jumlah harus diisi sebelum menyimpan.");
+      setErrorMessage("Please fill in name and amount fields before saving.");
       return;
     }
 
     if (totalParticipantAmount !== totalBill) {
-      setErrorMessage("Total pembagian belum sesuai dengan total tagihan.");
+      setErrorMessage("Split amount doesn't match the total bill.");
       return;
     }
 
@@ -131,7 +131,7 @@ export default function SplitBillForm({ onClose, transaction }) {
       await createSplitBill(payload);
       setShowSuccess(true);
     } catch {
-      setErrorMessage("Gagal menyimpan data, coba lagi.");
+      setErrorMessage("Failed saving data, please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -141,6 +141,11 @@ export default function SplitBillForm({ onClose, transaction }) {
     if (!val) return "Rp 0";
     return "Rp " + val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
+
+  const formatAmount = (val) => {
+    if (!val) return "";
+    return val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
 
   const hasEmptyFields = participants.some(
     (p) => !p.participantName.trim() || !p.participantAmount.trim()
@@ -169,34 +174,32 @@ export default function SplitBillForm({ onClose, transaction }) {
           <div className="bill-info">
             <p><strong>Bill Name :</strong> {transaction.detail}</p>
             <p><strong>Total Bill :</strong> {transaction.amount}</p>
-            <p style={{ fontWeight: "600", color: "#333" }}>
-              Total Dibagi: {formatRp(totalParticipantAmount.toString())}
-            </p>
+            <p><strong>Split Amount :</strong> {formatRp(totalParticipantAmount.toString())}</p>
             {remainingAmount > 0 && (
-              <p style={{ color: "#c88a00", fontWeight: "600" }}>
-                Sisa belum terbagi: {formatRp(remainingAmount.toString())}
+              <p style={{ color: "#c00f0c", fontWeight: "600" }}>
+                Unsplit Amount : {formatRp(remainingAmount.toString())}
               </p>
             )}
             {remainingAmount === 0 && (
               <p style={{ color: "#00a05a", fontWeight: "600" }}>
-                Pembagian sudah pas.
+                All amounts match the total bill.
               </p>
             )}
           </div>
         </div>
 
-        <div className="participant-secition-container">
+        <div className="participant-section-container">
           <div className="participant-section">
             <div className="participant-header">
               <span>No</span>
-              <span>Bill Members</span>
+              <span>Bill Member</span>
               <span>Amount Per Member</span>
               <span></span>
             </div>
 
             {participants.map((p, i) => (
               <div key={p.id} className="participant-row">
-                <span>{i + 1}</span>
+                <span className="member-index">{i + 1}</span>
                 <input
                   type="text"
                   placeholder="Enter name"
@@ -210,7 +213,7 @@ export default function SplitBillForm({ onClose, transaction }) {
                     inputMode="numeric"
                     type="text"
                     placeholder="0"
-                    value={p.participantAmount}
+                    value={formatAmount(p.participantAmount)}
                     onChange={(e) => handleChangeAmount(p.id, e.target.value)}
                   />
                 </div>
@@ -258,7 +261,7 @@ export default function SplitBillForm({ onClose, transaction }) {
               cursor: isSaving ? "not-allowed" : "pointer",
             }}
           >
-            {isSaving ? "Saving..." : "Save Split"}
+            {isSaving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>
@@ -273,14 +276,14 @@ export default function SplitBillForm({ onClose, transaction }) {
       {showSuccess && (
         <div className="splitbill-success-overlay">
           <div className="splitbill-success-modal">
-            <h3>Split Bill berhasil disimpan!</h3>
-            <p>Data tagihan bersama telah ditambahkan ke daftar Split Bill.</p>
+            <h3>Split bill saved successfully!</h3>
+            <p>Split bill data has been added to split bill list.</p>
             <div className="success-btn-group">
               <button className="go-splitbill" onClick={() => navigate("/splitbill")}>
-                Lihat Split Bill
+                View Split Bill List
               </button>
               <button className="close-success" onClick={() => onClose()}>
-                Tutup
+                Close
               </button>
             </div>
           </div>

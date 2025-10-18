@@ -62,7 +62,7 @@
 }
 
 /* participant area */
-.participant-secition-container {
+.participant-section-container {
   display: flex;
   justify-content: center;
   flex: 1;
@@ -105,6 +105,11 @@
   border-bottom: none;
 }
 
+.member-index {
+  font-size: 14px;
+  padding-left: 5px;
+}
+
 /* name input */
 .participant-row input[type="text"] {
   width: 100%;
@@ -134,11 +139,12 @@
   justify-content: center;
   width: 40px;
   height: 36px;
-  border: 1px solid #e6e6e6;
-  border-right: none;
+  /* border: 1px solid #e6e6e6; */
+  /* border-right: none; */
   border-radius: 6px 0 0 6px;
-  background: #fafafa;
-  font-weight: 600;
+  /* background: #fafafa; */
+  /* font-weight: 600; */
+  font-size: 14px;
 }
 
 .col-amount input {
@@ -173,16 +179,25 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px;
+  padding: 3px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
 }
 
-.add-btn:hover,
+.add-btn:hover {
+  background: none;
+  color: #6dddd0;
+  border: 1px solid #6dddd0;
+}
+
 .rmv-btn:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: none;
+  color: #c00f0c;
+  border: 1px solid #c00f0c;
 }
 
 /* bottom buttons */
@@ -211,8 +226,20 @@
   border: 1px solid #c00f0c;
 }
 
+.cancel-add-participant:hover {
+  background-color: #c00f0c;
+  color: #fff;
+  border: 1px solid #c00f0c;
+}
+
 /* Save */
 .add-participant-btn {
+  background-color: transparent;
+  color: #6dddd0;
+  border: 1px solid #6dddd0;
+}
+
+.add-participant-btn:hover {
   background-color: #6dddd0;
   color: #fff;
   border: 1px solid #6dddd0;
@@ -277,28 +304,35 @@
 }
 
 .go-splitbill {
-  background-color: #6dddd0;
-  color: #fff;
-  border: none;
+  background-color: transparent;
+  color: #6dddd0;
+  border: 1px solid #6dddd0;
   border-radius: 6px;
   padding: 8px 16px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.go-splitbill:hover {
+  background-color: #6dddd0;
+  color: #fff;
+  border: 1px solid #6dddd0;
 }
 
 .close-success {
   background-color: transparent;
-  color: #333;
-  border: 1px solid #999;
+  color: #c00f0c;
+  border: 1px solid #c00f0c;
   border-radius: 6px;
   padding: 8px 16px;
   font-weight: 600;
   cursor: pointer;
 }
 
-.go-splitbill:hover,
 .close-success:hover {
-  filter: brightness(0.9);
+  background-color: #c00f0c;
+  color: #fff;
+  border: 1px solid #c00f0c;
 }
 
 .error-message {
