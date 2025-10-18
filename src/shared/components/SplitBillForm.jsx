@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function SplitBillForm({ onClose, transaction }) {
   const [participants, setParticipants] = useState([
-    { id: Date.now(), participantName: "Evan Edrin", participantAmount: "15000" },
+    { id: Date.now(), participantName: "", participantAmount: "" },
   ]);
   const [showCancelPopup, setShowCancelPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");

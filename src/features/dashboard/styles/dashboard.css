@@ -104,7 +104,7 @@ body {
 
 /* Assets card gradient teal (match image 2) */
 .card-gradient.assets-card {
-  background: linear-gradient(180deg, rgba(61, 200, 176, 0.95) 0%, rgba(241, 250, 248, 0.95) 100%);
+  background: linear-gradient(180deg, #6dddd0 0%, rgba(241, 250, 248, 0.95) 100%);
   color: #042924;
   padding: 22px;
   min-height: 160px;
@@ -115,12 +115,12 @@ body {
 
 .card-gradient.assets-card h3 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
 }
 
 .card-gradient.assets-card h1 {
-  margin: 10px 0;
+  /* margin: 10px 0; */
   font-size: 34px;
   font-weight: 900;
 }
@@ -144,29 +144,30 @@ body {
 }
 
 .small-card--income {
-  background: linear-gradient(90deg, rgba(75, 210, 181, 0.12), rgba(75, 210, 181, 0.06));
-  color: #04443a;
+  background: linear-gradient(90deg, #6dddd0, #fff);
+  color: #000;
 }
 
 .small-card--expense {
-  background: linear-gradient(90deg, rgba(255, 178, 143, 0.12), rgba(255, 178, 143, 0.06));
-  color: #6b2a00;
+  background: linear-gradient(90deg, #FFBC8E, #fff);
+  color: #000;
 }
 
 .small-card--receivable {
-  background: linear-gradient(90deg, rgba(255, 243, 204, 0.12), rgba(255, 243, 204, 0.06));
-  color: #6b4f00;
+  background: linear-gradient(90deg, #FFE8B0, #fff);
+  color: #000;
 }
 
 .small-title {
-  font-weight: 700;
-  font-size: 15px;
+  font-weight: 800;
+  font-size: 17px;
 }
 
 .small-sub {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 6px;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  /* margin-top: 6px; */
 }
 
 /* Split card */
@@ -459,8 +460,10 @@ body {
 
 /* small helpers */
 .muted {
-  color: rgba(3, 25, 20, 0.6);
-  font-size: 13px;
+  color: #000;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .card-head h3 {
@@ -469,8 +472,15 @@ body {
   font-weight: 700;
 }
 
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .card-body h1 {
-  margin: 0;
   font-size: 30px;
   font-weight: 800;
 }
