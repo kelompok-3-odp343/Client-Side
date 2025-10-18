@@ -14,8 +14,8 @@ export default function DetailMyCard() {
       {
         date: "31 May 2025",
         items: [
-          { type: "QRIS", detail: "Warung Kak Ros", amount: "-Rp25.000" },
-          { type: "QRIS", detail: "Warung Kak Udin", amount: "-Rp25.000" },
+          { type: "QRIS", detail: "Warung Kak Ros", amount: "-Rp25.000", jenisTransaksi: 'Pengeluaran' },
+          { type: "QRIS", detail: "Warung Kak Udin", amount: "-Rp25.000", jenisTransaksi: 'Pengeluaran' },
         ],
       },
       {
@@ -25,11 +25,14 @@ export default function DetailMyCard() {
             type: "Transfer",
             detail: "BNI - Gajian uhuy",
             amount: "+Rp50.000.000",
+            jenisTransaksi: 'Pemasukan'
+
           },
           {
             type: "E-Wallet",
             detail: "Top Up Ovo - 0123456789",
             amount: "-Rp25.000",
+            jenisTransaksi: 'Pengeluaran'
           },
         ],
       },
@@ -42,13 +45,14 @@ export default function DetailMyCard() {
             type: "Transfer",
             detail: "BNI - Payroll Bonus",
             amount: "+Rp10.000.000",
+            jenisTransaksi: 'Pemasukan'
           },
         ],
       },
       {
         date: "02 June 2025",
         items: [
-          { type: "QRIS", detail: "Warung Kak Ros", amount: "-Rp50.000" },
+          { type: "QRIS", detail: "Warung Kak Ros", amount: "-Rp50.000", jenisTransaksi: 'Pengeluaran' },
         ],
       },
     ],
@@ -192,12 +196,14 @@ export default function DetailMyCard() {
                           >
                             {item.amount}
                           </span>
-                          <button
-                            className="split-btn"
-                            onClick={() => setShowSplitModal(true)}
-                          >
-                            Split bill?
-                          </button>
+                          {item.jenisTransaksi === 'Pengeluaran' && (
+                            <button
+                              className="split-btn"
+                              onClick={() => setShowSplitModal(true)}
+                            >
+                              Split bill?
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}
