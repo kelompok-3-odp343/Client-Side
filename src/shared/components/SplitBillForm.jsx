@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import "../styles/components/split-bill-form.css";
 import SplitBillFormCancel from "./SplitBillFormCancel";
 import { Plus, Minus } from "lucide-react";
+import { createSplitBill } from "../../features/split-bill/api/split-bill.api";
+import { useNavigate } from "react-router-dom";
 
 export default function SplitBillForm({ onClose, transaction }) {
   const [participants, setParticipants] = useState([
@@ -9,9 +11,12 @@ export default function SplitBillForm({ onClose, transaction }) {
   ]);
   const [showCancelPopup, setShowCancelPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const inputRefs = useRef({});
   const lastAddedId = useRef(null);
+  const navigate = useNavigate();
 
   const totalBill = parseInt(
     (transaction.amount || "").toString().replace(/[^\d]/g, ""),
@@ -25,7 +30,7 @@ export default function SplitBillForm({ onClose, transaction }) {
 
   const remainingAmount = totalBill - totalParticipantAmount;
 
-  // 🔒 Kunci scroll halaman belakang
+  // 🔒 Kunci scroll background saat modal terbuka
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -33,7 +38,7 @@ export default function SplitBillForm({ onClose, transaction }) {
     };
   }, []);
 
-  // Fokus otomatis hanya ketika row baru ditambahkan
+  // 🎯 Fokus otomatis pada input baru
   useEffect(() => {
     const last = participants[participants.length - 1];
     if (lastAddedId.current && last && lastAddedId.current === last.id) {
@@ -91,18 +96,35 @@ export default function SplitBillForm({ onClose, transaction }) {
     });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (totalParticipantAmount > totalBill) {
-      setErrorMessage(
-        "Jumlah total pembagian melebihi total tagihan. Kurangi nominal sebelum menyimpan."
-      );
+
+    if (totalParticipantAmount !== totalBill) {
+      setErrorMessage("Total pembagian harus sama dengan total tagihan sebelum disimpan.");
       return;
     }
-    const cleaned = participants
-      .map((p) => ({ ...p, participantAmount: p.participantAmount || "0" }))
-      .filter((p) => p.participantName.trim() !== "");
-    if (onClose) onClose(cleaned);
+
+    setIsSaving(true);
+
+    const payload = {
+      split_bill_title: transaction.detail,
+      total_bill: totalBill,
+      ref_id: transaction.id,
+      members: participants.map((p) => ({
+        member_name: p.participantName,
+        amount: Number(p.participantAmount),
+        status: "Unpaid",
+      })),
+    };
+
+    try {
+      await createSplitBill(payload);
+      setShowSuccess(true);
+    } catch {
+      setErrorMessage("Gagal menyimpan data, coba lagi.");
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   const formatRp = (val) => {
@@ -110,10 +132,11 @@ export default function SplitBillForm({ onClose, transaction }) {
     return "Rp " + val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  // 🔍 Cek apakah masih ada kolom kosong
   const hasEmptyFields = participants.some(
     (p) => !p.participantName.trim() || !p.participantAmount.trim()
   );
+
+  const disableSave = isSaving || remainingAmount !== 0 || hasEmptyFields;
 
   return (
     <div className="splitbill-modal" role="dialog" aria-modal="true">
@@ -136,15 +159,11 @@ export default function SplitBillForm({ onClose, transaction }) {
 
         <div className="bill-info-container">
           <div className="bill-info">
-            <p>
-              <strong>Bill Name :</strong> {transaction.detail}
-            </p>
-            <p>
-              <strong>Total Bill :</strong> {transaction.amount}</p>
+            <p><strong>Bill Name :</strong> {transaction.detail}</p>
+            <p><strong>Total Bill :</strong> {transaction.amount}</p>
             <p style={{ fontWeight: "600", color: "#333" }}>
               Total Dibagi: {formatRp(totalParticipantAmount.toString())}
             </p>
-
             {remainingAmount > 0 && (
               <p style={{ color: "#c88a00", fontWeight: "600" }}>
                 Sisa belum terbagi: {formatRp(remainingAmount.toString())}
@@ -159,7 +178,7 @@ export default function SplitBillForm({ onClose, transaction }) {
         </div>
 
         <div className="participant-secition-container">
-          <div className="participant-section" aria-label="participant-list">
+          <div className="participant-section">
             <div className="participant-header">
               <span>No</span>
               <span>Bill Members</span>
@@ -169,39 +188,27 @@ export default function SplitBillForm({ onClose, transaction }) {
 
             {participants.map((p, i) => (
               <div key={p.id} className="participant-row">
-                <span className="col-no">{i + 1}</span>
-
-                <div className="col-name">
-                  <input
-                    type="text"
-                    placeholder="Enter name"
-                    ref={(el) => (inputRefs.current[p.id] = el)}
-                    value={p.participantName}
-                    onChange={(e) => handleChangeName(p.id, e.target.value)}
-                  />
-                </div>
-
+                <span>{i + 1}</span>
+                <input
+                  type="text"
+                  placeholder="Enter name"
+                  ref={(el) => (inputRefs.current[p.id] = el)}
+                  value={p.participantName}
+                  onChange={(e) => handleChangeName(p.id, e.target.value)}
+                />
                 <div className="col-amount">
                   <span className="rp-prefix">Rp</span>
                   <input
                     inputMode="numeric"
-                    pattern="[0-9]*"
                     type="text"
                     placeholder="0"
                     value={p.participantAmount}
                     onChange={(e) => handleChangeAmount(p.id, e.target.value)}
-                    aria-label={`amount-${i + 1}`}
                   />
                 </div>
-
                 <div className="row-actions">
                   {participants.length > 1 && (
-                    <button
-                      type="button"
-                      className="rmv-btn"
-                      onClick={() => handleDeleteRow(p.id)}
-                      title="Remove"
-                    >
+                    <button type="button" className="rmv-btn" onClick={() => handleDeleteRow(p.id)}>
                       <Minus />
                     </button>
                   )}
@@ -210,8 +217,7 @@ export default function SplitBillForm({ onClose, transaction }) {
                       type="button"
                       className="add-btn"
                       onClick={handleAddRow}
-                      title="Add row"
-                      disabled={hasEmptyFields} // ⛔ nonaktif jika ada kolom kosong
+                      disabled={hasEmptyFields}
                       style={{
                         opacity: hasEmptyFields ? 0.4 : 1,
                         cursor: hasEmptyFields ? "not-allowed" : "pointer",
@@ -226,36 +232,51 @@ export default function SplitBillForm({ onClose, transaction }) {
           </div>
         </div>
 
-        {/* Inline Error Message */}
-        {errorMessage && (
-          <div
-            style={{
-              color: "#c00f0c",
-              fontSize: "14px",
-              fontWeight: 600,
-              marginTop: "10px",
-              textAlign: "center",
-            }}
-          >
-            {errorMessage}
-          </div>
-        )}
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
 
         <div className="add-participant-btn-container">
-          <button className="cancel-add-participant" onClick={() => setShowCancelPopup(true)}>
+          <button
+            className="cancel-add-participant"
+            onClick={() => setShowCancelPopup(true)}
+          >
             Cancel
           </button>
-          <button className="add-participant-btn" onClick={handleSubmit}>
-            Save Split
+          <button
+            className="add-participant-btn"
+            onClick={handleSubmit}
+            disabled={disableSave}
+            style={{
+              opacity: disableSave ? 0.6 : 1,
+              cursor: disableSave ? "not-allowed" : "pointer",
+            }}
+          >
+            {isSaving ? "Saving..." : "Save Split"}
           </button>
         </div>
       </div>
 
       {showCancelPopup && (
         <SplitBillFormCancel
-          onConfirm={() => onClose && onClose(null)}
+          onConfirm={onClose}
           onCancel={() => setShowCancelPopup(false)}
         />
+      )}
+
+      {showSuccess && (
+        <div className="splitbill-success-overlay">
+          <div className="splitbill-success-modal">
+            <h3>Split Bill berhasil disimpan!</h3>
+            <p>Data tagihan bersama telah ditambahkan ke daftar Split Bill.</p>
+            <div className="success-btn-group">
+              <button className="go-splitbill" onClick={() => navigate("/splitbill")}>
+                Lihat Split Bill
+              </button>
+              <button className="close-success" onClick={() => onClose()}>
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

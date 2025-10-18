@@ -235,3 +235,76 @@
     display: flex;
   }
 }
+
+/* === POPUP SUKSES === */
+.splitbill-success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 300;
+}
+
+.splitbill-success-modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px 32px;
+  width: 420px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.splitbill-success-modal h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 10px;
+}
+
+.splitbill-success-modal p {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.success-btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.go-splitbill {
+  background-color: #6dddd0;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.close-success {
+  background-color: transparent;
+  color: #333;
+  border: 1px solid #999;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.go-splitbill:hover,
+.close-success:hover {
+  filter: brightness(0.9);
+}
+
+.error-message {
+  color: #c00f0c;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 10px;
+  text-align: center;
+}
