@@ -3,9 +3,26 @@ import SplitBillForm from "../../../shared/components/SplitBillForm";
 import "../styles/detail-my-card.css";
 import Navbar from "../../../shared/components/Navbar";
 import { EyeOff, Eye } from "lucide-react";
+import { fetchAllCards, fetchCardTransactions } from "../api/card.api";
 import { DUMMY_CARDS, DUMMY_TRANSACTIONS } from "../data/card.dummy";
 
 export default function DetailMyCard() {
+  const months = [
+    "May",
+    "June",
+    "July",
+    "Aug",
+    "Sept",
+    "Oct",
+    "Nov",
+    "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+  ];
+
+  const [cards, setCards] = useState(DUMMY_CARDS);
   const [selectedCard, setSelectedCard] = useState(DUMMY_CARDS[0]);
   const [selectedMonth, setSelectedMonth] = useState("May");
   const [showBalance, setShowBalance] = useState(true);
@@ -14,232 +31,274 @@ export default function DetailMyCard() {
   const [transactions, setTransactions] = useState([]);
   const [chartData, setChartData] = useState({ income: 0, expense: 0 });
 
-  // normalisasi nama bulan
-  const normalize = (m) => m?.toLowerCase().slice(0, 3);
+  // helper: normalize month to 3-letter lowercase for robust matching
+  const normalize = (m) => (m || "").toString().toLowerCase().slice(0, 3);
 
-  // daftar bulan (singkatan tapi tetap support matching)
-  const months = [
-    "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"
-  ];
-
-  // ambil transaksi per akun dan bulan
+  // load cards (api-ready, fallback to dummy)
   useEffect(() => {
-    const allTx = DUMMY_TRANSACTIONS[selectedCard.account_id] || [];
-    const filtered = allTx.filter(
-      (t) => normalize(t.month) === normalize(selectedMonth)
-    );
-    setTransactions(filtered);
+    let mounted = true;
+    async function loadCards() {
+      try {
+        const data = await fetchAllCards();
+        if (!mounted) return;
+        if (Array.isArray(data) && data.length) {
+          setCards(data);
+          // keep current selection if present, otherwise pick first
+          const current =
+            data.find((c) => c.account_id === selectedCard?.account_id) ||
+            data[0];
+          setSelectedCard(current);
+        }
+      } catch {
+        /* fallback already set */
+      }
+    }
+    loadCards();
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // load transactions when selectedCard or month changes
+  useEffect(() => {
+    let mounted = true;
+    async function loadTx() {
+      try {
+        const res = await fetchCardTransactions(selectedCard.account_id);
+        const arr = Array.isArray(res) ? res : [];
+        if (!mounted) return;
+        // filter by month (robust)
+        const filtered = arr.filter(
+          (g) => normalize(g.month) === normalize(selectedMonth)
+        );
+        setTransactions(filtered);
+      } catch {
+        // fallback to dummy transactions if api fails
+        const arr = DUMMY_TRANSACTIONS[selectedCard.account_id] || [];
+        const filtered = arr.filter(
+          (g) => normalize(g.month) === normalize(selectedMonth)
+        );
+        if (mounted) setTransactions(filtered);
+      }
+    }
+    if (selectedCard?.account_id) loadTx();
+    return () => {
+      mounted = false;
+    };
   }, [selectedCard, selectedMonth]);
 
-  // hitung income dan expense
+  // compute chart data based on current transactions
   useEffect(() => {
-    const allTx = DUMMY_TRANSACTIONS[selectedCard.account_id] || [];
-    const monthTx = allTx.filter(
-      (t) => normalize(t.month) === normalize(selectedMonth)
-    );
-
-    const income = monthTx
-      .flatMap((t) => t.items)
-      .filter((i) => i.amount.startsWith("+"))
-      .reduce((s, i) => s + Number(i.amount.replace(/[^\d]/g, "")), 0);
-
-    const expense = monthTx
-      .flatMap((t) => t.items)
-      .filter((i) => i.amount.startsWith("-"))
-      .reduce((s, i) => s + Number(i.amount.replace(/[^\d]/g, "")), 0);
-
+    const flatItems = transactions.flatMap((g) => g.items || []);
+    const income = flatItems
+      .filter((i) => typeof i.amount === "string" && i.amount.startsWith("+"))
+      .reduce((s, i) => s + Number((i.amount || "").replace(/[^\d]/g, "")), 0);
+    const expense = flatItems
+      .filter((i) => typeof i.amount === "string" && i.amount.startsWith("-"))
+      .reduce((s, i) => s + Number((i.amount || "").replace(/[^\d]/g, "")), 0);
     setChartData({ income, expense });
-  }, [selectedCard, selectedMonth]);
+  }, [transactions]);
+
+  // when user changes selected card via select
+  const handleChangeCard = (accountId) => {
+    const found = cards.find((c) => c.account_id === accountId);
+    if (found) {
+      setSelectedCard(found);
+      // reset month to default May so charts update predictably
+      setSelectedMonth("May");
+      setSelectedTransaction(null);
+    }
+  };
+
+  // open split bill form with the exact transaction clicked
+  const handleOpenSplit = (group, itemIndex) => {
+    const item = group.items[itemIndex];
+    setSelectedTransaction({
+      id: `${group.date}-${itemIndex}`,
+      date: group.date,
+      detail: item.detail,
+      amount: item.amount,
+      account_id: selectedCard.account_id,
+    });
+    setShowSplitModal(true);
+  };
 
   return (
     <div className="detail-mycard">
       <Navbar />
 
-      <main className="dm-main">
+      <main className="main">
         {/* LEFT PANEL */}
-        <aside className="dm-left">
-          <div className="account-header">
-            <h2>Account Details</h2>
-            <select
-              value={selectedCard.account_id}
-              onChange={(e) =>
-                setSelectedCard(
-                  DUMMY_CARDS.find((c) => c.account_id === e.target.value)
-                )
-              }
-            >
-              {DUMMY_CARDS.map((c) => (
-                <option key={c.account_id} value={c.account_id}>
-                  {c.type} - {c.account_number}
-                </option>
-              ))}
-            </select>
-          </div>
+        <section className="left-panel">
+          <div className="account-details">
+            <div className="account-details-dropdown">
+              <h2>
+                <strong>Account Details</strong>
+              </h2>
+              <select
+                value={selectedCard.account_id}
+                onChange={(e) => handleChangeCard(e.target.value)}
+              >
+                {cards.map((c) => (
+                  <option key={c.account_id} value={c.account_id}>
+                    {c.type} - {c.account_number}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <p className="subtext">
-            Track your transaction history and payment information
-          </p>
+            <p className="subtext">
+              Track your transaction history and payment information
+            </p>
 
-          {/* ACCOUNT CARD */}
-          <div className="account-card">
-            <div className="acc-left">
-              <div className="acc-type">{selectedCard.type}</div>
-              <div className="acc-number">{selectedCard.account_number}</div>
-              <div className="acc-name">{selectedCard.account_holder_name}</div>
-
-              <div className="acc-balance">
-                <div className="balance-title">Effective Balance</div>
-                <div className="balance-row">
-                  <h3>
-                    {showBalance
-                      ? `Rp ${selectedCard.effective_balance.toLocaleString(
-                          "id-ID"
-                        )}`
-                      : "Rp •••••••"}
-                  </h3>
-                  <button
-                    className="eye-btn"
-                    onClick={() => setShowBalance(!showBalance)}
-                  >
-                    {showBalance ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
+            <div className="account-card">
+              <div className="account-header">
+                <div>
+                  <h4>{selectedCard.type}</h4>
+                  <p className="acc-number">
+                    <strong>{selectedCard.account_number}</strong>
+                  </p>
+                  <p className="acc-name">{selectedCard.account_holder_name}</p>
                 </div>
+                {selectedCard.is_main && (
+                  <div className="account-card-badge">
+                    <span>Main Account</span>
+                  </div>
+                )}
+              </div>
+
+              <p className="balance-title">Effective Balance</p>
+              <div className="balance-container">
+                <h3>
+                  {showBalance
+                    ? `Rp ${Number(selectedCard.effective_balance).toLocaleString(
+                        "id-ID"
+                      )}`
+                    : "•••••••••"}
+                </h3>
+                <span
+                  className="eye-icon"
+                  onClick={() => setShowBalance((s) => !s)}
+                  role="button"
+                  aria-label="toggle balance"
+                >
+                  {showBalance ? <EyeOff size={20} /> : <Eye size={20} />}
+                </span>
               </div>
             </div>
 
-            {selectedCard.is_main && (
-              <div className="main-label">Main Account</div>
-            )}
+            <div className="warning-box">
+              ⚠️ Do not share card number, expiration date, or CVV/CVC code with
+              anyone.
+            </div>
           </div>
 
-          <div className="warning">
-            ⚠️ Do not share card number, expiration date, or CVV/CVC code with
-            anyone.
-          </div>
-
-          {/* EARNINGS SECTION */}
-          <div className="earn-title-outside">
-            <h4>Earnings Overview</h4>
-            <span className="earn-month">({selectedMonth} 2025)</span>
-          </div>
+          <h5>Earnings Overview</h5>
 
           <div className="earnings">
-            <div className="earn-values">
-              <div className="ev">
-                <div className="ev-num">
-                  Rp{chartData.income.toLocaleString("id-ID")}
-                </div>
-                <div className="ev-label">
-                  <span className="dot income-dot"></span> Income
-                </div>
+            <div className="numbers">
+              <div>
+                <h3>Rp{chartData.income.toLocaleString("id-ID")}</h3>
+                <p>
+                  <strong>Income</strong>
+                </p>
               </div>
-              <div className="ev">
-                <div className="ev-num">
-                  Rp{chartData.expense.toLocaleString("id-ID")}
-                </div>
-                <div className="ev-label">
-                  <span className="dot expense-dot"></span> Expenses
-                </div>
+              <div>
+                <h3>Rp{chartData.expense.toLocaleString("id-ID")}</h3>
+                <p>
+                  <strong>Expenses</strong>
+                </p>
               </div>
             </div>
+            <p className="difference">
+              <strong>
+                A difference of Rp
+                {(chartData.income - chartData.expense).toLocaleString("id-ID")}
+              </strong>
+            </p>
 
-            <div className="difference">
-              A difference of Rp
-              {(chartData.income - chartData.expense).toLocaleString("id-ID")}
-            </div>
-
-            <div className="bar-chart centered">
-              <div className="bar-line" />
+            <div className="bar-chart">
               <div
-                className="bar income"
+                className="bar income-bar"
                 style={{
-                  height: `${
-                    (chartData.income /
-                      Math.max(chartData.income, chartData.expense || 1)) *
-                    90
-                  }px`,
+                  height: `${chartData.income
+                    ? Math.max(10, (chartData.income / Math.max(chartData.income, chartData.expense || 1)) * 100)
+                    : 8
+                  }%`,
                 }}
               />
               <div
-                className="bar expense"
+                className="bar expense-bar"
                 style={{
-                  height: `${
-                    (chartData.expense /
-                      Math.max(chartData.income, chartData.expense || 1)) *
-                    90
-                  }px`,
+                  height: `${chartData.expense
+                    ? Math.max(6, (chartData.expense / Math.max(chartData.income || 1, chartData.expense)) * 100)
+                    : 6
+                  }%`,
                 }}
               />
             </div>
           </div>
-        </aside>
+        </section>
 
         {/* RIGHT PANEL */}
-        <section className="dm-right">
-          <div className="tx-header">
-            <h2>Transaction History</h2>
-          </div>
+        <section className="right-panel">
+          <div className="transactions">
+            <div className="transaction-header">
+              <h3>Transaction History</h3>
+            </div>
 
-          <div className="month-row">
-            {months.map((m) => (
-              <button
-                key={m}
-                className={normalize(m) === normalize(selectedMonth) ? "month active" : "month"}
-                onClick={() => setSelectedMonth(m)}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
+            <div className="months">
+              {months.map((m) => (
+                <button
+                  key={m}
+                  className={normalize(m) === normalize(selectedMonth) ? "active" : ""}
+                  onClick={() => setSelectedMonth(m)}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
 
-          <div className="tx-list">
-            {transactions.length ? (
-              transactions.map((group, gi) => (
-                <div key={gi} className="tx-day">
-                  <div className="tx-day-title">
-                    <strong>{group.date}</strong>
-                  </div>
-                  <hr />
-                  {group.items.map((item, ii) => (
-                    <div key={ii} className="tx-row">
-                      <div className="tx-left-col">
-                        <div className="tx-type">{item.type}</div>
-                        <div className="tx-detail">{item.detail}</div>
-                      </div>
-                      <div className="tx-right-col">
-                        <div
-                          className={`amount ${
-                            item.amount.startsWith("+") ? "credit" : "debit"
-                          }`}
-                        >
-                          {item.amount}
+            <div className="transaction-list-modern">
+              {transactions.length ? (
+                transactions.map((group, gIdx) => (
+                  <div key={gIdx} className="transaction-group">
+                    <p className="transaction-date">
+                      <strong>{group.date}</strong>
+                    </p>
+                    <hr />
+                    {group.items.map((item, iIdx) => (
+                      <div key={iIdx} className="transaction-modern-item">
+                        <div className="transaction-text">
+                          <p className="transaction-type">{item.type}</p>
+                          <p className="transaction-detail">{item.detail}</p>
                         </div>
-                        {item.jenisTransaksi === "Pengeluaran" && (
-                          <button
-                            className="split-btn"
-                            onClick={() => {
-                              setSelectedTransaction({
-                                id: `${group.date}-${ii}`,
-                                date: group.date,
-                                detail: item.detail,
-                                amount: item.amount,
-                              });
-                              setShowSplitModal(true);
-                            }}
+                        <div className="transaction-amount-modern">
+                          <span
+                            className={`amount ${
+                              item.amount.startsWith("+") ? "credit" : "debit"
+                            }`}
                           >
-                            Split bill?
-                          </button>
-                        )}
+                            {item.amount}
+                          </span>
+                          {item.jenisTransaksi === "Pengeluaran" && (
+                            <button
+                              className="split-btn"
+                              onClick={() => handleOpenSplit(group, iIdx)}
+                            >
+                              Split bill?
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ))
-            ) : (
-              <div className="no-data">
-                No transactions available for {selectedMonth}
-              </div>
-            )}
+                    ))}
+                  </div>
+                ))
+              ) : (
+                <p className="no-data">No transactions available for {selectedMonth}</p>
+              )}
+            </div>
           </div>
         </section>
       </main>
@@ -247,7 +306,10 @@ export default function DetailMyCard() {
       {showSplitModal && selectedTransaction && (
         <div className="modal-overlay">
           <SplitBillForm
-            onClose={() => setShowSplitModal(false)}
+            onClose={() => {
+              setShowSplitModal(false);
+              setSelectedTransaction(null);
+            }}
             transaction={selectedTransaction}
           />
         </div>
