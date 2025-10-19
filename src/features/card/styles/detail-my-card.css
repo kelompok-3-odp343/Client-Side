@@ -43,11 +43,6 @@
   padding-right: 6px;
 }
 
-/* fix scroll global */
-body {
-  overflow: hidden;
-}
-
 /* ===== ACCOUNT HEADER ===== */
 .account-header {
   display: flex;
