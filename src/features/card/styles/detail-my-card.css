@@ -1,436 +1,303 @@
-/* ===== GLOBAL ===== */
+/* ========== detail-my-card.css (final minimal update) ========== */
+
+:root {
+  --accent: #ffa96b;
+  --income-bar: #00a884;
+  --expense-bar: #ffbc8e;
+  --income-text: #00a884;
+  --expense-text: #e74c3c;
+  --month-active: #ffa669;
+  --radius: 0.9rem;
+}
+
+/* PAGE */
 .detail-mycard {
   font-family: "Poppins", sans-serif;
   background: #fff;
   color: #111;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: hidden;
+  padding-bottom: 2rem;
 }
 
-.dm-main {
+.main {
+  width: 88%;
+  max-width: 1280px;
+  margin-top: 5rem;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 90%;
-  max-width: 1300px;
-  margin-top: 80px;
-  gap: 40px;
+  gap: 2rem;
+  box-sizing: border-box;
 }
 
-/* ===== LEFT PANEL ===== */
-.dm-left {
-  flex: 0.9;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 320px;
-}
-
-/* ===== RIGHT PANEL ===== */
-.dm-right {
-  flex: 1.4;
-  display: flex;
-  flex-direction: column;
-  height: 80vh;
-  min-width: 420px;
-}
-
-.tx-list {
+/* LEFT PANEL */
+.left-panel {
   flex: 1;
-  overflow-y: auto;
-  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-/* ===== ACCOUNT HEADER ===== */
+/* ACCOUNT CARD */
+.account-card {
+  background: linear-gradient(to bottom, var(--accent) 0%, #ffffff 100%);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
 .account-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: start;
 }
 
-.account-header h2 {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-}
-
-.account-header select {
-  padding: 6px 8px;
-  font-size: 12.5px;
-  border-radius: 6px;
-  border: 1px solid #e6e6e6;
-  background: #f5f5f5;
-}
-
-.subtext {
-  font-size: 13px;
-  color: #666;
-  margin-top: 2px;
-  margin-bottom: 2px;
-}
-
-/* ===== ACCOUNT CARD ===== */
-.account-card {
-  position: relative;
-  background: linear-gradient(180deg, #ffa96b 0%, #ffffff 100%);
-  border-radius: 14px;
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  height: 160px;
-}
-
-.acc-left {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.acc-type {
-  font-size: 13px;
-  font-weight: 600;
+.account-card-badge {
+  background: #ffeadb;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  color: #333;
+  font-weight: 500;
 }
 
 .acc-number {
-  font-size: 12.5px;
-  font-weight: 500;
-  color: #333;
+  color: #000;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .acc-name {
-  font-size: 11.5px;
-  color: #222;
-}
-
-.acc-balance {
-  margin-top: 12px;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+  color: #111;
 }
 
 .balance-title {
-  font-size: 11.5px;
+  font-size: 0.8rem;
   color: #777;
 }
 
-.balance-row {
+.balance-container {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.balance-row h3 {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.eye-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* label utama */
-.main-label {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  background: #fff;
-  border-radius: 8px;
-  font-size: 10.5px;
-  padding: 3px 7px;
-  color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-
-/* ===== WARNING ===== */
-.warning {
-  background: #fff5d8;
-  border: 1px solid #f0c070;
-  border-radius: 8px;
-  font-size: 10.5px;
-  padding: 5px 8px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ===== EARNINGS OVERVIEW ===== */
-.earn-title-outside {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-top: 4px;      
-  margin-bottom: 4px;   
-  padding-left: 2px;   
-}
-
-.earn-title-outside h4 {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #111;
-  margin: 0;
-}
-
-.earn-month {
-  font-size: 11px;
-  color: #777;
-}
-
-/* box utama */
-.earnings {
-  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
-  border: 1px solid #e6e6e6;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-  padding: 14px 12px;
-  text-align: center;
-  transition: all 0.25s ease;
-  margin-bottom: 8px;
-}
-
-.earnings:hover {
-  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
-}
-
-/* nilai income/expense */
-.earn-values {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 38px;
-  margin-bottom: 10px;
-}
-
-.ev-num {
-  font-weight: 700;
-  font-size: 13.5px;
-  margin-bottom: 2px;
-}
-
-.ev-label {
-  font-size: 11px;
-  color: #555;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-/* indikator warna bawah bar chart */
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.income-dot {
-  background: #6dddd0;
-}
-
-.expense-dot {
-  background: #ffbc8e;
-}
-
-.difference {
-  font-size: 11px;
-  color: #333;
-  margin-bottom: 6px;
-}
-
-/* bar chart */
-.bar-chart.centered {
-  position: relative;
-  height: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 40px;
-  margin-top: 6px;
-  padding-bottom: 8px;
-}
-
-.bar-line {
-  position: absolute;
-  bottom: 6px;
-  left: 8%;
-  right: 8%;
-  height: 1px;
-  background: #000;
-  opacity: 0.25;
-}
-
-.bar {
-  width: 32px;
-  border-radius: 6px 6px 0 0;
-  transition: transform 0.25s ease;
-}
-
-.bar.income {
-  background: #6dddd0;
-}
-
-.bar.expense {
-  background: #ffbc8e;
-}
-
-.bar:hover {
-  transform: scaleY(1.05);
-}
-
-/* ===== TRANSACTION HISTORY ===== */
-.tx-header h2 {
-  font-size: 15px;
-  margin-bottom: 6px;
-}
-
-.month-row {
-  display: flex;
   justify-content: space-between;
-  gap: 6px;
-  margin-bottom: 8px;
-  width: 100%;
 }
 
-.month {
-  flex: 1;
-  padding: 5px 8px;
-  font-size: 11px;
-  border: none;
-  border-radius: 10px;
-  background: #e5e5e5;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.balance-container h3 {
+  font-size: 1rem;
+  font-weight: 700;
 }
 
-.month.active {
-  background: #6dddd0;
-  color: #fff;
+/* WARNING */
+.warning-box {
+  background: #fff4d9;
+  border: 1px solid #f0c070;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #6b4f10;
 }
 
-.tx-day-title {
-  font-size: 12px;
-  margin-bottom: 4px;
+/* ---------- EARNINGS OVERVIEW ---------- */
+h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
 }
 
-.tx-row {
+.earnings {
+  background: #fff;
+  border-radius: 0.9rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  padding: 1rem 1rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.numbers {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 6px 0;
-  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 0.4rem;
 }
 
-.tx-type {
-  font-weight: 600;
-  font-size: 12.5px;
+.numbers div {
+  text-align: center;
+  flex: 1;
 }
 
-.tx-detail {
-  font-size: 11px;
-  color: #888;
-}
-
-.amount {
+.numbers h3 {
+  font-size: 1rem;
   font-weight: 700;
-  font-size: 12.5px;
+  color: #111;
+  margin-bottom: 0.25rem;
 }
 
-.credit {
-  color: #00a884;
+.numbers p {
+  font-size: 0.8rem;
+  color: #000;
+  margin: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
-.debit {
-  color: #e74c3c;
+.numbers p::after {
+  content: "";
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
 }
 
-.split-btn {
-  border: 1px solid #6dddd0;
-  background: #fff;
-  color: #6dddd0;
-  padding: 3px 7px;
+/* left (Income) legend color */
+.numbers div:first-child p::after {
+  background: #00a884;
+}
+
+/* right (Expense) legend color */
+.numbers div:last-child p::after {
+  background: #ffbc8e;
+}
+
+/* Difference line */
+.difference {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #333;
+  margin-top: 0.3rem;
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+}
+
+/* Bar Chart */
+.bar-chart {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 3rem;
+  height: 7rem;
+  margin-top: 0.6rem;
+}
+
+.bar {
+  width: 2rem;
+  border-radius: 10px;
+  transition: height 0.3s ease;
+}
+
+.income-bar {
+  background: #00a884; 
+  box-shadow: 0 2px 6px rgba(0, 168, 132, 0.3);
+}
+
+.expense-bar {
+  background: #ffbc8e; 
+  box-shadow: 0 2px 6px rgba(242, 179, 138, 0.3);
+}
+
+/* ---------- RIGHT PANEL ---------- */
+.right-panel {
+  flex: 1.4;
+  padding-left: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.months {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
+
+.months button {
+  border: none;
+  padding: 0.3rem 0.75rem;
   border-radius: 8px;
-  font-size: 10.5px;
+  background: #d9d9d9;
+  font-size: 0.8rem;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s;
 }
 
-.split-btn:hover {
-  background: #6dddd0;
+.months button.active {
+  background: var(--month-active);
   color: #fff;
+  font-weight: 500;
 }
 
-/* scrollbar */
-.tx-list::-webkit-scrollbar {
-  width: 5px;
+.transaction-group {
+  margin-bottom: 1rem;
 }
 
-.tx-list::-webkit-scrollbar-thumb {
+.transaction-modern-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.transaction-text p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.transaction-amount-modern {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.amount.credit {
+  color: var(--income-text);
+  font-weight: 600;
+}
+
+.amount.debit {
+  color: var(--expense-text);
+  font-weight: 600;
+}
+
+/* Split Bill Button (keep original color) */
+.split-btn {
+  background: #fff;
+  border: 1px solid #6dddd0;
+  color: #6dddd0;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Scrollbar */
+.transaction-list-modern::-webkit-scrollbar {
+  width: 6px;
+}
+.transaction-list-modern::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 10px;
 }
 
-/* ===== RESPONSIVE ===== */
-
-/* Tablet */
-@media (max-width: 1100px) {
-  .dm-main {
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .main {
     flex-direction: column;
-    align-items: center;
     width: 94%;
+    margin-top: 4rem;
   }
-
-  .dm-left {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 20px;
-    width: 100%;
-  }
-
-  .account-card,
-  .earnings {
-    flex: 1;
-    height: 160px;
-  }
-
-  .dm-right {
-    width: 100%;
-    height: auto;
-  }
-
-  .tx-list {
-    max-height: 400px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  .dm-left {
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .account-card {
-    height: auto;
-    padding: 14px;
-  }
-
-  .dm-main {
-    width: 96%;
-    margin-top: 60px;
-  }
-
-  .month {
-    font-size: 10px;
-    padding: 4px 6px;
+  .right-panel {
+    padding-left: 0;
   }
 }
