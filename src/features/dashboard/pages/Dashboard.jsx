@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../../../shared/components/Navbar";
+import { ChartPie } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 // import { DUMMY_CARDS } from "../data/dummy";
@@ -37,12 +38,14 @@ export default function Dashboard() {
           // dummy fallback data to show UI
           setData({
             meta: { user_id: "USR001", name: "Ulion Pardede", currency: "IDR" },
-            assets_total: { total: 17580062, extra_this_month: 20000 },
+            assets_total: { total: 50580062, extra_this_month: 7000000 },
             earnings_overview: { income: 17580062, expenses: 10580062 },
             split: {
-              progress: 100,
-              remaining: 2000000,
-              potential: 32580062,
+              paid: 12000000,
+              remaining: 3000000,
+              total: 15000000,
+              progress: 80,
+              potential: 20580062,
               ongoing: 4,
             },
             time_deposits: { total_balance: 15000000, count_accounts: 2 },
@@ -220,16 +223,25 @@ export default function Dashboard() {
             <h3>Income & Expenses</h3>
             <div className="small-cards">
               <div className="small-card small-card--income">
-                <div className="small-title">+ Rp{fmt(income)}</div>
-                <div className="small-sub">Total income this month</div>
+                <div className="small-card-icon"><ChartPie/></div>
+                <div className="small-card-info">
+                  <div className="small-title">+ Rp{fmt(income)}</div>
+                  <div className="small-sub">Total income this month</div>
+                </div>
               </div>
               <div className="small-card small-card--expense">
-                <div className="small-title">- Rp{fmt(expenses)}</div>
-                <div className="small-sub">Total expenses this month</div>
+                <div className="small-card-icon"><ChartPie/></div>
+                <div className="small-card-info">
+                  <div className="small-title">- Rp{fmt(expenses)}</div>
+                  <div className="small-sub">Total expenses this month</div>
+                </div>
               </div>
               <div className="small-card small-card--receivable">
-                <div className="small-title">+ Rp{fmt(income)}</div>
-                <div className="small-sub">Total receivable this month</div>
+                <div className="small-card-icon"><ChartPie/></div>
+                <div className="small-card-info">
+                  <div className="small-title">+ Rp{fmt(split?.remaining ?? 0)}</div>
+                  <div className="small-sub">Total receivable this month</div>
+                </div>
               </div>
             </div>
           </div>
@@ -238,16 +250,19 @@ export default function Dashboard() {
             <h3>Split Bills</h3>
 
             <div className="split-content">
-              <div
-                className="donut"
-                style={{
-                  background: `conic-gradient(#36D1B3 ${splitProgress * 3.6
-                    }deg, #e6f0ef 0deg)`,
-                }}
-              >
-                <div className="donut-center">{splitProgress}%</div>
+              <div className="split-left">
+                <div
+                  className="donut"
+                  style={{
+                    background: `conic-gradient(#6dddd0 ${splitProgress * 3.6
+                      }deg, #e6f0ef 0deg)`,
+                  }}
+                >
+                  <div className="donut-center">{splitProgress}%</div>
+                </div>
+                <div className="split-progress">Rp{fmt(split?.paid ?? 0)} / Rp{fmt(split?.total ?? 0)}</div>
               </div>
-
+              
               <div className="split-info">
                 <div className="info-panel">
                   <div className="panel-top">
@@ -255,7 +270,7 @@ export default function Dashboard() {
                       You have {split?.ongoing ?? 0} ongoing split bills
                     </div>
                     <div className="panel-sub">
-                      The remaining bill that can be collected is IDR Rp
+                      The remaining bill that can be collected is Rp
                       {fmt(split?.remaining ?? 0)}
                     </div>
                   </div>
