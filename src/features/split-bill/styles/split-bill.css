@@ -16,7 +16,8 @@
 .sb-main {
   flex: 1;
   padding: 2rem 3rem;
-  margin-top: 80px; /* memberi jarak dari navbar floating */
+  margin-top: 80px;
+  /* memberi jarak dari navbar floating */
 }
 
 .sb-title {
@@ -146,6 +147,23 @@
   opacity: 0.9;
 }
 
+.edit-btn {
+  margin-top: 0.8rem;
+  align-self: flex-start;
+  background: var(--color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.edit-btn:hover {
+  opacity: 0.9;
+}
+
 /* === LOADING TEXT === */
 .loading {
   text-align: center;
@@ -164,7 +182,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* menutupi navbar */
+  z-index: 9999;
+  /* menutupi navbar */
 }
 
 .sb-modal {
@@ -183,6 +202,7 @@
     transform: scale(0.9);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;

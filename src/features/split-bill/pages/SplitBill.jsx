@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
 import "../styles/split-bill.css";
-import { fetchSplitBills } from "../api/split-bill.api"; 
+import { fetchSplitBills } from "../api/split-bill.api";
+import SplitBillFormEdit from '../../../shared/components/SplitBillFormEdit'
+import Swal from "sweetalert2";
 
 export default function SplitBill() {
   const [bills, setBills] = useState([]);
@@ -9,6 +11,7 @@ export default function SplitBill() {
   const [selectedBill, setSelectedBill] = useState(null);
   const [selectedColor, setSelectedColor] = useState("#6dddd0");
   const [showModal, setShowModal] = useState(false);
+  const [editBill, setEditBill] = useState(null);
 
   useEffect(() => {
     async function loadData() {
@@ -98,12 +101,11 @@ export default function SplitBill() {
                     <div
                       className="progress-fill"
                       style={{
-                        width: `${
-                          (bill.members.filter((m) => m.status === "Paid")
-                            .length /
-                            Math.max(1, bill.members.length)) *
+                        width: `${(bill.members.filter((m) => m.status === "Paid")
+                          .length /
+                          Math.max(1, bill.members.length)) *
                           100
-                        }%`,
+                          }%`,
                       }}
                     />
                   </div>
@@ -116,9 +118,8 @@ export default function SplitBill() {
                       <span>
                         Rp{Number(m.amount).toLocaleString("id-ID")}{" "}
                         <span
-                          className={`status ${
-                            m.status === "Paid" ? "paid" : "unpaid"
-                          }`}
+                          className={`status ${m.status === "Paid" ? "paid" : "unpaid"
+                            }`}
                         >
                           {m.status}
                         </span>
@@ -130,12 +131,43 @@ export default function SplitBill() {
                   )}
                 </div>
 
-                <button
+                {/* <button
                   className="view-btn"
                   onClick={() => handleViewDetail(bill, color)}
                 >
                   View Detail
                 </button>
+
+                <button
+                  className="edit-btn"
+                  onClick={() => setEditBill(bill)}
+                >
+                  Edit
+                </button> */}
+
+                <div className="sb-actions" style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  marginTop: "10px"
+                }}>
+                  <button
+                    className="view-btn"
+                    onClick={() => handleViewDetail(bill, color)}
+                    style={{ alignSelf: "flex-start" }}
+                  >
+                    View Detail
+                  </button>
+
+                  <button
+                    className="edit-btn"
+                    onClick={() => setEditBill(bill)}
+                    style={{ alignSelf: "flex-end" }}
+                  >
+                    Edit
+                  </button>
+                </div>
+
               </div>
             );
           })}
@@ -223,6 +255,38 @@ export default function SplitBill() {
               </button>
             </div>
           </div>
+        )}
+
+        {editBill && (
+          <SplitBillFormEdit
+            data={editBill}
+            onClose={() => setEditBill(null)}
+            onSave={(updatedMembers) => {
+              setBills((prev) =>
+                prev.map((b) =>
+                  b.split_bill_id === editBill.split_bill_id
+                    ? {
+                      ...b,
+                      members: updatedMembers,
+                      remaining_bill: updatedMembers
+                        .filter((m) => m.status !== "Paid")
+                        .reduce((s, m) => s + (Number(m.amount) || 0), 0),
+                    }
+                    : b
+                )
+              );
+
+              setEditBill(null);
+
+              Swal.fire({
+                icon: "success",
+                title: "Updated!",
+                text: "Split bill updated successfully!",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+            }}
+          />
         )}
       </main>
     </div>
