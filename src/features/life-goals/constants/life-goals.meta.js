@@ -1,4 +1,4 @@
-import graduationIcon from "../../../assets/images/education.png";
+import educationIcon from "../../../assets/images/education.png";
 import vacationIcon from "../../../assets/images/vacation.png";
 import marriageIcon from "../../../assets/images/marriage.png";
 import homeIcon from "../../../assets/images/home.png";
@@ -10,7 +10,7 @@ const LIFE_GOALS_META = {
     title: "Education",
     desc: "Invest in Your Brightest Future",
     color: "#71d9d0",
-    icon: graduationIcon,
+    icon: educationIcon,
   },
   vacations: {
     title: "Vacations",
