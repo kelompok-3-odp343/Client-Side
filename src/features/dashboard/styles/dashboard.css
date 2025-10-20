@@ -204,7 +204,8 @@ body {
 .split-content {
   display: flex;
   gap: 16px;
-  align-items: center;
+  align-items: stretch;
+  width: 100%;
 }
 
 .split-left {
@@ -215,7 +216,6 @@ body {
   text-align: center;
   height: 100%;
   gap: 20px;
-  padding: 10px;
 }
 
 .donut {
@@ -256,56 +256,81 @@ body {
 }
 
 /* split info panel */
+.split-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .info-panel {
+  flex: 1;
   min-width: 260px;
-  background: linear-gradient(90deg, rgba(60, 225, 200, 0.12), rgba(242, 253, 251, 0.9));
+  background: linear-gradient(180deg, #6dddd0 0%, rgba(241, 250, 248, 0.95) 100%);
   border-radius: 12px;
-  padding: 12px;
+  padding: 8px 12px 2px;
   box-shadow: 0 8px 18px rgba(12, 50, 48, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
 }
 
 .panel-ttl {
   font-weight: 700;
-  color: #024b41;
+  color: #000;
   margin-bottom: 6px;
 }
 
 .panel-sub {
-  color: var(--muted);
+  color: #000;
   font-size: 13px;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
 .potential {
-  color: #083a36;
+  color: #000;
   font-size: 13px;
+  font-weight: 600;
 }
 
 .potential-value {
   font-weight: 800;
-  font-size: 18px;
-  color: #0b3f38;
+  font-size: 30px;
+  color: #000;
   margin-top: 4px;
 }
 
 .view-detail {
-  color: #0b6f67;
+  color: #000;
   text-decoration: underline;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 700;
   display: inline-block;
-  margin-top: 6px;
+  align-self: flex-end;
+  position: relative;
+  top: -10px;
 }
 
 .btn-add {
   margin-top: 10px;
-  background: linear-gradient(90deg, #2cb1ff, #36d1b3);
-  color: #fff;
+  align-self: center;
+  background: #6dddd0;
+  color: #000;
   border: none;
-  padding: 8px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   cursor: pointer;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   box-shadow: 0 8px 18px rgba(44, 177, 255, 0.18);
+}
+
+.btn-add:hover {
+  opacity: 0.75;
+  background: #6dddd0;
+  color: #000;
 }
 
 /* Fund pills */
@@ -338,27 +363,30 @@ body {
   justify-content: flex-start;
   text-align: left;
   width: 170px;
+  gap: 5px;
   /* margin-right: 10px; */
 }
 
 .pill-img {
-  width: 2.875rem;         /* 46px ≈ 2.875rem when 1rem = 16px */
-  height: 2.875rem;
+  width: 60px;
+  height: 60px;
   display: inline-block;
   object-fit: cover;
   display: flex;
   justify-content: flex-end;
-  border-radius: 50%;/* 5px ≈ 0.3125rem */
-  margin-left: 20px;
+  /* border-radius: 50%;5px ≈ 0.3125rem */
+  /* margin-left: 20px; */
 }
 
 .pill .pill-title {
-  font-weight: 700;
-  color: #111827;
+  font-size: 17px;
+  font-weight: 800;
+  color: #000;
 }
 
 .pill .pill-amount {
-  color: #0b3b36;
+  color: #000;
+  font-size: 16px;
   font-weight: 700;
   /* margin-left: 8px; */
 }

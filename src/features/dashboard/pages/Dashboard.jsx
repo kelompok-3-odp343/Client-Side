@@ -4,6 +4,10 @@ import { ChartPie } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { fetchCards } from "../api/dashboard.api.js";
+import depositsIcon from "../../../assets/images/dashboard-deposits-icon.png";
+import savingsIcon from "../../../assets/images/dashboard-savings-icon.png";
+import lifeGoalsIcon from "../../../assets/images/dashboard-life-goals-icon.png";
+import dplkIcon from "../../../assets/images/dashboard-dplk-icon.png";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
@@ -174,8 +178,7 @@ export default function Dashboard() {
                     You have {split?.ongoing ?? 0} ongoing split bills
                   </div>
                   <div className="panel-sub">
-                    The remaining bill that can be collected is Rp
-                    {fmt(split?.remaining ?? 0)}
+                    The remaining bill that can be collected is <strong>Rp{fmt(split?.remaining ?? 0)}</strong>
                   </div>
                   <div className="potential">
                     Your potential asset accumulation:
@@ -215,7 +218,7 @@ export default function Dashboard() {
                 Rp{fmt(time_deposits?.total_balance ?? 0)}
               </div>
             </div>
-            <img className="pill-img" src="" alt="" />
+            <img className="pill-img" src={depositsIcon} alt="Deposits Icon" />
           </button>
 
           <button
@@ -229,7 +232,7 @@ export default function Dashboard() {
                 Rp{fmt(savings?.[0]?.total_balance ?? 0)}
               </div>
             </div>
-            <img className="pill-img" src="" alt="" />
+            <img className="pill-img" src={savingsIcon} alt="Savings Icon" />
           </button>
 
           <button
@@ -249,7 +252,7 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-            <img className="pill-img" src="" alt="" />
+            <img className="pill-img" src={lifeGoalsIcon} alt="Life Goals Icon" />
           </button>
 
           <button
@@ -266,7 +269,7 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-            <img className="pill-img" src="" alt="" />
+            <img className="pill-img" src={dplkIcon} alt="Pension Funds Icon" />
           </button>
         </section>
 
