@@ -1,25 +1,115 @@
 .life-goals-page {
-  padding: 120px 80px;
+  padding: 8rem 9rem;
   font-family: "Poppins", sans-serif;
   background: linear-gradient(to bottom right, #ffffff, #f8fdfa);
   min-height: 100vh;
 }
 
 .section-title {
-  font-size: 24px;
+  font-size: 2.75rem;
   font-weight: 700;
   color: #111;
-  margin-bottom: 6px;
+  margin-bottom: 0.75rem;
 }
 
 .section-subtitle {
-  font-size: 14px;
+  font-size: 1.35rem;
   color: #555;
-  margin-bottom: 35px;
+  margin-bottom: 3.25rem;
 }
 
 .life-goal-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(3, minmax(clamp(23rem, 22vw, 27rem), 1fr)); 
+  gap: 3rem;
+  justify-items: stretch;
+}
+
+/* Larger default styles for buttons / cards / content di dalam card */
+.life-goal-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 0.3rem 1rem rgba(0,0,0,0.06);
+}
+
+/* === RESPONSIVE: kurang dari 1600px (1200–1599px) === */
+@media (max-width: 1599px) {
+  .life-goals-page {
+    padding: 7rem 7rem;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+  }
+
+  .section-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 3rem;
+  }
+
+  .life-goal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(21rem, 23vw, 26rem), 1fr)); 
+    gap: 3rem;
+    justify-items: stretch;
+  }
+
+  .life-goal-card {
+    padding: 1.4rem;
+  }
+}
+
+/* === RESPONSIVE: kurang dari 1200px (tablet / small laptop) === */
+@media (max-width: 1199px) {
+  .life-goals-page {
+    padding: 6rem 6rem;
+  }
+
+  .section-title {
+    font-size: 2.125rem;
+  }
+
+  .section-subtitle {
+    font-size: 1.125rem;
+    margin-bottom: 3rem;
+  }
+
+  .life-goal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(19rem, 30vw, 22rem), 1fr));
+    gap: 2.5rem;
+    justify-items: stretch;
+  }
+
+  .life-goal-card {
+    padding: 1.25rem;
+  }
+}
+
+/* === RESPONSIVE: kurang dari 768px (mobile) === */
+@media (max-width: 767px) {
+  .life-goals-page {
+    padding: 4.5rem 2.25rem;
+  }
+
+  .section-title {
+    font-size: 1.875rem;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .life-goal-grid {
+    display: grid;
+    grid-template-columns: 1fr; 
+    gap: 1.5rem;
+    justify-items: stretch;
+  }
+
+  .life-goal-card {
+    padding: 1rem;
+  }
 }

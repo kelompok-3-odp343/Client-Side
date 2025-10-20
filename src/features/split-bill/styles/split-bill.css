@@ -3,6 +3,7 @@
   --border: #e5e7eb;
   --text-main: #111827;
   --text-sub: #6b7280;
+  font-size: clamp(1rem, 0.95vw + 0.6rem, 1.1rem);
 }
 
 /* === LAYOUT DASAR === */
@@ -15,49 +16,49 @@
 
 .sb-main {
   flex: 1;
-  padding: 2rem 3rem;
-  margin-top: 80px;
+  padding: 2.5rem 5vw;
+  margin-top: 6vh;
   /* memberi jarak dari navbar floating */
 }
 
 .sb-title {
-  font-size: 20px;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--text-main);
 }
 
 .sb-sub {
-  font-size: 13px;
+  font-size: 0.9rem;
   color: var(--text-sub);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.8rem;
 }
 
 /* === GRID CARD === */
 .sb-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(18rem, 22vw, 24rem), 1fr));
+  gap: 2rem;
 }
 
 /* === CARD STYLE === */
 .sb-card {
   background: white;
-  border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  padding: 1rem 1.2rem;
+  border-radius: 1rem;
+  box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.08);
+  padding: 1.2rem 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border-top: 6px solid var(--color);
+  border-top: 0.5rem solid var(--color);
   transition: transform 0.2s ease;
 }
 
 .sb-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-0.25rem);
 }
 
 .sb-card-header h3 {
-  font-size: 16px;
+  font-size: 1.05rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
   color: var(--text-main);
@@ -66,7 +67,7 @@
 .sb-card-header p {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-main);
 }
@@ -82,34 +83,34 @@
 
 .progress-track {
   width: 100%;
-  height: 8px;
+  height: 0.6rem;
   background: #e5e7eb;
-  border-radius: 4px;
+  border-radius: 0.3rem;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
   background: var(--color);
-  border-radius: 4px;
+  border-radius: 0.3rem;
 }
 
 /* === MEMBER LIST === */
 .sb-members {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .sb-member-row {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 0.9rem;
   color: var(--text-main);
 }
 
 .status {
-  margin-left: 6px;
+  margin-left: 0.4rem;
   font-weight: 600;
 }
 
@@ -123,10 +124,10 @@
 
 /* "x more" di card */
 .sb-member-more {
-  font-size: 12px;
+  font-size: 0.8rem;
   color: #6b7280;
   text-align: right;
-  margin-top: 2px;
+  margin-top: 0.25rem;
 }
 
 /* === BUTTON VIEW DETAIL === */
@@ -136,9 +137,9 @@
   background: var(--color);
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 12px;
-  padding: 0.4rem 0.9rem;
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+  padding: 0.45rem 1rem;
   cursor: pointer;
   transition: background 0.2s ease;
 }
@@ -153,9 +154,9 @@
   background: var(--color);
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 12px;
-  padding: 0.4rem 0.9rem;
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+  padding: 0.45rem 1rem;
   cursor: pointer;
   transition: background 0.2s ease;
 }
@@ -188,11 +189,10 @@
 
 .sb-modal {
   background: white;
-  border-radius: 14px;
-  width: 90%;
-  max-width: 700px;
-  padding: 2rem 2.5rem;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+  border-radius: 1rem;
+  width: min(90%, 60rem);
+  padding: 2rem 3vw;
+  box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.2);
   position: relative;
   animation: pop 0.25s ease;
 }
@@ -212,20 +212,20 @@
 /* === MODAL CONTENT === */
 .modal-title {
   text-align: center;
-  font-size: 20px;
+  font-size: 1.35rem;
   font-weight: 700;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.4rem;
 }
 
 .modal-meta {
   text-align: center;
-  font-size: 13px;
+  font-size: 0.9rem;
   color: #6b7280;
 }
 
 .modal-ref {
   text-align: center;
-  font-size: 12px;
+  font-size: 0.8rem;
   text-decoration: underline;
   color: #6b7280;
   margin-bottom: 1.2rem;
@@ -233,18 +233,18 @@
 
 .modal-total {
   background: linear-gradient(to right, #71d9d0, #b8f3ea);
-  padding: 0.7rem 1rem;
-  border-radius: 10px;
+  padding: 0.8rem 1.2rem;
+  border-radius: 0.8rem;
   display: flex;
   justify-content: space-between;
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.6rem;
   color: #111827;
 }
 
 .modal-list h4 {
   font-weight: 700;
-  font-size: 14px;
+  font-size: 0.95rem;
   margin-bottom: 0.6rem;
 }
 
@@ -252,24 +252,24 @@
   display: flex;
   justify-content: space-between;
   padding: 0.6rem 0;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 13px;
+  border-bottom: 0.06rem solid #e5e7eb;
+  font-size: 0.9rem;
 }
 
 /* === SCROLL AREA === */
 .scrollable {
-  max-height: 250px;
+  max-height: 16rem;
   overflow-y: auto;
   padding-right: 0.5rem;
 }
 
 .scrollable::-webkit-scrollbar {
-  width: 6px;
+  width: 0.4rem;
 }
 
 .scrollable::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
+  border-radius: 0.4rem;
 }
 
 /* === FOOTER MODAL === */
@@ -282,12 +282,12 @@
 
 /* === BUTTON STATUS (PAID / UNPAID) === */
 .mark-btn {
-  font-size: 12px;
-  border-radius: 8px;
-  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid transparent;
+  border: 0.06rem solid transparent;
 }
 
 /* Warna dikontrol inline via JSX */
@@ -300,10 +300,10 @@
   margin-top: 1.5rem;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.5rem;
   padding: 0.6rem 1rem;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.9rem;
   font-weight: 500;
   width: 100%;
   transition: background 0.25s ease;
@@ -314,10 +314,16 @@
 }
 
 /* === RESPONSIVE === */
+@media (max-width: 1024px) {
+  .sb-grid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(16rem, 45vw, 24rem), 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .sb-main {
     padding: 1.5rem;
-    margin-top: 70px;
+    margin-top: 4vh;
   }
 
   .sb-grid {
@@ -330,6 +336,6 @@
   }
 
   .modal-title {
-    font-size: 18px;
+    font-size: 1.15rem;
   }
 }
