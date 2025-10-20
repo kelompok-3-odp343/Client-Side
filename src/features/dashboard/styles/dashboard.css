@@ -392,65 +392,87 @@ body {
   font-weight: 800;
 }
 
-/* Cards slider */
-.card-slider {
+/* === MY CARDS === */
+.auto-slider {
   display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding: 12px 0;
-  scroll-snap-type: x mandatory;
-}
-
-.card-slider::-webkit-scrollbar {
-  display: none;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: 10px;
 }
 
 .bank-card {
-  min-width: 420px;
+  width: 100%;
+  max-width: 400px;
   border-radius: 12px;
   padding: 18px;
   background: linear-gradient(180deg, #ff9b61 0%, #ffffff 100%);
   color: #081219;
   box-shadow: 0 12px 26px rgba(255, 140, 75, 0.12);
-  flex: 0 0 auto;
-  scroll-snap-align: start;
+  text-decoration: none;
+  transition: transform 0.6s ease, opacity 0.6s ease;
 }
 
-.empty-card {
-  min-height: 140px;
+.bank-card.fade-slide {
+  animation: fadeSlide 0.8s ease;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.bank-card .card-top {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.bank-card .masked {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+.bank-card .holder {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.bank-card h4 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 8px;
+  color: #000;
+}
+
+.dots {
   display: flex;
-  align-items: center;
   justify-content: center;
-  color: var(--muted);
-  background: linear-gradient(90deg, #fafafa, #f7f7f8);
-  box-shadow: var(--soft-shadow);
+  gap: 6px;
+  margin-top: 10px;
 }
 
-.slider-wrapper {
-  position: relative;
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ccc;
+  transition: all 0.3s ease;
 }
 
-.slider-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: none;
-  background: #ffffff;
-  box-shadow: 0 6px 14px rgba(2, 8, 12, 0.06);
-  cursor: pointer;
-  color: #2cb1ff;
-  font-weight: 800;
-}
-
-.slider-btn.left {
-  left: -12px;
-}
-
-.slider-btn.right {
-  right: -12px;
+.dot.active {
+  background: #ff9b61;
+  transform: scale(1.2);
 }
 
 /* Earnings panel */
