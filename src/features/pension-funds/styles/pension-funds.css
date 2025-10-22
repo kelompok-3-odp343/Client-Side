@@ -3,19 +3,15 @@
   font-family: "Poppins", sans-serif;
   min-height: 100vh;
   overflow: auto;
-  /* Pastikan konten bisa bergulir jika diperlukan */
 }
 
 /* ======== LAYOUT UTAMA ======== */
 .pension-fund-container {
   display: flex;
-  gap: 40px;
-  padding: 100px 80px 60px;
-  /* offset dari navbar */
-  max-width: 1400px;
+  gap: 2.5rem;
+  padding: 6.25rem 5rem 3.75rem;
   margin: 0 auto;
   align-items: stretch;
-  /* Menyelaraskan tinggi antara kiri dan kanan */
 }
 
 /* ======== LEFT SIDE ======== */
@@ -23,22 +19,21 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  min-width: 420px;
+  gap: 1.75rem;
+  min-width: 26.25rem;
   max-width: 100%;
-  /* Pastikan kontainer bisa mengalir sesuai ukuran */
 }
 
 .section-header .lg-title {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
 }
 
 .section-header .lg-sub {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #666;
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 
 /* ======== PENSION FUND SUMMARY CARD ======== */
@@ -46,18 +41,17 @@
   display: flex;
   align-items: center;
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 0.625rem;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  border: 1px solid #e5e5e5;
+  border: 0.0625rem solid #e5e5e5;
   width: 100%;
-  max-width: 600px;
   transition: all 0.2s ease;
 }
 
 .pension-fund-summary-card.fancy:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
 }
 
 .pension-fund-summary-left {
@@ -67,103 +61,100 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
+  border-top-left-radius: 0.625rem;
+  border-bottom-left-radius: 0.625rem;
 }
 
 .pension-fund-icon-circle img {
-  width: 80px;
+  width: 5rem;
   height: auto;
-  /* Pastikan ukuran ikon tidak merusak layout */
 }
 
 .pension-fund-summary-right {
   flex: 1;
-  padding: 24px 30px;
+  padding: 1.5rem 1.875rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  /* Pastikan kanan memiliki tinggi penuh */
 }
 
 .summary-title {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #000;
-  margin-bottom: 10px;
+  margin-bottom: 0.625rem;
 }
 
 .summary-label {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #777;
   margin: 0;
 }
 
 .summary-balance {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 700;
-  margin: 6px 0;
+  margin: 0.375rem 0;
 }
 
 .summary-divider {
   width: 100%;
-  height: 1px;
+  height: 0.0625rem;
   background: #e2e2e2;
-  margin: 10px 0;
+  margin: 0.625rem 0;
 }
 
 .summary-sub {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #555;
   margin: 0;
 }
 
 /* ======== YOUR PENSION FUNDS ======== */
 .your-pension-title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 700;
-  margin-top: 20px;
+  margin-top: 1.25rem;
 }
 
 .pension-fund-grid {
   display: flex;
-  gap: 20px;
+  gap: 1.25rem;
   flex-wrap: wrap;
-  max-width: 600px;
 }
 
 /* ======== ACCOUNT NUMBER CARD ======== */
 .account-number-card {
   background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border: 0.0625rem solid #e5e5e5;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.05);
   width: 100%;
   transition: 0.2s ease;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .account-number-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-0.1875rem);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
 }
 
 .account-number-header {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
 }
 
 .account-title {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
 }
 
 .account-number {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #888;
 }
 
@@ -174,7 +165,7 @@
 .account-balance p {
   display: flex;
   justify-content: space-between;
-  margin: 8px 0;
+  margin: 0.5rem 0;
   color: #333;
 }
 
@@ -185,18 +176,15 @@
 /* ======== ACCOUNT NUMBER GRID ======== */
 .account-number-grid {
   display: flex;
-  gap: 20px;
+  gap: 1.25rem;
   justify-content: flex-start;
-  margin-top: 20px;
+  margin-top: 1.25rem;
 }
 
 .account-number-column {
   flex: 1 1 45%;
-  /* Membagi ruang menjadi 2 kolom (45% lebar) */
-  min-width: 100px;
-  /* Membatasi lebar minimal */
-  max-width: 450px;
-  /* Membatasi lebar maksimal */
+  min-width: 6.25rem;
+  max-width: 28rem;
 }
 
 /* ======== RIGHT SIDE ======== */
@@ -205,10 +193,8 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  /* Menjaga konten berada di atas */
   height: 100%;
-  margin-top: 30px;
-  /* Menjamin tinggi bagian kanan sesuai tinggi bagian kiri */
+  margin-top: 1.875rem;
 }
 
 .transaction-header {
@@ -226,26 +212,23 @@
 .months {
   display: flex;
   flex-wrap: nowrap;
-  /* Prevent wrapping */
-  gap: 10px;
-  margin: 18px 0 12px;
+  gap: 0.625rem;
+  margin: 1.125rem 0 0.75rem;
   justify-content: flex-start;
   overflow-x: auto;
-  /* Allows scrolling horizontally if buttons overflow */
 }
 
 .month-btn {
   border: none;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   background: #f4f4f4;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05);
   white-space: nowrap;
-  /* Prevent wrapping of text */
 }
 
 .month-btn:hover {
@@ -256,80 +239,81 @@
   background: #ffe9b0;
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0, 168, 132, 0.25);
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 168, 132, 0.25);
 }
 
 /* ======== TRANSACTION LIST ======== */
 .transaction-list {
-  border-top: 1px solid #ddd;
+  border-top: 0.0625rem solid #ddd;
 }
 
 .transaction-group {
-  margin-top: 18px;
+  margin-top: 1.125rem;
 }
 
 .transaction-date {
   font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 6px;
+  font-size: 0.875rem;
+  margin-bottom: 0.375rem;
 }
 
 .transaction-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
+  padding: 0.5rem 0;
+  border-bottom: 0.0625rem solid #eee;
 }
 
 .tx-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
 }
 
 .tx-icon {
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   border-radius: 50%;
-  border: 1px solid #ccc;
+  border: 0.0625rem solid #ccc;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #888;
 }
 
 .tx-type {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #000;
 }
 
 .tx-detail {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #999;
 }
 
 .tx-amount {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #222;
 }
 
 /* ======== NO TRANSACTION TEXT ======== */
 .no-tx {
   color: #777;
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 1.25rem;
 }
 
-/* ======== MEDIA QUERIES ======== */
-@media (max-width: 768px) {
+/* ======== RESPONSIVE ======== */
+@media (max-width: 48rem) {
   .pension-fund-container {
     flex-direction: column;
-    gap: 20px;
+    gap: 1.25rem;
+    padding: 4rem 1.5rem;
   }
 
   .pension-fund-left,
@@ -338,7 +322,15 @@
   }
 
   .month-btn {
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .account-number-grid {
+    flex-direction: column;
+  }
+
+  .account-number-column {
+    max-width: 100%;
   }
 }
