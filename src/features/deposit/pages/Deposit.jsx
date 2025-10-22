@@ -147,7 +147,7 @@ export default function Deposits() {
             {months.map((m) => (
               <button
                 key={m}
-                className={`month-btn ${selectedMonth === m ? "active" : ""}`}
+                className={`month-btn-dep ${selectedMonth === m ? "active" : ""}`}
                 onClick={() => setSelectedMonth(m)}
               >
                 {m}
@@ -193,7 +193,7 @@ function DepositCard({ title, balance, date, interest, opening, period }) {
   return (
     <div className="deposit-card">
       <h4 className="deposit-title">{title}</h4>
-      <p className="deposit-balance">Balance: Rp{balance.toLocaleString()}</p>
+      <p className="deposit-balance">Balance:<br /><strong>Rp{balance.toLocaleString()}</strong></p>
 
       <div className="circle-container">
         <div className="circle-ring">
