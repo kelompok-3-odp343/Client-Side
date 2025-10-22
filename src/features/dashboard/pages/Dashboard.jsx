@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../../shared/components/Navbar";
-import { ChartPie } from "lucide-react";
+import { ChartPie, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { fetchCards } from "../api/dashboard.api.js";
+import depositsIcon from "../../../assets/images/dashboard-deposits-icon.png";
+import savingsIcon from "../../../assets/images/dashboard-savings-icon.png";
+import lifeGoalsIcon from "../../../assets/images/dashboard-life-goals-icon.png";
+import dplkIcon from "../../../assets/images/dashboard-dplk-icon.png";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
@@ -23,7 +27,7 @@ export default function Dashboard() {
         if (API_BASE_URL) {
           const resp = await fetch(
             `${API_BASE_URL}/api/v1/dashboard?user_id=${userId}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           );
           if (!resp.ok) throw new Error("API error");
           const json = await resp.json();
@@ -79,7 +83,15 @@ export default function Dashboard() {
   if (loading) return <div className="loading">Loading dashboard...</div>;
   if (!data) return <div className="empty">No data found</div>;
 
-  const { assets_total, earnings_overview, split, time_deposits, savings, pension_funds, life_goals } = data;
+  const {
+    assets_total,
+    earnings_overview,
+    split,
+    time_deposits,
+    savings,
+    pension_funds,
+    life_goals,
+  } = data;
   const income = earnings_overview?.income ?? 0;
   const expenses = earnings_overview?.expenses ?? 0;
   const assets = assets_total?.total ?? 0;
@@ -102,7 +114,8 @@ export default function Dashboard() {
             <div className="card-body">
               <h1>Rp{fmt(assets)}</h1>
               <p className="muted">
-                You made extra Rp{fmt(assets_total?.extra_this_month ?? 0)} this month
+                You made extra Rp{fmt(assets_total?.extra_this_month ?? 0)} this
+                month
               </p>
             </div>
           </div>
@@ -111,23 +124,31 @@ export default function Dashboard() {
             <h3>Income & Expenses</h3>
             <div className="small-cards">
               <div className="small-card small-card--income">
-                <div className="small-card-icon"><ChartPie /></div>
+                <div className="small-card-icon">
+                  <ChartPie />
+                </div>
                 <div className="small-card-info">
                   <div className="small-title">+ Rp{fmt(income)}</div>
                   <div className="small-sub">Total income this month</div>
                 </div>
               </div>
               <div className="small-card small-card--expense">
-                <div className="small-card-icon"><ChartPie /></div>
+                <div className="small-card-icon">
+                  <ChartPie />
+                </div>
                 <div className="small-card-info">
                   <div className="small-title">- Rp{fmt(expenses)}</div>
                   <div className="small-sub">Total expenses this month</div>
                 </div>
               </div>
               <div className="small-card small-card--receivable">
-                <div className="small-card-icon"><ChartPie /></div>
+                <div className="small-card-icon">
+                  <ChartPie />
+                </div>
                 <div className="small-card-info">
-                  <div className="small-title">+ Rp{fmt(split?.remaining ?? 0)}</div>
+                  <div className="small-title">
+                    + Rp{fmt(split?.remaining ?? 0)}
+                  </div>
                   <div className="small-sub">Total receivable this month</div>
                 </div>
               </div>
@@ -157,15 +178,26 @@ export default function Dashboard() {
                     You have {split?.ongoing ?? 0} ongoing split bills
                   </div>
                   <div className="panel-sub">
-                    The remaining bill that can be collected is Rp{fmt(split?.remaining ?? 0)}
+                    The remaining bill that can be collected is <strong>Rp{fmt(split?.remaining ?? 0)}</strong>
                   </div>
-                  <div className="potential">Your potential asset accumulation:</div>
-                  <div className="potential-value">Rp{fmt(split?.potential ?? 0)}</div>
-                  <a href="#" className="view-detail" onClick={() => handleNavigate("splitbill")}>
+                  <div className="potential">
+                    Your potential asset accumulation:
+                  </div>
+                  <div className="potential-value">
+                    Rp{fmt(split?.potential ?? 0)}
+                  </div>
+                  <a
+                    href="#"
+                    className="view-detail"
+                    onClick={() => handleNavigate("splitbill")}
+                  >
                     View Detail
                   </a>
                 </div>
-                <button className="btn-add" onClick={() => handleNavigate("detailMyCard")}>
+                <button
+                  className="btn-add"
+                  onClick={() => handleNavigate("detailMyCard")}
+                >
                   + Add a New Bill
                 </button>
               </div>
@@ -175,52 +207,69 @@ export default function Dashboard() {
 
         {/* ========== FUND PILLS ========== */}
         <section className="fund-pills">
-          <button className="pill" onClick={() => handleNavigate("deposits")} style={{backgroundColor: "#FFE8B0"}}>
+          <button
+            className="pill"
+            onClick={() => handleNavigate("deposits")}
+            style={{ backgroundColor: "#FFE8B0" }}
+          >
             <div className="pill-text">
               <div className="pill-title">Time Deposits</div>
               <div className="pill-amount">
                 Rp{fmt(time_deposits?.total_balance ?? 0)}
               </div>
             </div>
-            <img className="pill-img"src="" alt="" />
+            <img className="pill-img" src={depositsIcon} alt="Deposits Icon" />
           </button>
 
-          <button className="pill" onClick={() => handleNavigate("savings")} style={{backgroundColor: "#FFE8B0"}}>
+          <button
+            className="pill"
+            onClick={() => handleNavigate("savings")}
+            style={{ backgroundColor: "#FFE8B0" }}
+          >
             <div className="pill-text">
               <div className="pill-title">Savings</div>
               <div className="pill-amount">
                 Rp{fmt(savings?.[0]?.total_balance ?? 0)}
               </div>
             </div>
-            <img className="pill-img"src="" alt="" />
-
+            <img className="pill-img" src={savingsIcon} alt="Savings Icon" />
           </button>
 
-          <button className="pill" onClick={() => handleNavigate("lifegoals")} style={{backgroundColor: "#FFE8B0"}}>
+          <button
+            className="pill"
+            onClick={() => handleNavigate("lifegoals")}
+            style={{ backgroundColor: "#FFE8B0" }}
+          >
             <div className="pill-text">
               <div className="pill-title">Life Goals</div>
               <div className="pill-amount">
                 Rp
                 {fmt(
-                  life_goals?.reduce((s, g) => s + (g.current_savings || 0), 0) ??
-                  0
+                  life_goals?.reduce(
+                    (s, g) => s + (g.current_savings || 0),
+                    0,
+                  ) ?? 0,
                 )}
               </div>
             </div>
-            <img className="pill-img"src="" alt="" />
+            <img className="pill-img" src={lifeGoalsIcon} alt="Life Goals Icon" />
           </button>
 
-          <button className="pill" onClick={() => handleNavigate("pensionfunds")} style={{backgroundColor: "#FFE8B0"}}>
+          <button
+            className="pill"
+            onClick={() => handleNavigate("pensionfunds")}
+            style={{ backgroundColor: "#FFE8B0" }}
+          >
             <div className="pill-text">
               <div className="pill-title">Pension Funds</div>
               <div className="pill-amount">
                 Rp
                 {fmt(
-                  pension_funds?.reduce((s, p) => s + (p.balance || 0), 0) ?? 0
+                  pension_funds?.reduce((s, p) => s + (p.balance || 0), 0) ?? 0,
                 )}
               </div>
-            </div>  
-            <img className="pill-img"src="" alt="" />
+            </div>
+            <img className="pill-img" src={dplkIcon} alt="Pension Funds Icon" />
           </button>
         </section>
 
@@ -228,43 +277,79 @@ export default function Dashboard() {
         <section className="bottom-grid">
           {/* MY CARDS */}
           <div className="card cards-panel">
-            <div className="cards-header">
-              <h3>My Cards</h3>
-              <div className="cards-sub">Tap a card to see history and manage split bill</div>
-            </div>
+            <div className="cards-layout">
+              {/* LEFT SIDE TEXT */}
+              <div className="cards-info">
+                <h3>My Cards</h3>
+                {cards.length > 0 && (
+                  <p className="cards-sub">{cards.length} Active Cards</p>
+                )}
+                <p className="cards-tip">
+                  Tap a card to see history and manage split bill
+                </p>
+              </div>
 
-            <div className="auto-slider">
-              {cards.length > 0 ? (
-                <>
-                  <Link
-                    to="/detailmycard"
-                    key={cards[currentIndex]?.account_id}
-                    className="bank-card fade-slide"
-                  >
-                    <div className="card-top">
-                      {cards[currentIndex]?.type} - {cards[currentIndex]?.account_number}
-                    </div>
-                    <div className="card-body">
-                      <p className="masked">
-                        **** **** ****{" "}
-                        {String(cards[currentIndex]?.account_number ?? "").slice(-4)}
-                      </p>
-                      <p className="holder">
-                        {cards[currentIndex]?.account_holder_name ?? ""}
-                      </p>
-                      <h4>Rp{fmt(cards[currentIndex]?.effective_balance ?? 0)}</h4>
-                    </div>
-                  </Link>
+              {/* RIGHT SIDE CARD SLIDER */}
+              <div className="auto-slider">
+                {cards.length > 0 ? (
+                  <>
+                    <div
+                      key={cards[currentIndex]?.account_id}
+                      className="bank-card slide-in"
+                      onClick={() => navigate("/detailmycard")}
+                    >
+                      <div className="card-header">
+                        <span className="bank-type">
+                          {cards[currentIndex]?.type} – {cards[currentIndex]?.account_number}
+                        </span>
+                      </div>
 
-                  <div className="dots">
-                    {cards.map((_, i) => (
-                      <span key={i} className={`dot ${i === currentIndex ? "active" : ""}`} />
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="bank-card empty-card">No active cards</div>
-              )}
+                      <div className="card-body">
+                        <div className="card-number-row">
+                          <p className="card-number">
+                            {cards[currentIndex]?.showCardNumber
+                              ? (cards[currentIndex]?.card_number ?? "")
+                                  .replace(/(\d{4})(?=\d)/g, "$1 ")
+                              : "**** **** **** " +
+                                String(cards[currentIndex]?.card_number ?? "").slice(-4)}
+                          </p>
+                          <span
+                            className="eye-icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const updated = [...cards];
+                              updated[currentIndex].showCardNumber =
+                                !updated[currentIndex].showCardNumber;
+                              setCards(updated);
+                            }}
+                          >
+                            {cards[currentIndex]?.showCardNumber ? (
+                              <EyeOff size={18} strokeWidth={2.5} />
+                            ) : (
+                              <Eye size={18} strokeWidth={2.5} />
+                            )}
+                          </span>
+                        </div>
+
+                        <p className="card-holder">
+                          {cards[currentIndex]?.account_holder_name ?? ""}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="dots">
+                      {cards.map((_, i) => (
+                        <span
+                          key={i}
+                          className={`dot ${i === currentIndex ? "active" : ""}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="bank-card empty-card">No active cards</div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -287,7 +372,7 @@ export default function Dashboard() {
                   className="bar income-bar"
                   style={{
                     height: `${Math.round(
-                      (income / Math.max(1, income + expenses)) * 200
+                      (income / Math.max(1, income + expenses)) * 200,
                     )}px`,
                   }}
                 />
@@ -295,7 +380,7 @@ export default function Dashboard() {
                   className="bar expense-bar"
                   style={{
                     height: `${Math.round(
-                      (expenses / Math.max(1, income + expenses)) * 200
+                      (expenses / Math.max(1, income + expenses)) * 200,
                     )}px`,
                   }}
                 />

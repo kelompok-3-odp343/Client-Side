@@ -204,7 +204,8 @@ body {
 .split-content {
   display: flex;
   gap: 16px;
-  align-items: center;
+  align-items: stretch;
+  width: 100%;
 }
 
 .split-left {
@@ -215,7 +216,6 @@ body {
   text-align: center;
   height: 100%;
   gap: 20px;
-  padding: 10px;
 }
 
 .donut {
@@ -256,56 +256,81 @@ body {
 }
 
 /* split info panel */
+.split-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .info-panel {
+  flex: 1;
   min-width: 260px;
-  background: linear-gradient(90deg, rgba(60, 225, 200, 0.12), rgba(242, 253, 251, 0.9));
+  background: linear-gradient(180deg, #6dddd0 0%, rgba(241, 250, 248, 0.95) 100%);
   border-radius: 12px;
-  padding: 12px;
+  padding: 8px 12px 2px;
   box-shadow: 0 8px 18px rgba(12, 50, 48, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
 }
 
 .panel-ttl {
   font-weight: 700;
-  color: #024b41;
+  color: #000;
   margin-bottom: 6px;
 }
 
 .panel-sub {
-  color: var(--muted);
+  color: #000;
   font-size: 13px;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
 .potential {
-  color: #083a36;
+  color: #000;
   font-size: 13px;
+  font-weight: 600;
 }
 
 .potential-value {
   font-weight: 800;
-  font-size: 18px;
-  color: #0b3f38;
+  font-size: 30px;
+  color: #000;
   margin-top: 4px;
 }
 
 .view-detail {
-  color: #0b6f67;
+  color: #000;
   text-decoration: underline;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 700;
   display: inline-block;
-  margin-top: 6px;
+  align-self: flex-end;
+  position: relative;
+  top: -10px;
 }
 
 .btn-add {
   margin-top: 10px;
-  background: linear-gradient(90deg, #2cb1ff, #36d1b3);
-  color: #fff;
+  align-self: center;
+  background: #6dddd0;
+  color: #000;
   border: none;
-  padding: 8px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   cursor: pointer;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   box-shadow: 0 8px 18px rgba(44, 177, 255, 0.18);
+}
+
+.btn-add:hover {
+  opacity: 0.75;
+  background: #6dddd0;
+  color: #000;
 }
 
 /* Fund pills */
@@ -338,27 +363,30 @@ body {
   justify-content: flex-start;
   text-align: left;
   width: 170px;
+  gap: 5px;
   /* margin-right: 10px; */
 }
 
 .pill-img {
-  width: 2.875rem;         /* 46px ≈ 2.875rem when 1rem = 16px */
-  height: 2.875rem;
+  width: 60px;
+  height: 60px;
   display: inline-block;
   object-fit: cover;
   display: flex;
   justify-content: flex-end;
-  border-radius: 50%;/* 5px ≈ 0.3125rem */
-  margin-left: 20px;
+  /* border-radius: 50%;5px ≈ 0.3125rem */
+  /* margin-left: 20px; */
 }
 
 .pill .pill-title {
-  font-weight: 700;
-  color: #111827;
+  font-size: 17px;
+  font-weight: 800;
+  color: #000;
 }
 
 .pill .pill-amount {
-  color: #0b3b36;
+  color: #000;
+  font-size: 16px;
   font-weight: 700;
   /* margin-left: 8px; */
 }
@@ -387,41 +415,86 @@ body {
   margin-top: 6px;
 }
 
-.cards-header h3 {
-  font-size: 18px;
-  font-weight: 800;
+/* === MY CARDS === */
+.cards-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 36px 40px;
 }
 
-/* === MY CARDS === */
+.cards-layout {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 36px;
+}
+
+.cards-info {
+  flex: 0.7;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 10px;
+}
+
+.cards-info h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.cards-sub {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 6px 0;
+}
+
+.cards-tip {
+  font-size: 15px;
+  color: #6b7280;
+}
+
+/* CARD SLIDER */
 .auto-slider {
+  flex: 1.3;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  overflow: hidden;
-  padding-top: 10px;
 }
 
+/* CARD STYLE */
 .bank-card {
-  width: 100%;
-  max-width: 400px;
-  border-radius: 12px;
-  padding: 18px;
-  background: linear-gradient(180deg, #ff9b61 0%, #ffffff 100%);
-  color: #081219;
-  box-shadow: 0 12px 26px rgba(255, 140, 75, 0.12);
+  width: 420px;
+  height: 210px;
+  border-radius: 16px;
+  padding: 22px 26px;
+  background: linear-gradient(180deg, #ffa876 0%, #ffffff 100%);
+  color: #000;
+  box-shadow: 0 6px 18px rgba(255, 140, 75, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  cursor: pointer;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
   text-decoration: none;
-  transition: transform 0.6s ease, opacity 0.6s ease;
 }
 
-.bank-card.fade-slide {
-  animation: fadeSlide 0.8s ease;
+.bank-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(255, 140, 75, 0.3);
 }
 
-@keyframes fadeSlide {
+.bank-card.slide-in {
+  animation: slideCard 0.45s ease forwards;
+}
+
+@keyframes slideCard {
   from {
     opacity: 0;
-    transform: translateX(40px);
+    transform: translateX(30px);
   }
   to {
     opacity: 1;
@@ -429,50 +502,102 @@ body {
   }
 }
 
-.bank-card .card-top {
+/* TOP SECTION */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 18px;
+}
+
+.bank-type {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  background: transparent;
+}
+
+/* BODY */
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 6px;
+}
+
+.card-number-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.card-number {
+  font-family: "Courier New", monospace;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #111;
+  background: transparent;
+  margin: 0;
+  text-align: left;
+}
+
+.eye-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.eye-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* CARD HOLDER */
+.card-holder {
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.bank-card .masked {
-  font-size: 13px;
-  letter-spacing: 1.5px;
   color: #111;
-  margin-bottom: 4px;
+  text-transform: uppercase;
+  text-align: left;
+  margin-top: auto;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
 }
 
-.bank-card .holder {
-  font-size: 13px;
-  font-weight: 500;
-  color: #333;
+/* REMOVE UNDERLINE AND FORCE FLAT BACKGROUND */
+.bank-card * {
+  text-decoration: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-.bank-card h4 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-top: 8px;
-  color: #000;
-}
-
+/* DOTS */
 .dots {
   display: flex;
   justify-content: center;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #ccc;
+  background: #d1d5db;
   transition: all 0.3s ease;
 }
 
 .dot.active {
-  background: #ff9b61;
-  transform: scale(1.2);
+  background: #ffa876;
+  transform: scale(1.25);
 }
 
 /* Earnings panel */
@@ -532,33 +657,6 @@ body {
   box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.04);
 }
 
-/* small helpers */
-.muted {
-  color: #000;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.card-head h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-body h1 {
-  font-size: 30px;
-  font-weight: 800;
-}
-
 /* Responsive */
 @media (max-width:1100px) {
   .top-grid {
@@ -571,5 +669,21 @@ body {
 
   .bank-card {
     min-width: 320px;
+  }
+}
+
+@media (max-width: 950px) {
+  .cards-layout {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .cards-info {
+    align-items: center;
+    text-align: center;
+    padding-left: 0;
+  }
+  .bank-card {
+    width: 340px;
+    height: 200px;
   }
 }
