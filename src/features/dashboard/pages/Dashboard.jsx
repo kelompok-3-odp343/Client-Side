@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../../shared/components/Navbar";
-import { ChartPie } from "lucide-react";
+import { ChartPie, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { fetchCards } from "../api/dashboard.api.js";
@@ -277,53 +277,79 @@ export default function Dashboard() {
         <section className="bottom-grid">
           {/* MY CARDS */}
           <div className="card cards-panel">
-            <div className="cards-header">
-              <h3>My Cards</h3>
-              <div className="cards-sub">
-                Tap a card to see history and manage split bill
+            <div className="cards-layout">
+              {/* LEFT SIDE TEXT */}
+              <div className="cards-info">
+                <h3>My Cards</h3>
+                {cards.length > 0 && (
+                  <p className="cards-sub">{cards.length} Active Cards</p>
+                )}
+                <p className="cards-tip">
+                  Tap a card to see history and manage split bill
+                </p>
               </div>
-            </div>
 
-            <div className="auto-slider">
-              {cards.length > 0 ? (
-                <>
-                  <Link
-                    to="/detailmycard"
-                    key={cards[currentIndex]?.account_id}
-                    className="bank-card fade-slide"
-                  >
-                    <div className="card-top">
-                      {cards[currentIndex]?.type} -{" "}
-                      {cards[currentIndex]?.account_number}
-                    </div>
-                    <div className="card-body">
-                      <p className="masked">
-                        **** **** ****{" "}
-                        {String(
-                          cards[currentIndex]?.account_number ?? "",
-                        ).slice(-4)}
-                      </p>
-                      <p className="holder">
-                        {cards[currentIndex]?.account_holder_name ?? ""}
-                      </p>
-                      <h4>
-                        Rp{fmt(cards[currentIndex]?.effective_balance ?? 0)}
-                      </h4>
-                    </div>
-                  </Link>
+              {/* RIGHT SIDE CARD SLIDER */}
+              <div className="auto-slider">
+                {cards.length > 0 ? (
+                  <>
+                    <div
+                      key={cards[currentIndex]?.account_id}
+                      className="bank-card slide-in"
+                      onClick={() => navigate("/detailmycard")}
+                    >
+                      <div className="card-header">
+                        <span className="bank-type">
+                          {cards[currentIndex]?.type} – {cards[currentIndex]?.account_number}
+                        </span>
+                      </div>
 
-                  <div className="dots">
-                    {cards.map((_, i) => (
-                      <span
-                        key={i}
-                        className={`dot ${i === currentIndex ? "active" : ""}`}
-                      />
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="bank-card empty-card">No active cards</div>
-              )}
+                      <div className="card-body">
+                        <div className="card-number-row">
+                          <p className="card-number">
+                            {cards[currentIndex]?.showCardNumber
+                              ? (cards[currentIndex]?.card_number ?? "")
+                                  .replace(/(\d{4})(?=\d)/g, "$1 ")
+                              : "**** **** **** " +
+                                String(cards[currentIndex]?.card_number ?? "").slice(-4)}
+                          </p>
+                          <span
+                            className="eye-icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const updated = [...cards];
+                              updated[currentIndex].showCardNumber =
+                                !updated[currentIndex].showCardNumber;
+                              setCards(updated);
+                            }}
+                          >
+                            {cards[currentIndex]?.showCardNumber ? (
+                              <EyeOff size={18} strokeWidth={2.5} />
+                            ) : (
+                              <Eye size={18} strokeWidth={2.5} />
+                            )}
+                          </span>
+                        </div>
+
+                        <p className="card-holder">
+                          {cards[currentIndex]?.account_holder_name ?? ""}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="dots">
+                      {cards.map((_, i) => (
+                        <span
+                          key={i}
+                          className={`dot ${i === currentIndex ? "active" : ""}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="bank-card empty-card">No active cards</div>
+                )}
+              </div>
             </div>
           </div>
 
