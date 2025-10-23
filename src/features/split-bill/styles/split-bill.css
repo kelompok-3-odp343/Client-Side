@@ -131,38 +131,24 @@
 }
 
 /* === BUTTON VIEW DETAIL === */
-.view-btn {
+.sb-card .view-btn,
+.sb-card .edit-btn {
   margin-top: 0.8rem;
   align-self: flex-start;
-  background: var(--color);
-  color: white;
+  background-color: var(--color);
+  color: #fff;
   border: none;
   border-radius: 0.4rem;
   font-size: 0.85rem;
   padding: 0.45rem 1rem;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: filter 0.2s ease, opacity 0.2s ease;
 }
 
-.view-btn:hover {
-  opacity: 0.9;
-}
-
-.edit-btn {
-  margin-top: 0.8rem;
-  align-self: flex-start;
-  background: var(--color);
-  color: white;
-  border: none;
-  border-radius: 0.4rem;
-  font-size: 0.85rem;
-  padding: 0.45rem 1rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.edit-btn:hover {
-  opacity: 0.9;
+.sb-card .view-btn:hover,
+.sb-card .edit-btn:hover {
+  filter: brightness(0.9);
+  opacity: 0.95;
 }
 
 /* === LOADING TEXT === */

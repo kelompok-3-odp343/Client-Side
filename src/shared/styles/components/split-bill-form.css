@@ -36,8 +36,6 @@
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  /* margin-bottom: 12px;
-  padding-bottom: 8px; */
 }
 
 .bill-info-container {
@@ -48,7 +46,7 @@
 .bill-info {
   width: 100%;
   max-width: 720px;
-  background: linear-gradient(to bottom, #6dddd0, #ffffff);
+  background: linear-gradient(to bottom, var(--theme-color, #6dddd0), #ffffff);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 12px;
@@ -126,7 +124,7 @@
   background: #fff;
 }
 
-/* amount column with constant Rp prefix */
+/* amount column */
 .col-amount {
   position: relative;
   display: flex;
@@ -139,11 +137,7 @@
   justify-content: center;
   width: 40px;
   height: 36px;
-  /* border: 1px solid #e6e6e6; */
-  /* border-right: none; */
   border-radius: 6px 0 0 6px;
-  /* background: #fafafa; */
-  /* font-weight: 600; */
   font-size: 14px;
 }
 
@@ -156,15 +150,6 @@
   outline: none;
   font-size: 14px;
   box-sizing: border-box;
-}
-
-/* small formatted preview to the right (optional) */
-.amount-preview {
-  display: none;
-  /* hide if not needed; uncomment display:block to show */
-  margin-left: 8px;
-  font-size: 13px;
-  color: #333;
 }
 
 /* actions */
@@ -189,12 +174,14 @@
   height: 30px;
 }
 
+/* tombol tambah mengikuti tema */
 .add-btn:hover {
   background: none;
-  color: #6dddd0;
-  border: 1px solid #6dddd0;
+  color: var(--theme-color, #6dddd0);
+  border: 1px solid var(--theme-color, #6dddd0);
 }
 
+/* tombol hapus tetap merah */
 .rmv-btn:hover {
   background: none;
   color: #c00f0c;
@@ -233,22 +220,21 @@
   border: 1px solid #c00f0c;
 }
 
-/* Save */
+/* Save — tema dinamis */
 .add-participant-btn {
   background-color: transparent;
-  color: #6dddd0;
-  border: 1px solid #6dddd0;
+  color: var(--theme-color, #6dddd0);
+  border: 1px solid var(--theme-color, #6dddd0);
 }
 
 .add-participant-btn:hover {
-  background-color: #6dddd0;
+  background-color: var(--theme-color, #6dddd0);
   color: #fff;
-  border: 1px solid #6dddd0;
+  border: 1px solid var(--theme-color, #6dddd0);
 }
 
-/* small screens adjustments */
+/* small screens */
 @media (max-width: 480px) {
-
   .participant-header,
   .participant-row {
     grid-template-columns: 30px 1fr;
@@ -307,10 +293,11 @@
   gap: 16px;
 }
 
+/* tombol "go splitbill" ikut tema */
 .go-splitbill {
   background-color: transparent;
-  color: #6dddd0;
-  border: 1px solid #6dddd0;
+  color: var(--theme-color, #6dddd0);
+  border: 1px solid var(--theme-color, #6dddd0);
   border-radius: 6px;
   padding: 8px 16px;
   font-weight: 600;
@@ -318,11 +305,12 @@
 }
 
 .go-splitbill:hover {
-  background-color: #6dddd0;
+  background-color: var(--theme-color, #6dddd0);
   color: #fff;
-  border: 1px solid #6dddd0;
+  border: 1px solid var(--theme-color, #6dddd0);
 }
 
+/* tombol close tetap merah */
 .close-success {
   background-color: transparent;
   color: #c00f0c;
