@@ -6,17 +6,16 @@
   background: #ffffff;
   font-family: "Poppins", sans-serif;
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border-bottom: #000 1px solid;
+  box-shadow: 0 0.1875rem 0.75rem rgba(0, 0, 0, 0.05); 
+  border-bottom: 0.0625rem solid #000; 
 }
 
 .navbar-content {
-  /* max-width: 1400px; */
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 40px;
+  padding: 1.3125rem 3.75rem; 
 }
 
 /* LEFT */
@@ -26,32 +25,20 @@
   cursor: pointer;
 }
 
-.navbar-logo {
-  font-size: 28px;
-  color: #00b7a5;
-  margin-right: 10px;
+.navbar-logo-img {
+  height: 2.25rem; 
+  object-fit: contain;
 }
 
-.navbar-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: 0.5px;
-}
-
-.o1,
-.o2 {
-  color: #00b7a5;
-}
-
+/* RIGHT */
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 2.25rem; 
 }
 
 .nav-icon {
-  font-size: 22px;
+  font-size: 2.0625rem; 
   color: #333;
   cursor: pointer;
   transition: color 0.3s;
@@ -59,11 +46,4 @@
 
 .nav-icon:hover {
   color: #00b7a5;
-}
-
-.notif-overlay {
-  position: fixed;
-  inset: 0;
-  background: transparent;
-  z-index: 900;
 }
