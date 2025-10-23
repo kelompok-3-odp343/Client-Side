@@ -40,6 +40,7 @@ export async function fetchLifeGoalsRevamp(userId = "USER001") {
     if (res.data.status) return res.data.data;
     return LIFE_GOALS_REVAMP_DUMMY;
   } catch {
+    // return LIFE_GOALS_REVAMP_DUMMY;
     return LIFE_GOALS_REVAMP_DUMMY;
   }
 }
