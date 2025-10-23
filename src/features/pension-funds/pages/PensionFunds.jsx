@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
-import "../styles/pension-funds.css"; 
+import "../styles/pension-funds.css";
 import { Download } from "lucide-react";
-import pensionfunds from "../../../assets/images/pension.png"; 
-import { getPensionFunds } from '../api/pension-funds.api';
+import pensionfunds from "../../../assets/images/Pension.png";
+import { getPensionFunds } from "../api/pension-funds.api";
 
 export default function PensionFunds() {
   const months = [
-    "May", "June", "July", "Aug", "Sept", "Oct",
-    "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"
+    "May",
+    "June",
+    "July",
+    "Aug",
+    "Sept",
+    "Oct",
+    "Nov",
+    "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
   ];
 
   const [selectedMonth, setSelectedMonth] = useState("May");
@@ -22,10 +32,7 @@ export default function PensionFunds() {
 
       const funds = Array.isArray(response.data) ? response.data : [];
 
-      const totalBalance = funds.reduce(
-        (sum, f) => sum + f.total_balance,
-        0
-      );
+      const totalBalance = funds.reduce((sum, f) => sum + f.total_balance, 0);
 
       const pensionFunds = funds.flatMap((f, index) =>
         f.items.map((item) => ({
@@ -45,18 +52,38 @@ export default function PensionFunds() {
     } catch (error) {
       console.error("error", error);
     }
-  }
+  };
 
   const dummyTransactions = [
-    { date: "31 May 2025", month: "May", type: "Simponi Likuid", detail: "Admin fee", amount: "-Rp1.000" },
-    { date: "31 May 2025", month: "May", type: "Simponi Likuid Syariah", detail: "Management fee", amount: "-Rp7" },
-    { date: "30 May 2025", month: "May", type: "Simponi Likuid Syariah", detail: "Pension Fund Contribution", amount: "-Rp3.500" },
+    {
+      date: "31 May 2025",
+      month: "May",
+      type: "Simponi Likuid",
+      detail: "Admin fee",
+      amount: "-Rp1.000",
+    },
+    {
+      date: "31 May 2025",
+      month: "May",
+      type: "Simponi Likuid Syariah",
+      detail: "Management fee",
+      amount: "-Rp7",
+    },
+    {
+      date: "30 May 2025",
+      month: "May",
+      type: "Simponi Likuid Syariah",
+      detail: "Pension Fund Contribution",
+      amount: "-Rp3.500",
+    },
   ];
 
   useEffect(() => {
     pension();
     // Filter transaksi sesuai bulan yang dipilih
-    const filtered = dummyTransactions.filter((tx) => tx.month === selectedMonth);
+    const filtered = dummyTransactions.filter(
+      (tx) => tx.month === selectedMonth
+    );
     setTransactions(filtered);
   }, [selectedMonth]);
 
@@ -87,9 +114,13 @@ export default function PensionFunds() {
             <div className="pension-fund-summary-right">
               <h3 className="summary-title">Total Pension Funds</h3>
               <p className="summary-label">Total Balance</p>
-              <p className="summary-balance">Rp{pensionFundsData?.totalBalance.toLocaleString()}</p>
+              <p className="summary-balance">
+                Rp{pensionFundsData?.totalBalance.toLocaleString()}
+              </p>
               <div className="summary-divider" />
-              <p className="summary-sub">You have {pensionFundsData?.totalCount} Pension Funds</p>
+              <p className="summary-sub">
+                You have {pensionFundsData?.totalCount} Pension Funds
+              </p>
             </div>
           </div>
 
@@ -126,7 +157,9 @@ export default function PensionFunds() {
             {transactions.length > 0 ? (
               Object.keys(groupedTransactions).map((date) => (
                 <div key={date} className="transaction-group">
-                  <p className="transaction-date"><strong>{date}</strong></p>
+                  <p className="transaction-date">
+                    <strong>{date}</strong>
+                  </p>
                   <hr />
                   {groupedTransactions[date].map((tx, i) => (
                     <div key={i} className="transaction-item">
@@ -137,7 +170,11 @@ export default function PensionFunds() {
                           <p className="tx-detail">{tx.detail}</p>
                         </div>
                       </div>
-                      <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
+                      <div
+                        className={`tx-amount ${
+                          tx.amount.startsWith("-") ? "neg" : "pos"
+                        }`}
+                      >
                         {tx.amount}
                       </div>
                     </div>
@@ -145,7 +182,9 @@ export default function PensionFunds() {
                 </div>
               ))
             ) : (
-              <p className="no-tx">No transactions available for {selectedMonth}</p>
+              <p className="no-tx">
+                No transactions available for {selectedMonth}
+              </p>
             )}
           </div>
         </section>
@@ -164,8 +203,14 @@ function AccountNumberCard({ title, accountNumber, balance, growth }) {
       </div>
       <hr />
       <div className="account-balance">
-        <p><span>Accumulated Balance</span><span>Rp{balance.toLocaleString()}</span></p>
-        <p><span>Growth</span><span>{growth}</span></p>
+        <p>
+          <span>Accumulated Balance</span>
+          <span>Rp{balance.toLocaleString()}</span>
+        </p>
+        <p>
+          <span>Growth</span>
+          <span>{growth}</span>
+        </p>
       </div>
     </div>
   );
