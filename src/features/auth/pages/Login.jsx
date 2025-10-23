@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
 import "../styles/auth-login.css";
+import logo from "../../../assets/images/wandoor-logo-2.png";
 
 export default function Login() {
   const [userId, setUserId] = useState("");
@@ -48,11 +49,7 @@ export default function Login() {
     <div className="auth-background">
       <div className="login-box fade-in">
         <div className="logo">
-          <i className="fas fa-door-open"></i>
-          <h1>
-            wand<span className="o1">o</span>
-            <span className="o2">o</span>r
-          </h1>
+          <img src={logo} alt="Wandoor Logo" className="logo-img" />
         </div>
 
         <p className="login-subtitle">Please login to your account</p>

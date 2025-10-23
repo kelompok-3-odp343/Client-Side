@@ -124,3 +124,10 @@ input:focus {
   background-attachment: fixed;
   font-family: "Poppins", sans-serif;
 }
+
+.logo-img {
+  width: clamp(9rem, 14vw, 11rem);
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}

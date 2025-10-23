@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
 import "../styles/auth-otp.css";
+import logo from "../../../assets/images/wandoor-logo-2.png";
 
 export default function OtpLogin() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -58,11 +59,7 @@ export default function OtpLogin() {
     <div className="auth-background">
       <div className="otp-box fade-in">
         <div className="logo">
-          <i className="fas fa-door-open"></i>
-          <h1>
-            wand<span className="o1">o</span>
-            <span className="o2">o</span>r
-          </h1>
+          <img src={logo} alt="Wandoor Logo" className="logo-img" />
         </div>
 
         <h2 className="otp-title">Verify Your OTP</h2>
@@ -92,14 +89,10 @@ export default function OtpLogin() {
         <p className="otp-resend">
           Didn’t receive the email?{" "}
           <span
-            className={`otp-resend-link ${
-              resendTimer > 0 ? "disabled" : ""
-            }`}
+            className={`otp-resend-link ${resendTimer > 0 ? "disabled" : ""}`}
             onClick={handleResend}
           >
-            {resendTimer > 0
-              ? `Resend in ${resendTimer}s`
-              : "Click to resend"}
+            {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Click to resend"}
           </span>
         </p>
 
