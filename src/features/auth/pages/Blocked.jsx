@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
 import "../styles/auth-blocked.css";
+import logo from "../../../assets/images/wandoor-logo-2.png";
 
 export default function PopupBlock() {
   const navigate = useNavigate();
@@ -10,11 +11,7 @@ export default function PopupBlock() {
     <div className="auth-background">
       <div className="block-box fade-in">
         <div className="logo">
-          <i className="fas fa-door-open"></i>
-          <h1>
-            wand<span className="o1">o</span>
-            <span className="o2">o</span>r
-          </h1>
+          <img src={logo} alt="Wandoor Logo" className="logo-img" />
         </div>
 
         <div className="block-icon">

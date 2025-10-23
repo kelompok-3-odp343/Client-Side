@@ -4,17 +4,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
-  /* warna dasar putih */
   background-color: #ffffff;
-
-  /* gambar dari Figma */
   background-image: url("../../../assets/images/auth-bg.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
-
   font-family: "Poppins", sans-serif;
 }
 
@@ -22,7 +17,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.05); 
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .login-container {
@@ -34,10 +29,10 @@
 
 .login-box {
   background: #fff;
-  border: 2px solid #b2f0e9;
-  border-radius: 10px;
-  width: 380px;
-  padding: 40px 35px;
+  border: 0.125rem solid #b2f0e9;
+  border-radius: 0.75rem;
+  width: clamp(22rem, 32vw, 30rem);
+  padding: clamp(2.5rem, 4vw, 3.5rem);
   text-align: center;
   box-shadow: var(--shadow-soft);
 }
@@ -46,17 +41,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 15px;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
 }
 
 .logo i {
-  font-size: 50px;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
   color: var(--primary);
 }
 
 .logo h1 {
-  font-size: 30px;
+  font-size: clamp(2rem, 3vw, 2.5rem);
   font-weight: 700;
   color: #333;
 }
@@ -68,41 +63,42 @@
 
 .login-subtitle {
   color: #444;
-  margin-bottom: 25px;
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  margin-bottom: 2rem;
 }
 
 .input-field {
   position: relative;
-  margin-bottom: 18px;
+  margin-bottom: 1.25rem;
 }
 
 .input-field i {
   position: absolute;
   color: #777;
-  font-size: 16px;
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
   top: 50%;
   transform: translateY(-50%);
 }
 
 .input-field .fa-user,
 .input-field .fa-lock {
-  left: 12px;
+  left: 0.9rem;
 }
 
 .input-field .toggle-eye {
-  right: 12px;
+  right: 0.9rem;
   cursor: pointer;
   color: #777;
 }
 
 .input-field input {
   width: 100%;
-  height: 46px;
-  padding: 0 38px;
-  border: 2px solid var(--border-light);
+  height: clamp(2.8rem, 3.5vw, 3rem);
+  padding: 0 2.5rem;
+  border: 0.125rem solid var(--border-light);
   border-radius: var(--radius);
   outline: none;
-  font-size: 14px;
+  font-size: clamp(0.9rem, 1vw, 1rem);
   color: #444;
   background: #fff;
 }
@@ -115,13 +111,14 @@
   width: 100%;
   background: var(--secondary);
   color: #333;
-  padding: 12px;
-  border-radius: 6px;
+  padding: clamp(0.75rem, 1.2vw, 1rem);
+  border-radius: 0.5rem;
   font-weight: 600;
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
   cursor: pointer;
   transition: 0.3s;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
-  margin-top: 10px;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.08);
+  margin-top: 0.8rem;
 }
 
 .login-btn:hover {
@@ -131,8 +128,8 @@
 
 .forgot-password {
   text-align: right;
-  font-size: 13px;
-  margin-top: 5px;
+  font-size: clamp(0.8rem, 0.9vw, 0.9rem);
+  margin-top: 0.4rem;
 }
 
 .forgot-password a {
@@ -141,6 +138,6 @@
 
 .login-error {
   color: #d9534f;
-  font-size: 13px;
-  margin-top: 12px;
+  font-size: clamp(0.85rem, 0.9vw, 1rem);
+  margin-top: 0.8rem;
 }
