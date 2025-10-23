@@ -16,7 +16,7 @@ export default function SplitBill() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const data = await fetchSplitBills(); // 
+      const data = await fetchSplitBills();
       setBills(data);
       setLoading(false);
     }
@@ -75,10 +75,7 @@ export default function SplitBill() {
             const col = i % 3;
             const color = cardColors[(row + col) % cardColors.length];
             const membersToShow = bill.members.slice(0, 3);
-            const extraCount = Math.max(
-              0,
-              bill.members.length - membersToShow.length
-            );
+            const extraCount = Math.max(0, bill.members.length - membersToShow.length);
 
             return (
               <div
@@ -101,11 +98,8 @@ export default function SplitBill() {
                     <div
                       className="progress-fill"
                       style={{
-                        width: `${(bill.members.filter((m) => m.status === "Paid")
-                          .length /
-                          Math.max(1, bill.members.length)) *
-                          100
-                          }%`,
+                        width: `${(bill.members.filter((m) => m.status === "Paid").length /
+                          Math.max(1, bill.members.length)) * 100}%`,
                       }}
                     />
                   </div>
@@ -118,8 +112,7 @@ export default function SplitBill() {
                       <span>
                         Rp{Number(m.amount).toLocaleString("id-ID")}{" "}
                         <span
-                          className={`status ${m.status === "Paid" ? "paid" : "unpaid"
-                            }`}
+                          className={`status ${m.status === "Paid" ? "paid" : "unpaid"}`}
                         >
                           {m.status}
                         </span>
@@ -131,26 +124,15 @@ export default function SplitBill() {
                   )}
                 </div>
 
-                {/* <button
-                  className="view-btn"
-                  onClick={() => handleViewDetail(bill, color)}
+                <div
+                  className="sb-actions"
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginTop: "10px",
+                  }}
                 >
-                  View Detail
-                </button>
-
-                <button
-                  className="edit-btn"
-                  onClick={() => setEditBill(bill)}
-                >
-                  Edit
-                </button> */}
-
-                <div className="sb-actions" style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  marginTop: "10px"
-                }}>
                   <button
                     className="view-btn"
                     onClick={() => handleViewDetail(bill, color)}
@@ -161,13 +143,15 @@ export default function SplitBill() {
 
                   <button
                     className="edit-btn"
-                    onClick={() => setEditBill(bill)}
+                    onClick={() => {
+                      setEditBill(bill);
+                      setSelectedColor(color);
+                    }}
                     style={{ alignSelf: "flex-end" }}
                   >
                     Edit
                   </button>
                 </div>
-
               </div>
             );
           })}
@@ -260,18 +244,19 @@ export default function SplitBill() {
         {editBill && (
           <SplitBillFormEdit
             data={editBill}
+            color={selectedColor} // <— tambahkan ini
             onClose={() => setEditBill(null)}
             onSave={(updatedMembers) => {
               setBills((prev) =>
                 prev.map((b) =>
                   b.split_bill_id === editBill.split_bill_id
                     ? {
-                      ...b,
-                      members: updatedMembers,
-                      remaining_bill: updatedMembers
-                        .filter((m) => m.status !== "Paid")
-                        .reduce((s, m) => s + (Number(m.amount) || 0), 0),
-                    }
+                        ...b,
+                        members: updatedMembers,
+                        remaining_bill: updatedMembers
+                          .filter((m) => m.status !== "Paid")
+                          .reduce((s, m) => s + (Number(m.amount) || 0), 0),
+                      }
                     : b
                 )
               );
