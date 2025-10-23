@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: wandoor-frontend
+    ports:
+      - "80:80" # Lebih simple
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=http://wandoor-backend:8080
+    restart: always
+    networks:
+      - wandoor-network
+
+networks:
+  wandoor-network:
+    # external: true
