@@ -55,6 +55,7 @@ export default function OtpLogin() {
       return;
     }
 
+    sessionStorage.setItem("token", respOTP.data.token)
     sessionStorage.setItem("user_id", respOTP.data.user.userId)
     sessionStorage.setItem("username", respOTP.data.user.username)
 
