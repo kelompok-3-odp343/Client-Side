@@ -1,359 +1,191 @@
+/* ===== PAGE ===== */
 .life-goals-page {
-  padding: 8rem 9rem;
   font-family: "Poppins", sans-serif;
-  background: linear-gradient(to bottom right, #ffffff, #f8fdfa);
+  background: #fafdfb;
   min-height: 100vh;
+  padding-top: 110px;
 }
 
+/* ===== CONTAINER ===== */
+.content-wrap {
+  width: calc(100% - 8rem);
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* ===== HEADER ===== */
 .section-title {
-  font-size: 2.75rem;
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 0.75rem;
+  font-size: 2.2rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.25rem !important;
 }
 
 .section-subtitle {
-  font-size: 1.35rem;
-  color: #555;
-  margin-bottom: 3.25rem;
+  font-size: 1.05rem !important;
+  color: #555 !important;
+  margin-bottom: 1.2rem !important;
+  position: relative;
 }
 
-.life-goal-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(clamp(23rem, 22vw, 27rem), 1fr));
-  gap: 3rem;
-  justify-items: stretch;
-}
-
-/* Larger default styles for buttons / cards / content di dalam card */
-.life-goal-card {
-  padding: 1.5rem;
-  border-radius: 1rem;
-  background: #fff;
-  box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.06);
-}
-
-/* === RESPONSIVE: kurang dari 1600px (1200–1599px) === */
-@media (max-width: 1599px) {
-  .life-goals-page {
-    padding: 7rem 7rem;
-  }
-
-  .section-title {
-    font-size: 2.5rem;
-  }
-
-  .section-subtitle {
-    font-size: 1.25rem;
-    margin-bottom: 3rem;
-  }
-
-  .life-goal-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(clamp(21rem, 23vw, 26rem), 1fr));
-    gap: 3rem;
-    justify-items: stretch;
-  }
-
-  .life-goal-card {
-    padding: 1.4rem;
-  }
-}
-
-/* === RESPONSIVE: kurang dari 1200px (tablet / small laptop) === */
-@media (max-width: 1199px) {
-  .life-goals-page {
-    padding: 6rem 6rem;
-  }
-
-  .section-title {
-    font-size: 2.125rem;
-  }
-
-  .section-subtitle {
-    font-size: 1.125rem;
-    margin-bottom: 3rem;
-  }
-
-  .life-goal-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(clamp(19rem, 30vw, 22rem), 1fr));
-    gap: 2.5rem;
-    justify-items: stretch;
-  }
-
-  .life-goal-card {
-    padding: 1.25rem;
-  }
-}
-
-/* === RESPONSIVE: kurang dari 768px (mobile) === */
-@media (max-width: 767px) {
-  .life-goals-page {
-    padding: 4.5rem 2.25rem;
-  }
-
-  .section-title {
-    font-size: 1.875rem;
-  }
-
-  .section-subtitle {
-    font-size: 1rem;
-    margin-bottom: 2.5rem;
-  }
-
-  .life-goal-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    justify-items: stretch;
-  }
-
-  .life-goal-card {
-    padding: 1rem;
-  }
-}
-
-/* ========================= */
-/* ===== REVAMP (Gbr 2) ==== */
-/* ========================= */
-
-.goals-sections {
+.section-subtitle::after {
+  content: "";
   display: block;
   width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, #e5e9ef, #d7dee7, #e5e9ef);
+  margin: 1.2rem auto 1.8rem auto;
 }
 
-/* BLOCK per kategori (flat) */
+/* ===== CATEGORY ===== */
 .category-block {
-  margin-bottom: 2.25rem;
+  margin-bottom: 3rem !important;
 }
 
 .category-header {
-  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 0.75rem;
 }
 
 .category-title {
-  font-size: 1.625rem;
-  /* Heading A */
+  font-size: 1.3rem;
   font-weight: 700;
-  color: #111;
   margin: 0;
 }
 
 .category-subtitle {
   font-size: 1rem;
   color: #666;
-  margin: 0.35rem 0 0 0;
 }
 
-/* Row angka total (Rp cur / Rp target) */
-.category-total-row {
-  margin: 0.8rem 0 0.4rem 0;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.total-amounts {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 1rem;
-  color: #222;
-  font-weight: 600;
-}
-
-.amount-current {
-  color: #111;
-}
-
-.amount-sep {
-  color: #777;
-}
-
-.amount-target {
-  color: #444;
-  font-weight: 500;
-}
-
-/* Big progress bar */
 .big-progress {
-  position: relative;
   width: 100%;
   height: 14px;
-  border-radius: 999px;
-  background: #eef2f7;
+  background: #e6ebf2;
+  border-radius: 8px;
   overflow: hidden;
 }
 
 .big-progress-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
   height: 100%;
-  border-radius: 999px;
-  background: #9fb4ff;
-  /* netral lembut */
-  width: 0%;
-  transition: width 360ms ease;
+  transition: width 0.3s ease;
 }
 
 .big-progress-meta {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 0.35rem;
-  font-size: 0.95rem;
-  color: #555;
-}
-
-/* Grid sub-cards: 3 kolom */
-.subcards-grid {
-  margin-top: 1.1rem;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 1.25rem;
-}
-
-/* Sub-card (with gradient per kategori) */
-.subcard {
-  border-radius: 14px;
-  border: 1px solid #e8eef7;
-  padding: 1.25rem 1.3rem;
-  background-color: #fff;
-  background-blend-mode: soft-light;
-  box-shadow: 0 0.25rem 0.9rem rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-  outline: none;
-}
-
-.subcard:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.08);
-  border-color: #dbe6fb;
-}
-
-.subcard:focus {
-  box-shadow: 0 0 0 3px rgba(84, 140, 255, 0.22);
-  border-color: #b9ccff;
-}
-
-/* Header sub card */
-.subcard-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.6rem;
-}
-
-.subcard-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 60%;
-}
-
-.subcard-amounts {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.95rem;
-  color: #222;
-  font-weight: 600;
-}
-
-/* Mini progress */
-.mini-progress {
-  position: relative;
-  width: 100%;
-  height: 8px;
-  border-radius: 999px;
-  background: #f1f4f9;
-  overflow: hidden;
-}
-
-.mini-progress-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  height: 100%;
-  border-radius: 999px;
-  background: #b9ccff;
-  /* lembut */
-  width: 0%;
-  transition: width 260ms ease;
-}
-
-.mini-progress-meta {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.45rem;
-  font-size: 0.85rem;
+  text-align: right;
   color: #666;
+  font-size: 0.9rem;
+  margin-top: 4px;
 }
 
-.mini-progress-meta .mini-left {
-  color: #555;
+/* ===== SUBCARDS ===== */
+.subcards-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
 }
 
-.mini-progress-meta .mini-right {
-  color: #7a7a7a;
-}
-
-/* Separator antar kategori */
 .category-separator {
   width: 100%;
   height: 1px;
-  background: linear-gradient(to right, #e9edf3, #dfe6f0, #e9edf3);
-  margin-top: 1.4rem;
+  background: #e8ecf2;
+  margin-top: 2rem;
 }
 
-.subcard-header.stacked {
+/* ===== SUBCARD ===== */
+.lg-subcard {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  position: relative;
+  min-height: 240px; /* sebelumnya 200px */
+  transition: all 0.25s ease;
+}
+
+.lg-subcard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 70%;
+  width: 100%;
+  background: var(--gradient-color);
+  z-index: 0;
+}
+
+.lg-subcard-body {
+  position: relative;
+  z-index: 2;
+  padding: 24px;
+  display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.4rem;
+  justify-content: space-between;
+  height: 100%;
 }
 
-.subcard-amounts.stacked {
+.lg-subcard-title {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #000;
+  margin-bottom: 6px;
+}
+
+.lg-subcard-subtitle {
   font-size: 0.95rem;
-  font-weight: 500;
-  color: #333;
+  color: #444;
+  margin-bottom: 18px;
 }
 
-/* Responsives */
-@media (max-width: 1199px) {
-  .goals-sections {
-    max-width: 1000px;
-  }
-
-  .subcards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+/* ===== PROGRESS ===== */
+.lg-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-@media (max-width: 767px) {
-  .goals-sections {
-    max-width: 100%;
-  }
+.lg-mini-progress {
+  width: 100%;
+  height: 14px;
+  background: #eef1f6;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
 
-  .category-title {
-    font-size: 1.5rem;
-  }
+.lg-mini-progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: width 0.3s ease;
+}
 
-  .subcards-grid {
-    grid-template-columns: 1fr;
-  }
+.lg-progress-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  padding-right: 6px;
+}
 
-  .subcard {
-    padding: 0.85rem 0.9rem;
-  }
+.lg-progress-labels {
+  display: flex !important;
+  justify-content: space-between !important;
+  font-size: 0.85rem !important;
+  color: #555 !important;
+  margin-top: 4px !important;
+  order: 2 !important;
+}
 
-  .subcard-title {
-    max-width: 100%;
-  }
-
-  .category-total-row {
-    justify-content: flex-start;
-  }
+.lg-progress-values {
+  display: flex !important;
+  justify-content: space-between !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #000 !important;
+  margin-top: 2px !important;
 }

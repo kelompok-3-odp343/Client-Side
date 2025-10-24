@@ -1,205 +1,111 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
-import { useNavigate } from "react-router-dom";
-import "../styles/life-goals.css";
 import { fetchLifeGoalsRevamp } from "../api/life-goals.api";
-import LIFE_GOALS_META from "../constants/life-goals.meta"; // pakai hanya desc + base color (untuk gradient subcard)
+import "../styles/life-goals.css";
+import "../styles/life-goals-card.css";
 
 export default function LifeGoals() {
-  const navigate = useNavigate();
   const [goals, setGoals] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // --- helpers ---
-  const formatRupiah = (n) => {
-    if (n === null || n === undefined) return "Rp 0";
-    const s = Number(n).toLocaleString("id-ID");
-    return `Rp ${s}`;
-  };
-
-  const calcPercent = (current, target) => {
-    if (!target || target <= 0) return 0;
-    const pct = Math.round((Number(current || 0) / Number(target)) * 100);
-    return Math.max(0, Math.min(100, pct));
-  };
-
-  const normKey = (name = "") =>
-    String(name).trim().toLowerCase().replace(/\s+/g, "_");
-
-  const CATEGORY_COLOR_FIX = {
-    vacations: "#ffd367",
-    vehicles: "#ffed9c",
-    marriage: "#9c7edc",
-    home: "#c3aff1",
-    education: "#71d9d0",
-    gadget: "#b6efe9",
-  };
-
-  const getMeta = (category = "") => {
-    const key = normKey(category);
-    const map = {
-      vacation: "vacation",
-      vacation: "vacation",
-      education: "education",
-      marriage: "marriage",
-      home: "home",
-      gadget: "gadget",
-      gadgets: "gadget",
-      vehicle: "vehicles",
-      vehicles: "vehicles",
-    };
-    const metaKey = map[key] || key;
-    const meta = CATEGORY_COLOR_FIX[metaKey] || {};
-
-    return {
-      desc: meta?.desc || "",
-      color: CATEGORY_COLOR_FIX[metaKey] || meta?.color || "#9fb4ff",
-    };
-  };
-
-  // bikin gradient lembut dari hex
-  const hexToRgb = (hex) => {
-    const h = hex.replace("#", "");
-    const bigint = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
-    return {
-      r: (bigint >> 16) & 255,
-      g: (bigint >> 8) & 255,
-      b: bigint & 255,
-    };
-  };
-
-  const makeSoftGradient = (hex) => {
-    const { r, g, b } = hexToRgb(hex);
-    // warna sangat soft (alpha kecil) agar tetap netral seperti mockup
-    return `linear-gradient(135deg, rgba(${r}, ${g}, ${b}, 0.22) 0%, rgba(${r}, ${g}, ${b}, 0.10) 100%)`;
-  };
+  const COLORS = ["#71d9d0", "#ffd367", "#9c7edc"];
 
   useEffect(() => {
-    async function loadGoals() {
-      setLoading(true);
-      const data = await fetchLifeGoalsRevamp("USER001");
-      setGoals(data || {});
+    const loadData = async () => {
+      const res = await fetchLifeGoalsRevamp();
+      setGoals(res || {});
       setLoading(false);
-    }
-    loadGoals();
+    };
+    loadData();
   }, []);
 
-  const hasData = useMemo(() => Object.keys(goals || {}).length > 0, [goals]);
+  const format = (v) => `Rp${(v || 0).toLocaleString("id-ID")}`;
+  const percent = (cur, tar) =>
+    tar ? Math.round((cur / tar) * 100) : 0;
 
-  if (loading) return <div className="loading">Loading Life Goals...</div>;
+  if (loading) return <div className="loading">Loading...</div>;
+
+  const colorByIndex = (idx) => COLORS[idx % COLORS.length];
 
   return (
     <div className="life-goals-page">
       <Navbar />
-      <h2 className="section-title">Life Goals Information</h2>
-      <p className="section-subtitle">Small saves fuel big dreams</p>
+      <div className="content-wrap">
+        <h2 className="section-title">Life Goals Information</h2>
+        <p className="section-subtitle">Small saves fuel big dreams</p>
 
-      <div className="goals-sections">
-        {!hasData && (
-          <div className="empty-state">
-            <p>Tidak ada data Life Goals.</p>
-          </div>
-        )}
+        {Object.entries(goals).map(([cat, data], i) => {
+          const color = colorByIndex(i);
+          const prog = percent(data.currentBalance, data.totalTarget);
 
-        {hasData &&
-          Object.entries(goals).map(([category, obj]) => {
-            const totalTarget = obj?.totalTarget ?? 0;
-            const currentBalance = obj?.currentBalance ?? 0;
-            const bigPct = calcPercent(currentBalance, totalTarget);
-            const meta = getMeta(category);
-            console.log('zxczxc', meta);
-
-
-            return (
-              <section key={category} className="category-block">
-                {/* Header kategori FLAT */}
-                <header className="category-header">
-                  <h3 className="category-title">{category}</h3>
-                  {meta.desc ? <p className="category-subtitle">{meta.desc}</p> : null}
-                </header>
-
-                {/* Big total row */}
-                <div className="category-total-row">
-                  <div className="total-amounts">
-                    <span className="amount-current">{formatRupiah(currentBalance)}</span>
-                    <span className="amount-sep">/</span>
-                    <span className="amount-target">{formatRupiah(totalTarget)}</span>
-                  </div>
+          return (
+            <section key={cat} className="category-block">
+              <div className="category-header">
+                <div>
+                  <h3 className="category-title">{cat}</h3>
+                  <p className="category-subtitle">
+                    Invest in your brightest future
+                  </p>
                 </div>
-
-                {/* Big progress */}
-                <div className="big-progress">
-                  <div className="big-progress-fill" style={{ width: `${bigPct}%` }} />
+                <div className="category-total">
+                  {format(data.currentBalance)} / {format(data.totalTarget)}
                 </div>
-                <div className="big-progress-meta">
-                  <span>{bigPct}% achieved</span>
-                </div>
+              </div>
 
-                {/* Grid sub-cards 3 kolom */}
-                <div className="subcards-grid">
-                  {(obj?.lifeGoalsList || []).map((item) => {
-                    const miniPct = calcPercent(item?.currentBalance, item?.targetBalance);
-                    const bg = makeSoftGradient(meta.color);
+              <div className="big-progress">
+                <div
+                  className="big-progress-fill"
+                  style={{ width: `${prog}%`, background: color }}
+                />
+              </div>
+              <p className="big-progress-meta">{prog}% achieved</p>
 
-                    return (
-                      <article
-                        key={item.id}
-                        className="subcard"
-                        style={{ backgroundImage: bg }}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => navigate(`/lifegoal/${item.id}`, { state: { item, category } })}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            navigate(`/lifegoal/${item.id}`, { state: { item, category } });
-                          }
-                        }}
-                      >
-                        <div className="subcard-header stacked">
-                          <div className="subcard-title" title={item?.lifegoalsTitle}>
-                            {item?.lifegoalsTitle || "-"}
+              <div className="subcards-grid">
+                {data.lifeGoalsList.map((g) => {
+                  const p = percent(g.currentBalance, g.targetBalance);
+                  return (
+                    <div
+                      key={g.id}
+                      className="lg-subcard"
+                      style={{
+                        "--gradient-color": `linear-gradient(to bottom, ${color} 0%, #ffffff 100%)`,
+                      }}
+                    >
+                      <div className="lg-subcard-body">
+                        <h4 className="lg-subcard-title">{g.lifegoalsTitle}</h4>
+                        <p className="lg-subcard-subtitle">
+                          {g.lifegoalsSubtitle}
+                        </p>
+
+                        <div className="lg-progress-wrap">
+                          <div className="lg-mini-progress">
+                            <div
+                              className="lg-mini-progress-fill"
+                              style={{ width: `${p}%`, background: color }}
+                            >
+                              <span className="lg-progress-text">{p}%</span>
+                            </div>
                           </div>
 
-                          <div className="subcard-amounts stacked">
-                            <span className="amount-current">
-                              {formatRupiah(item?.currentBalance)}
-                            </span>
-                            <span className="amount-sep">/</span>
-                            <span className="amount-target">
-                              {formatRupiah(item?.targetBalance)}
-                            </span>
+                          <div className="lg-progress-labels">
+                            <span>Current Savings</span>
+                            <span>Target</span>
+                          </div>
+                          <div className="lg-progress-values">
+                            <span>{format(g.currentBalance)}</span>
+                            <span>{format(g.targetBalance)}</span>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-                        <div className="mini-progress">
-                          <div className="mini-progress-fill" style={{ width: `${miniPct}%` }} />
-                        </div>
-
-                        <div className="mini-progress-meta">
-                          <span className="mini-left">
-                            {miniPct}% • {item?.lifegoalsCategory || category}
-                          </span>
-                          <span className="mini-right">
-                            Created:{" "}
-                            {item?.createdTime
-                              ? new Date(item.createdTime).toLocaleDateString("id-ID", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              })
-                              : "-"}
-                          </span>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
-
-                {/* Separator antar kategori */}
-                <div className="category-separator" />
-              </section>
-            );
-          })}
+              <div className="category-separator" />
+            </section>
+          );
+        })}
       </div>
     </div>
   );
