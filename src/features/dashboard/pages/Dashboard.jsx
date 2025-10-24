@@ -3,7 +3,7 @@ import Navbar from "../../../shared/components/Navbar";
 import { ChartPie, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
-import { fetchCards } from "../api/dashboard.api.js";
+import { fetchDashboard } from "../api/dashboard.api.js";
 import depositsIcon from "../../../assets/images/dashboard-deposits-icon.png";
 import savingsIcon from "../../../assets/images/dashboard-savings-icon.png";
 import lifeGoalsIcon from "../../../assets/images/dashboard-life-goals-icon.png";
@@ -17,68 +17,61 @@ export default function Dashboard() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
 
-  // fetch dashboard data
   useEffect(() => {
-    const userId = localStorage.getItem("userId") || "dummyUser123";
-    const token = localStorage.getItem("token");
-
-    const fetchData = async () => {
-      try {
-        if (API_BASE_URL) {
-          const resp = await fetch(
-            `${API_BASE_URL}/api/v1/dashboard?user_id=${userId}`,
-            { headers: { Authorization: `Bearer ${token}` } },
-          );
-          if (!resp.ok) throw new Error("API error");
-          const json = await resp.json();
-          setData(json.data);
-        } else {
-          setData({
-            assets_total: { total: 50580062, extra_this_month: 7000000 },
-            earnings_overview: { income: 17580062, expenses: 10580062 },
-            split: {
-              paid: 12000000,
-              remaining: 3000000,
-              total: 15000000,
-              progress: 80,
-              potential: 20580062,
-              ongoing: 4,
-            },
-            time_deposits: { total_balance: 15000000, count_accounts: 2 },
-            savings: [],
-            pension_funds: [],
-            life_goals: [],
-          });
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
+    const dataDashboards = async () => {
+      const raw = await fetchDashboard();
+      if (!raw) {
         setLoading(false);
+        return;
       }
+
+      const d = raw.data;
+
+      const total = d.assetoverview?.totalAsset ?? 0;
+      const income = d.cashFlowOverview?.totalIncome ?? 0;
+      const expenses = d.cashFlowOverview?.totalExpense ?? 0;
+      const receivable = d.cashFlowOverview?.totalReceivable ?? 0;
+
+      const totalBill = d.splitBillOverview?.totalBillAmount ?? 0;
+      const remainingBill = d.splitBillOverview?.remainingBillAmount ?? 0;
+      const paidBill = totalBill - remainingBill;
+      const progress = totalBill > 0 ? Math.round((paidBill / totalBill) * 100) : 0;
+
+      const pf = d.portfolioOverview ?? [];
+      const amt = (name) =>
+        pf.find((p) => p.productName === name)?.totalAmount ?? 0;
+
+      setData({
+        assets_total: { total, extra_this_month: 0 },
+        earnings_overview: { income, expenses },
+        split: {
+          paid: paidBill,
+          remaining: remainingBill,
+          total: totalBill,
+          progress,
+          potential: receivable,
+          ongoing: d.splitBillOverview?.countSplitBill ?? 0,
+        },
+        time_deposits: { total_balance: amt("timeDeposit") },
+        savings: [{ total_balance: amt("accountSavings") }],
+        life_goals: [{ current_savings: amt("lifegoals") }],
+        pension_funds: [{ balance: amt("dplk") }],
+      });
+
+      const mappedCards = (d.accountList ?? []).map((item) => ({
+        type: item.account_product_name,
+        account_number: item.account_number,
+        card_number: item.debit_card_number || item.account_number,
+        account_holder_name: item.account_name,
+        showCardNumber: false,
+      }));
+      setCards(mappedCards);
+
+      setLoading(false);
     };
 
-    fetchData();
-  }, [API_BASE_URL]);
-
-  // fetch cards
-  useEffect(() => {
-    const userId = localStorage.getItem("userId") || "dummyUser123";
-    const token = localStorage.getItem("token");
-    const getCards = async () => {
-      const result = await fetchCards(userId, token);
-      setCards(result);
-    };
-    getCards();
+    dataDashboards();
   }, []);
-
-  // auto slide
-  useEffect(() => {
-    if (!cards.length) return;
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % cards.length);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, [cards]);
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
   if (!data) return <div className="empty">No data found</div>;
@@ -92,10 +85,12 @@ export default function Dashboard() {
     pension_funds,
     life_goals,
   } = data;
+
   const income = earnings_overview?.income ?? 0;
   const expenses = earnings_overview?.expenses ?? 0;
   const assets = assets_total?.total ?? 0;
   const splitProgress = split?.progress ?? 0;
+
   const fmt = (v) => Number(v).toLocaleString("id-ID");
   const handleNavigate = (section) => navigate(`/${section}`);
 
@@ -309,9 +304,9 @@ export default function Dashboard() {
                           <p className="card-number">
                             {cards[currentIndex]?.showCardNumber
                               ? (cards[currentIndex]?.card_number ?? "")
-                                  .replace(/(\d{4})(?=\d)/g, "$1 ")
+                                .replace(/(\d{4})(?=\d)/g, "$1 ")
                               : "**** **** **** " +
-                                String(cards[currentIndex]?.card_number ?? "").slice(-4)}
+                              String(cards[currentIndex]?.card_number ?? "").slice(-4)}
                           </p>
                           <span
                             className="eye-icon"

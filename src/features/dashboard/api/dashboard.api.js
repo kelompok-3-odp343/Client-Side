@@ -1,6 +1,6 @@
 import { DUMMY_CARDS } from "../data/dashboard.dummy.js";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import axios from "axios";
+const API_BASE_URL = import.meta.env.BASE_URL;
 
 export async function fetchCards(userId, token) {
   try {
@@ -21,5 +21,28 @@ export async function fetchCards(userId, token) {
   } catch (err) {
     console.warn("⚠️ Using dummy cards due to API error:", err.message);
     return DUMMY_CARDS;
+  }
+}
+
+export async function fetchDashboard() {
+  try {
+    const token = sessionStorage.getItem('token');
+
+    const data = await axios.get(`/api/v1/fetch-dashboard`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "User-Id": sessionStorage.getItem('user_id'),
+        "Customer-Id": sessionStorage.getItem('cif'),
+        // "Customer-Id": "CIF001",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true"
+      }
+    })
+
+    return data;
+  } catch (error) {
+    console.error('Error saat mengambil data dashboard', error);
+    return null;
   }
 }
