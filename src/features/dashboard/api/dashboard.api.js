@@ -1,5 +1,7 @@
 import { DUMMY_CARDS } from "../data/dashboard.dummy.js";
 import axios from "axios";
+import { DASHBOARD_DUMMY } from "../data/dashboardPage.dummy.js";
+
 const API_BASE_URL = import.meta.env.BASE_URL;
 
 export async function fetchCards(userId, token) {
@@ -43,6 +45,9 @@ export async function fetchDashboard() {
     return data;
   } catch (error) {
     console.error('Error saat mengambil data dashboard', error);
-    return null;
+    // REAL RESPONSE
+    // return null;
+    // Dummy Data
+    return { data: DASHBOARD_DUMMY };
   }
 }

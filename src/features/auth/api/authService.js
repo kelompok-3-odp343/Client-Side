@@ -10,10 +10,19 @@ export async function postAuthLogin({ username, password }) {
         const data = resAuth.data;
         return { ok: true, data };
     } catch (error) {
+        // REAL RESPONSE
+        // return {
+        //     ok: false,
+        //     message: error?.response?.data?.message || 'Login Failed'
+        // }
+
+        //dummy sementara
         return {
-            ok: false,
-            message: error?.response?.data?.message || 'Login Failed'
-        }
+            ok: true,
+            data: {
+                otpRef: "DUMMY-OTP-REF-12345"
+            }
+        };
     }
 }
 
@@ -28,9 +37,23 @@ export async function postVerifyOtp({ otp_ref, otp_code }) {
 
         return { ok: true, data: res.data };
     } catch (error) {
+        // REAL API
+        // return {
+        //     ok: false,
+        //     message: err?.response?.data?.message || "Verify OTP failed",
+        // }
+
+        // dummy sementara
         return {
-            ok: false,
-            message: err?.response?.data?.message || "Verify OTP failed",
+            ok: true,
+            data: {
+                token: "DUMMY-TOKEN-ABCDEF",
+                user: {
+                    userId: "P001",
+                    username: "dummyuser",
+                    cif: "CIF001"
+                }
+            }
         }
     }
 }
