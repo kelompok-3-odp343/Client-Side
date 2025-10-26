@@ -1,64 +1,58 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/Navbar";
 import "../styles/split-bill.css";
 import { fetchSplitBills } from "../api/split-bill.api";
-import SplitBillFormEdit from '../../../shared/components/SplitBillFormEdit'
-import Swal from "sweetalert2";
 
 export default function SplitBill() {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedBill, setSelectedBill] = useState(null);
-  const [selectedColor, setSelectedColor] = useState("#6dddd0");
-  const [showModal, setShowModal] = useState(false);
-  const [editBill, setEditBill] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       const data = await fetchSplitBills();
-      setBills(data);
+      if (!data || data.length === 0) {
+        // fallback dummy data
+        setBills([
+          {
+            split_bill_id: 1,
+            split_bill_title: "Kopi Nako",
+            total_bill: 2000000,
+            ref_id: "20251023054245000290",
+            created_time: new Date().toISOString(),
+            members: [
+              { member_name: "Ulion Pardede", amount: 25000, status: "Paid" },
+              { member_name: "Ulion Simanjuntak", amount: 25000, status: "Unpaid" },
+              { member_name: "Della Puspita", amount: 25000, status: "Unpaid" },
+              { member_name: "Ridwan Surya Ghani", amount: 25000, status: "Unpaid" },
+              { member_name: "Ulion Alberto P. Pardede", amount: 25000, status: "Paid" },
+              { member_name: "Ulion Tampubolon", amount: 25000, status: "Paid" },
+            ],
+          },
+          {
+            split_bill_id: 2,
+            split_bill_title: "Dinner at Sushi Tei",
+            total_bill: 750000,
+            ref_id: "20251023054245000291",
+            created_time: new Date().toISOString(),
+            members: [
+              { member_name: "Rudi Hartono", amount: 250000, status: "Paid" },
+              { member_name: "Cindy Oktavia", amount: 250000, status: "Unpaid" },
+              { member_name: "Tomi Kurniawan", amount: 250000, status: "Unpaid" },
+            ],
+          },
+        ]);
+      } else {
+        setBills(data);
+      }
       setLoading(false);
     }
     loadData();
   }, []);
 
-  const handleViewDetail = (bill, color) => {
-    setSelectedBill(bill);
-    setSelectedColor(color);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedBill(null);
-  };
-
-  const handleTogglePaid = (index) => {
-    if (!selectedBill) return;
-
-    const updated = {
-      ...selectedBill,
-      members: selectedBill.members.map((m, idx) =>
-        idx === index
-          ? { ...m, status: m.status === "Paid" ? "Unpaid" : "Paid" }
-          : m
-      ),
-    };
-
-    updated.remaining_bill = updated.members
-      .filter((m) => m.status !== "Paid")
-      .reduce((s, m) => s + (Number(m.amount) || 0), 0);
-
-    setSelectedBill(updated);
-    setBills((prev) =>
-      prev.map((b) =>
-        b.split_bill_id === updated.split_bill_id ? updated : b
-      )
-    );
-  };
-
-  const cardColors = ["#6dddd0", "#9c7edc", "#ffd367"];
+  const cardColors = ["#6dddd0", "#ffd367", "#9c7edc"];
 
   if (loading) return <div className="loading">Loading split bills...</div>;
 
@@ -66,8 +60,29 @@ export default function SplitBill() {
     <div className="sb-container">
       <Navbar />
       <main className="sb-main">
-        <h1 className="sb-title">Split Bill</h1>
-        <p className="sb-sub">Track and manage your shared expenses</p>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
+          <div>
+            <h1 className="sb-title">Split Bill</h1>
+            <p className="sb-sub">Track and manage your shared expenses</p>
+          </div>
+
+          <div>
+            <button
+              className="add-split-btn"
+              onClick={() => navigate("/detailmycard")}
+              aria-label="Add split bill"
+            >
+              + Add Split Bill
+            </button>
+          </div>
+        </div>
 
         <div className="sb-grid">
           {bills.map((bill, i) => {
@@ -88,7 +103,7 @@ export default function SplitBill() {
                   <p>
                     <span>Total Bill</span>
                     <span className="amount">
-                      Rp {bill.total_bill.toLocaleString("id-ID")}
+                      Rp {Number(bill.total_bill).toLocaleString("id-ID")}
                     </span>
                   </p>
                 </div>
@@ -98,8 +113,11 @@ export default function SplitBill() {
                     <div
                       className="progress-fill"
                       style={{
-                        width: `${(bill.members.filter((m) => m.status === "Paid").length /
-                          Math.max(1, bill.members.length)) * 100}%`,
+                        width: `${
+                          (bill.members.filter((m) => m.status === "Paid").length /
+                            Math.max(1, bill.members.length)) *
+                          100
+                        }%`,
                       }}
                     />
                   </div>
@@ -112,7 +130,9 @@ export default function SplitBill() {
                       <span>
                         Rp{Number(m.amount).toLocaleString("id-ID")}{" "}
                         <span
-                          className={`status ${m.status === "Paid" ? "paid" : "unpaid"}`}
+                          className={`status ${
+                            m.status === "Paid" ? "paid" : "unpaid"
+                          }`}
                         >
                           {m.status}
                         </span>
@@ -124,155 +144,22 @@ export default function SplitBill() {
                   )}
                 </div>
 
-                <div
-                  className="sb-actions"
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    marginTop: "10px",
-                  }}
-                >
+                <div className="sb-actions sb-actions-right">
                   <button
                     className="view-btn"
-                    onClick={() => handleViewDetail(bill, color)}
-                    style={{ alignSelf: "flex-start" }}
+                    onClick={() =>
+                      navigate(`/splitbill/detail/${bill.split_bill_id}`, {
+                        state: { bill, color },
+                      })
+                    }
                   >
                     View Detail
-                  </button>
-
-                  <button
-                    className="edit-btn"
-                    onClick={() => {
-                      setEditBill(bill);
-                      setSelectedColor(color);
-                    }}
-                    style={{ alignSelf: "flex-end" }}
-                  >
-                    Edit
                   </button>
                 </div>
               </div>
             );
           })}
         </div>
-
-        {showModal && selectedBill && (
-          <div className="sb-modal-backdrop" onClick={handleCloseModal}>
-            <div
-              className="sb-modal"
-              onClick={(e) => e.stopPropagation()}
-              style={{ borderTop: `6px solid ${selectedColor}` }}
-            >
-              <h2 className="modal-title" style={{ color: selectedColor }}>
-                {selectedBill.split_bill_title}
-              </h2>
-              <p className="modal-meta">
-                {new Date(selectedBill.created_time).toLocaleString("id-ID", {
-                  dateStyle: "medium",
-                  timeStyle: "medium",
-                })}{" "}
-                WIB
-              </p>
-              <p className="modal-ref">Ref ID: {selectedBill.ref_id}</p>
-
-              <div
-                className="modal-total"
-                style={{
-                  background: `linear-gradient(to right, ${selectedColor}, #fff)`,
-                }}
-              >
-                <span>Total Bill</span>
-                <span>
-                  Rp {selectedBill.total_bill.toLocaleString("id-ID")}
-                </span>
-              </div>
-
-              <div className="modal-list scrollable">
-                <h4>Detail Bill</h4>
-                {selectedBill.members.map((m, i) => (
-                  <div key={i} className="modal-row">
-                    <span>{m.member_name}</span>
-                    <span>
-                      {m.status === "Paid" ? "+" : "-"} Rp
-                      {Number(m.amount).toLocaleString("id-ID")}
-                      <br />
-                      <button
-                        className="mark-btn"
-                        style={{
-                          borderColor: selectedColor,
-                          color:
-                            m.status === "Paid" ? "#fff" : selectedColor,
-                          backgroundColor:
-                            m.status === "Paid"
-                              ? selectedColor
-                              : "transparent",
-                        }}
-                        onClick={() => handleTogglePaid(i)}
-                      >
-                        {m.status === "Paid"
-                          ? "Mark as Unpaid"
-                          : "Mark as Paid"}
-                      </button>
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="modal-footer">
-                <span>Remaining Bill</span>
-                <span>
-                  Rp {Number(selectedBill.remaining_bill).toLocaleString("id-ID")}
-                </span>
-              </div>
-
-              <button
-                className="close-btn"
-                style={{
-                  backgroundColor: selectedColor,
-                  color: "#fff",
-                  border: "none",
-                }}
-                onClick={handleCloseModal}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
-
-        {editBill && (
-          <SplitBillFormEdit
-            data={editBill}
-            color={selectedColor} // <— tambahkan ini
-            onClose={() => setEditBill(null)}
-            onSave={(updatedMembers) => {
-              setBills((prev) =>
-                prev.map((b) =>
-                  b.split_bill_id === editBill.split_bill_id
-                    ? {
-                        ...b,
-                        members: updatedMembers,
-                        remaining_bill: updatedMembers
-                          .filter((m) => m.status !== "Paid")
-                          .reduce((s, m) => s + (Number(m.amount) || 0), 0),
-                      }
-                    : b
-                )
-              );
-
-              setEditBill(null);
-
-              Swal.fire({
-                icon: "success",
-                title: "Updated!",
-                text: "Split bill updated successfully!",
-                showConfirmButton: false,
-                timer: 1500,
-              });
-            }}
-          />
-        )}
       </main>
     </div>
   );
