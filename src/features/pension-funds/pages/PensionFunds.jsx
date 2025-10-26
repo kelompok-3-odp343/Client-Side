@@ -30,10 +30,10 @@ export default function PensionFunds() {
       const pensionFunds = funds.flatMap((f, index) =>
         f.items.map((item) => ({
           id: index + 1,
-          title: f.title,
+          title: item.product_name,
           accountNumber: item.deposit_account_number,
           balance: item.balance,
-          growth: index % 2 === 0 ? "+0.6%" : "+0.4%",
+          growth: index % 2 === 0 ? 0.006 : -0.004,
         }))
       );
 
@@ -114,7 +114,7 @@ export default function PensionFunds() {
             {months.map((m) => (
               <button
                 key={m}
-                className={`month-btn ${selectedMonth === m ? "active" : ""}`}
+                className={`month-btn-dplk ${selectedMonth === m ? "active" : ""}`}
                 onClick={() => setSelectedMonth(m)}
               >
                 {m}
@@ -164,8 +164,13 @@ function AccountNumberCard({ title, accountNumber, balance, growth }) {
       </div>
       <hr />
       <div className="account-balance">
-        <p><span>Accumulated Balance</span><span>Rp{balance.toLocaleString()}</span></p>
-        <p><span>Growth</span><span>{growth}</span></p>
+        <p><span>Accumulated balance</span><span><strong>Rp{balance.toLocaleString()}</strong></span></p>
+        <p><span>Growth</span>
+        <span style={{
+          color:
+          growth > 0 ? "#3DBF4A" :
+          growth < 0 ? "#F94449" : "#000"}}
+          ><strong>({growth > 0 ? "+" : ""}{growth*100}%)</strong></span></p>
       </div>
     </div>
   );
