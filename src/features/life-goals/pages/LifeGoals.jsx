@@ -13,10 +13,11 @@ export default function LifeGoals() {
   useEffect(() => {
     const loadData = async () => {
       const res = await fetchLifeGoalsRevamp();
-      setGoals(res || {});
+      setGoals(res?.data || {});
       setLoading(false);
     };
     loadData();
+
   }, []);
 
   const format = (v) => `Rp${(v || 0).toLocaleString("id-ID")}`;
