@@ -58,6 +58,7 @@ export default function OtpLogin() {
     sessionStorage.setItem("token", respOTP.data.token)
     sessionStorage.setItem("user_id", respOTP.data.user.userId)
     sessionStorage.setItem("username", respOTP.data.user.username)
+    sessionStorage.setItem("role", respOTP.data.user.role)
 
     setMessage("✅ OTP Verified!");
     setTimeout(() => navigate("/dashboard"), 800);

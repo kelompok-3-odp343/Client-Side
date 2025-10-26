@@ -39,12 +39,22 @@ export async function fetchLifeGoalTransactions(userId = "USER001", goalId) {
   }
 }
 
-export async function fetchLifeGoalsRevamp(userId = "USER001") {
+export async function fetchLifeGoalsRevamp() {
   try {
-    const res = await axios.get(`/api/life-goals-revamp/${userId}`);
-    if (res?.data?.status) return res.data.data;
-    return LIFE_GOALS_REVAMP_DUMMY;
+    const token = sessionStorage.getItem('token');
+
+    const res = await axios.get(`/api/v1/lifegoals`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "User-Id": sessionStorage.getItem('user_id'),
+        "Customer-Id": sessionStorage.getItem('cif'),
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true"
+      }
+    });
+    return res;
   } catch (err) {
-    return LIFE_GOALS_REVAMP_DUMMY;
+    // return null;
+    return { data: LIFE_GOALS_REVAMP_DUMMY }
   }
 }
