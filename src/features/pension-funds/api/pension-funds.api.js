@@ -23,6 +23,7 @@ export const getPensionFunds = async (userId) => {
                     items: [{
                         item_id: "DPLK_0001",
                         deposit_account_number: "DPLK12345",
+                        product_name: "Simponi Likuid",
                         balance: 50000000,
                         maturity_date: "2026-06-01T00:00:00Z",
                         currency_code: "IDR",
@@ -35,6 +36,7 @@ export const getPensionFunds = async (userId) => {
                     items: [{
                         item_id: "DPLK_0002",
                         deposit_account_number: "DPLK67890",
+                        product_name: "Simponi Likuid Syariah",
                         balance: 8000000,
                         maturity_date: "2026-12-15T00:00:00Z",
                         currency_code: "IDR",
