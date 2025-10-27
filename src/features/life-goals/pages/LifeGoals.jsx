@@ -3,10 +3,13 @@ import Navbar from "../../../shared/components/Navbar";
 import { fetchLifeGoalsRevamp } from "../api/life-goals.api";
 import "../styles/life-goals.css";
 import "../styles/life-goals-card.css";
+import { useNavigate } from "react-router-dom";
 
 export default function LifeGoals() {
   const [goals, setGoals] = useState({});
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
 
   const COLORS = ["#71d9d0", "#ffd367", "#9c7edc"];
 
@@ -66,11 +69,26 @@ export default function LifeGoals() {
                   const p = percent(g.currentBalance, g.targetBalance);
                   return (
                     <div
-                      key={g.id}
+                      key={g.accountNumber}
                       className="lg-subcard"
                       style={{
                         "--gradient-color": `linear-gradient(to bottom, ${color} 0%, #ffffff 100%)`,
                       }}
+                      onClick={() =>
+                        navigate(`/lifegoal/${g.accountNumber}`, {
+                          state: {
+                            accountNumber: g.accountNumber,
+                            goal: {
+                              title: g.lifegoalsTitle,
+                              desc: g.lifegoalsSubtitle,
+                              current: g.currentBalance,
+                              target: g.targetBalance,
+                              progress: percent(g.currentBalance, g.targetBalance),
+                              color,
+                            }
+                          }
+                        })
+                      }
                     >
                       <div className="lg-subcard-body">
                         <h4 className="lg-subcard-title">{g.lifegoalsTitle}</h4>

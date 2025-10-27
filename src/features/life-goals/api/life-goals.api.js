@@ -15,17 +15,25 @@ export async function fetchLifeGoals(userId = "USER001") {
   }
 }
 
-export async function fetchLifeGoalDetail(userId = "USER001", goalId) {
-  // goalId optional for dummy lookup
+export async function fetchLifeGoalDetail(accountNumber) {
   try {
-    const res = await axios.get(`/api/life-goals/${userId}/detail/${goalId}`);
-    if (res?.data?.status && res.data.data) return res.data.data;
-    // fallback: try dummy shape
-    const fallback = (LIFE_GOALS_DETAILS_DUMMY[userId] && LIFE_GOALS_DETAILS_DUMMY[userId].details) || {};
-    return fallback[goalId] || null;
+    const token = sessionStorage.getItem("token");
+    const res = await axios.get(`/api/v1/lifegoals-detail`, {
+      accountNumber
+    }, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "User-Id": sessionStorage.getItem('user_id'),
+        "Customer-Id": sessionStorage.getItem('cif'),
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true"
+      }
+    });
+    return res;
   } catch (err) {
-    const fallback = (LIFE_GOALS_DETAILS_DUMMY[userId] && LIFE_GOALS_DETAILS_DUMMY[userId].details) || {};
-    return fallback[goalId] || null;
+    // const fallback = (LIFE_GOALS_DETAILS_DUMMY[userId] && LIFE_GOALS_DETAILS_DUMMY[userId].details) || {};
+    // return fallback[goalId] || null;
+    return { data: LIFE_GOALS_DETAILS_DUMMY };
   }
 }
 
