@@ -5,6 +5,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
     lifeGoalsList: [
       {
         id: "EDU-01",
+        accountNumber: 11234566,
         lifegoalsTitle: "S1",
         lifegoalsSubtitle: "Kuliah Ulion di Oxford",
         lifegoalsCategory: "Education",
@@ -13,6 +14,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
       },
       {
         id: "EDU-02",
+        accountNumber: 11234567,
         lifegoalsTitle: "S2",
         lifegoalsSubtitle: "Kuliah Ulion di Harvard",
         lifegoalsCategory: "Education",
@@ -21,6 +23,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
       },
       {
         id: "EDU-03",
+        accountNumber: 11234568,
         lifegoalsTitle: "S3",
         lifegoalsSubtitle: "Kuliah Ulion di MIT",
         lifegoalsCategory: "Education",
@@ -35,6 +38,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
     lifeGoalsList: [
       {
         id: "VAC-01",
+        accountNumber: 11234569,
         lifegoalsTitle: "Japan",
         lifegoalsSubtitle: "Travel to Tokyo & Kyoto",
         lifegoalsCategory: "Vacations",
@@ -43,6 +47,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
       },
       {
         id: "VAC-02",
+        accountNumber: 11234510,
         lifegoalsTitle: "Bali",
         lifegoalsSubtitle: "Visit all the beaches",
         lifegoalsCategory: "Vacations",
@@ -51,6 +56,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
       },
       {
         id: "VAC-03",
+        accountNumber: 11234511,
         lifegoalsTitle: "South Korea",
         lifegoalsSubtitle: "Honeymoon trip",
         lifegoalsCategory: "Vacations",
@@ -65,6 +71,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
     lifeGoalsList: [
       {
         id: "M-01",
+        accountNumber: 11234512,
         lifegoalsTitle: "Lamaran",
         lifegoalsSubtitle: "Engagement ceremony",
         lifegoalsCategory: "Marriage",
@@ -73,6 +80,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
       },
       {
         id: "M-02",
+        accountNumber: 11234513,
         lifegoalsTitle: "Resepsi",
         lifegoalsSubtitle: "Wedding day",
         lifegoalsCategory: "Marriage",
@@ -87,6 +95,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
     lifeGoalsList: [
       {
         id: "G-01",
+        accountNumber: 11234514,
         lifegoalsTitle: "Laptop",
         lifegoalsSubtitle: "MacBook Air M3",
         lifegoalsCategory: "Gadget",
@@ -95,6 +104,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
       },
       {
         id: "G-02",
+        accountNumber: 11234515,
         lifegoalsTitle: "Handphone",
         lifegoalsSubtitle: "iPhone 16 Pro",
         lifegoalsCategory: "Gadget",
@@ -109,6 +119,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
     lifeGoalsList: [
       {
         id: "V-01",
+        accountNumber: 11234516,
         lifegoalsTitle: "Car",
         lifegoalsSubtitle: "Toyota Yaris GR",
         lifegoalsCategory: "Vehicles",
@@ -117,6 +128,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
       },
       {
         id: "V-02",
+        accountNumber: 11234517,
         lifegoalsTitle: "Motorcycle",
         lifegoalsSubtitle: "Yamaha XSR 155",
         lifegoalsCategory: "Vehicles",

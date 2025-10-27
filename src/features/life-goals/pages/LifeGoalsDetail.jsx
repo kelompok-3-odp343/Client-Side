@@ -1,41 +1,54 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Navbar from "../../../shared/components/Navbar";
 import "../styles/life-goals-detail.css";
-import { fetchLifeGoalTransactions, fetchLifeGoalDetail } from "../api/life-goals.api";
+import {
+  fetchLifeGoalTransactions,
+  fetchLifeGoalDetail,
+} from "../api/life-goals.api";
 
 export default function LifeGoalDetail() {
-  const { id } = useParams();
   const location = useLocation();
   const goal = location.state?.goal;
+  const accountNumber = location.state?.accountNumber;
+
   const [transactions, setTransactions] = useState({});
   const [goalDetail, setGoalDetail] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("May");
   const [loading, setLoading] = useState(false);
 
-  const months = ["May","Jun","Jul","Aug","Sept","Oct","Nov","Dec","Jan","Feb","Mar","Apr"];
+  const months = [
+    "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"
+  ];
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const [txData, detailData] = await Promise.all([
-        fetchLifeGoalTransactions("USER001", id),
-        fetchLifeGoalDetail("USER001", id),
+      const [txRes, detailRes] = await Promise.all([
+        fetchLifeGoalTransactions(accountNumber),
+        fetchLifeGoalDetail(accountNumber),
       ]);
-      setTransactions(txData);
-      setGoalDetail(detailData);
+      setTransactions(txRes?.data || {});
+      setGoalDetail(detailRes?.data || null);
       setLoading(false);
     }
-    loadData();
-  }, [id]);
+    if (accountNumber) loadData();
+  }, [accountNumber]);
 
   if (loading || !goalDetail) return <div className="loading">Loading...</div>;
+
+  const toDate = (str) => {
+    const [d, m, rest] = str.split("-");
+    const y = rest.split("T")[0];
+    return new Date(`${y}-${m}-${d}`);
+  };
 
   return (
     <div className="lg-container" style={{ "--theme": goal.color }}>
       <Navbar />
       <main className="lg-main">
         <div className="lg-grid">
+          {/* LEFT */}
           <div className="left-column">
             <header className="section-header">
               <h1 className="lg-title">{goal.title} Progress</h1>
@@ -43,8 +56,11 @@ export default function LifeGoalDetail() {
             </header>
 
             <section className="lg-topcard">
-              <div className="topcard-left" style={{ background: "var(--theme)" }}>
-                <img src={goal.icon} alt={goal.title} />
+              <div
+                className="topcard-left"
+                style={{ background: "var(--theme)" }}
+              >
+                {/* no icon from API right now */}
               </div>
 
               <div className="topcard-right">
@@ -86,7 +102,8 @@ export default function LifeGoalDetail() {
                 {months.map((m) => (
                   <button
                     key={m}
-                    className={`month-pill ${selectedMonth === m ? "active" : ""}`}
+                    className={`month-pill ${selectedMonth === m ? "active" : ""
+                      }`}
                     onClick={() => setSelectedMonth(m)}
                   >
                     {m}
@@ -101,17 +118,16 @@ export default function LifeGoalDetail() {
                     {group.items.map((tx, i) => (
                       <div key={i} className="tx-row">
                         <div className="tx-left">
-                          <div className="tx-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.2" />
-                            </svg>
-                          </div>
+                          <div className="tx-icon">●</div>
                           <div className="tx-text">
                             <div className="tx-type">{tx.type}</div>
                             <div className="tx-sub">{tx.desc}</div>
                           </div>
                         </div>
-                        <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
+                        <div
+                          className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"
+                            }`}
+                        >
                           {tx.amount}
                         </div>
                       </div>
@@ -128,30 +144,52 @@ export default function LifeGoalDetail() {
               <h4 className="info-heading">Life Goals Detail</h4>
               <div className="info-grid">
                 <div className="label">Life Goals Account</div>
-                <div className="value">{goalDetail.life_goals_account}</div>
+                <div className="value">{goalDetail.accountNumber}</div>
 
                 <div className="label">Estimated Accumulated Funds</div>
                 <div className="value">
-                  Rp{goalDetail.estimated_accumulated_funds.toLocaleString("id-ID")}
+                  Rp{goalDetail.estimatedAccumulatedBalance.toLocaleString("id-ID")}
                 </div>
 
                 <div className="label">Initial Deposit</div>
                 <div className="value">
-                  Rp{goalDetail.initial_deposit.toLocaleString("id-ID")}
+                  Rp{goalDetail.initalDeposit.toLocaleString("id-ID")}
                 </div>
 
                 <div className="label">Annual Interest Rate</div>
-                <div className="value">{goalDetail.annual_interest_rate}</div>
+                <div className="value">{goalDetail.interestRate * 100}%</div>
 
                 <div className="label">Duration</div>
-                <div className="value">{goalDetail.duration_years} years</div>
+                <div className="value">{goalDetail.lifegoalsDuration} years</div>
 
                 <div className="label">Creation Date</div>
-                <div className="value">{goalDetail.creation_date}</div>
+                <div className="value">
+                  {toDate(goalDetail.createdTime).toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </div>
               </div>
 
               <div className="divider" />
 
+              <h4 className="info-heading small">Disbursement Details</h4>
+              <div className="info-grid">
+                <div className="label">Maturity Date</div>
+                <div className="value">
+                  {toDate(goalDetail.maturityDate).toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </div>
+
+                <div className="label">Disbursement Account</div>
+                <div className="value">{goalDetail.disbursementAccountNumber}</div>
+              </div>
+
+              <div className="divider" />
               <h4 className="info-heading small">Disbursement Details</h4>
               <div className="info-grid">
                 <div className="label">Disbursement Date</div>
