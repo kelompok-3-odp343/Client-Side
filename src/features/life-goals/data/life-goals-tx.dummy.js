@@ -1,253 +1,46 @@
+// helper untuk membuat transaksi acak realistis
+function makeTx(monthName, count, baseDate, baseAmount = 1000000) {
+  const groups = [];
+  for (let i = 1; i <= count; i++) {
+    const date = `${String(i).padStart(2, "0")} ${monthName} 2025`;
+    groups.push({
+      date,
+      items: [
+        {
+          type: i % 2 === 0 ? "Autodebit" : "Top Up",
+          desc: i % 2 === 0 ? "Monthly Deposit" : "Manual Deposit",
+          amount: `+Rp${(baseAmount + i * 1000).toLocaleString("id-ID")}`,
+        },
+        {
+          type: "Others",
+          desc: "Interest",
+          amount: `+Rp${(3000 + (i % 5) * 500).toLocaleString("id-ID")}`,
+        },
+        ...(i % 4 === 0
+          ? [
+              {
+                type: "Others",
+                desc: "Tax",
+                amount: `-Rp${(500 + (i % 3) * 100).toLocaleString("id-ID")}`,
+              },
+            ]
+          : []),
+      ],
+    });
+  }
+  return groups;
+}
+
+// setiap goal punya 12 bulan (May–Apr), tiap bulan 5–8 grup transaksi
+const months = ["May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"];
+
 const LIFE_GOALS_TX_DUMMY = {
-  education: {
-    May: [
-      {
-        date: "31 May 2025",
-        items: [
-          { type: "Others", desc: "Interest", amount: "+Rp5.000" },
-          { type: "Others", desc: "Tax", amount: "-Rp1.000" },
-        ],
-      },
-      {
-        date: "25 May 2025",
-        items: [{ type: "Autodebit", desc: "Deposit", amount: "+Rp2.000.000" }],
-      },
-    ],
-    Jun: [
-      {
-        date: "26 Jun 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp2.000.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp5.000" },
-        ],
-      },
-    ],
-    Jul: [
-      {
-        date: "28 Jul 2025",
-        items: [
-          { type: "Top Up", desc: "Extra Contribution", amount: "+Rp1.000.000" },
-        ],
-      },
-    ],
-  },
-
-  vacations: {
-    May: [
-      {
-        date: "5 May 2025",
-        items: [
-          { type: "Top Up", desc: "Deposit", amount: "+Rp500.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp2.000" },
-        ],
-      },
-    ],
-    Jun: [
-      {
-        date: "3 Jun 2025",
-        items: [{ type: "Autodebit", desc: "Deposit", amount: "+Rp2.000.000" }],
-      },
-    ],
-    Jul: [
-      {
-        date: "15 Jul 2025",
-        items: [
-          { type: "Top Up", desc: "Bonus from Cashback", amount: "+Rp750.000" },
-        ],
-      },
-    ],
-    Aug: [
-      {
-        date: "2 Aug 2025",
-        items: [{ type: "Autodebit", desc: "Deposit", amount: "+Rp2.000.000" }],
-      },
-    ],
-  },
-
-  marriage: {
-    May: [
-      {
-        date: "20 May 2025",
-        items: [
-          { type: "Top Up", desc: "Deposit", amount: "+Rp1.000.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp3.000" },
-        ],
-      },
-    ],
-    Jun: [
-      {
-        date: "21 Jun 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp1.500.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp3.000" },
-          { type: "Others", desc: "Tax", amount: "-Rp500" },
-        ],
-      },
-    ],
-    Jul: [
-      {
-        date: "25 Jul 2025",
-        items: [
-          { type: "Top Up", desc: "Manual Deposit", amount: "+Rp500.000" },
-        ],
-      },
-    ],
-    Aug: [
-      {
-        date: "22 Aug 2025",
-        items: [{ type: "Autodebit", desc: "Deposit", amount: "+Rp1.500.000" }],
-      },
-    ],
-  },
-
-  home: {
-    May: [
-      {
-        date: "10 May 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp1.500.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp5.000" },
-        ],
-      },
-    ],
-    Jun: [
-      {
-        date: "9 Jun 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp1.500.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp5.000" },
-        ],
-      },
-    ],
-    Jul: [
-      {
-        date: "15 Jul 2025",
-        items: [
-          { type: "Top Up", desc: "Extra Deposit", amount: "+Rp2.000.000" },
-          { type: "Others", desc: "Tax", amount: "-Rp500" },
-        ],
-      },
-    ],
-    Aug: [
-      {
-        date: "9 Aug 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp1.500.000" },
-        ],
-      },
-    ],
-    Sept: [
-      {
-        date: "10 Sept 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp1.500.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp5.000" },
-        ],
-      },
-    ],
-  },
-
-  gadget: {
-    May: [
-      {
-        date: "1 May 2025",
-        items: [
-          { type: "Top Up", desc: "Deposit", amount: "+Rp500.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp1.500" },
-        ],
-      },
-    ],
-    Jun: [
-      {
-        date: "1 Jun 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp500.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp1.500" },
-        ],
-      },
-    ],
-    Jul: [
-      {
-        date: "5 Jul 2025",
-        items: [
-          { type: "Top Up", desc: "Manual Deposit", amount: "+Rp750.000" },
-        ],
-      },
-    ],
-    Aug: [
-      {
-        date: "2 Aug 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp500.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp1.000" },
-        ],
-      },
-    ],
-    Sept: [
-      {
-        date: "3 Sept 2025",
-        items: [
-          { type: "Top Up", desc: "Extra Deposit", amount: "+Rp1.000.000" },
-        ],
-      },
-    ],
-  },
-
-  vehicles: {
-    May: [
-      {
-        date: "12 May 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp750.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp2.000" },
-        ],
-      },
-    ],
-    Jun: [
-      {
-        date: "14 Jun 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp750.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp2.000" },
-        ],
-      },
-    ],
-    Jul: [
-      {
-        date: "16 Jul 2025",
-        items: [
-          { type: "Top Up", desc: "Manual Deposit", amount: "+Rp1.000.000" },
-          { type: "Others", desc: "Tax", amount: "-Rp300" },
-        ],
-      },
-    ],
-    Aug: [
-      {
-        date: "12 Aug 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp750.000" },
-        ],
-      },
-    ],
-    Sept: [
-      {
-        date: "15 Sept 2025",
-        items: [
-          { type: "Top Up", desc: "Extra Deposit", amount: "+Rp1.200.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp2.000" },
-        ],
-      },
-    ],
-    Oct: [
-      {
-        date: "10 Oct 2025",
-        items: [
-          { type: "Autodebit", desc: "Deposit", amount: "+Rp750.000" },
-          { type: "Others", desc: "Interest", amount: "+Rp2.000" },
-        ],
-      },
-    ],
-  },
+  EDU001: Object.fromEntries(months.map((m) => [m, makeTx(m, 8, 1, 1500000)])),
+  VAC001: Object.fromEntries(months.map((m) => [m, makeTx(m, 6, 1, 1200000)])),
+  MAR001: Object.fromEntries(months.map((m) => [m, makeTx(m, 7, 1, 1000000)])),
+  HOM001: Object.fromEntries(months.map((m) => [m, makeTx(m, 8, 1, 2000000)])),
+  GAD001: Object.fromEntries(months.map((m) => [m, makeTx(m, 5, 1, 500000)])),
+  VEH001: Object.fromEntries(months.map((m) => [m, makeTx(m, 6, 1, 800000)])),
 };
 
 export default LIFE_GOALS_TX_DUMMY;
