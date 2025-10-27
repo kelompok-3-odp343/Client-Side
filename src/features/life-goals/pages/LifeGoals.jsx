@@ -10,7 +10,6 @@ export default function LifeGoals() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-
   const COLORS = ["#71d9d0", "#ffd367", "#9c7edc"];
 
   useEffect(() => {
@@ -20,12 +19,10 @@ export default function LifeGoals() {
       setLoading(false);
     };
     loadData();
-
   }, []);
 
   const format = (v) => `Rp${(v || 0).toLocaleString("id-ID")}`;
-  const percent = (cur, tar) =>
-    tar ? Math.round((cur / tar) * 100) : 0;
+  const percent = (cur, tar) => (tar ? Math.round((cur / tar) * 100) : 0);
 
   if (loading) return <div className="loading">Loading...</div>;
 
@@ -83,15 +80,43 @@ export default function LifeGoals() {
                               desc: g.lifegoalsSubtitle,
                               current: g.currentBalance,
                               target: g.targetBalance,
-                              progress: percent(g.currentBalance, g.targetBalance),
+                              progress: percent(
+                                g.currentBalance,
+                                g.targetBalance
+                              ),
                               color,
-                            }
-                          }
+                            },
+                          },
                         })
                       }
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          navigate(`/lifegoal/${g.accountNumber}`, {
+                            state: {
+                              accountNumber: g.accountNumber,
+                              goal: {
+                                title: g.lifegoalsTitle,
+                                desc: g.lifegoalsSubtitle,
+                                current: g.currentBalance,
+                                target: g.targetBalance,
+                                progress: percent(
+                                  g.currentBalance,
+                                  g.targetBalance
+                                ),
+                                color,
+                              },
+                            },
+                          });
+                        }
+                      }}
+                      aria-label={`Open details for ${g.lifegoalsTitle}`}
                     >
                       <div className="lg-subcard-body">
-                        <h4 className="lg-subcard-title">{g.lifegoalsTitle}</h4>
+                        <h4 className="lg-subcard-title">
+                          {g.lifegoalsTitle}
+                        </h4>
                         <p className="lg-subcard-subtitle">
                           {g.lifegoalsSubtitle}
                         </p>
