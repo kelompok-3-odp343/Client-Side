@@ -47,7 +47,7 @@ export default function DetailMyCard() {
       }
 
       groups[key].items.push({
-        id: trx.transactionId,
+        transactionId: trx.transactionId,
         type: trx.transactionType,
         detail: trx.partyName,
         amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
@@ -62,7 +62,6 @@ export default function DetailMyCard() {
       .map(({ sortKey, ...rest }) => rest);
   };
 
-  // --- State ---
   const [cards, setCards] = useState(DUMMY_CARDS);
   const [selectedCard, setSelectedCard] = useState(DUMMY_CARDS[0]);
   const [showBalance, setShowBalance] = useState(true);
@@ -76,13 +75,9 @@ export default function DetailMyCard() {
   const [showSplitModal, setShowSplitModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
-  // Transactions grouped by date (kept same structure with previous UI)
   const [transactions, setTransactions] = useState([]);
-
-  // Chart still depends on the grouped structure; leave as-is
   const [chartData, setChartData] = useState({ income: 0, expense: 0 });
 
-  // --- Load Cards (once) ---
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -97,25 +92,21 @@ export default function DetailMyCard() {
           setSelectedCard(current);
         }
       } catch {
-        // fallback already set via DUMMY_CARDS
+
       }
     })();
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // --- Auto fetch when selectedCard changes (first load & card change) ---
   useEffect(() => {
     if (!selectedCard) return;
     const last = months[months.length - 1];
     setSelectedMonth(last);
     handleSelectedMonth(last);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCard]);
 
-  // --- Chart calculation (keep as-is) ---
   useEffect(() => {
     const flatItems = transactions.flatMap((g) => g.items || []);
     const income = flatItems
@@ -140,7 +131,7 @@ export default function DetailMyCard() {
   const handleOpenSplit = (group, itemIndex) => {
     const item = group.items[itemIndex];
     setSelectedTransaction({
-      id: `${group.date}-${itemIndex}`,
+      transactionId: item.transactionId,
       date: group.date,
       detail: item.detail,
       amount: item.amount,
@@ -171,8 +162,6 @@ export default function DetailMyCard() {
     console.log('cc', card.account_number);
   };
 
-
-  // --- Render ---
   return (
     <div className="detail-mycard">
       <Navbar />

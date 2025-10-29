@@ -2,6 +2,7 @@ import axios from "axios";
 import SPLIT_BILL_DUMMY_DATA from "../data/split-bill.dummy";
 
 let DUMMY_STORAGE = [...SPLIT_BILL_DUMMY_DATA]; // penyimpanan sementara di memori
+let API_WORKED_BEFORE = false;
 
 function normalizeBill(b) {
   const bill = {
@@ -46,38 +47,53 @@ export async function fetchSplitBills() {
   }
 }
 
-/**
- * Buat Split Bill baru
- * - Prioritas: kirim ke API jika BE aktif
- * - Fallback: tulis ke dummy storage lokal
- */
 export async function createSplitBill(payload) {
   const newBill = {
-    split_bill_id: "SB" + String(DUMMY_STORAGE.length + 1).padStart(3, "0"),
-    split_bill_title: payload.split_bill_title,
-    total_bill: payload.total_bill,
-    created_time: new Date().toISOString(),
-    ref_id: payload.ref_id,
-    members: payload.members,
+    accountNumber: payload.accountNumber,
+    transactionId: payload.transactionId,
+    splitBillTitle: payload.splitBillTitle,
+    currency: "IDR", // hardcode sesuai instruksi
+    totalAmount: payload.totalAmount,
+    billMembers: payload.billMembers,
   };
 
   try {
-    const res = await axios.post("/api/split-bill/create", newBill, {
-      headers: { "Content-Type": "application/json" },
-      timeout: 3000,
+    const token = sessionStorage.getItem("token")
+    const res = await axios.post("/api/split-bill/add", newBill, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "User-Id": sessionStorage.getItem("user_id"),
+        "Customer-Id": sessionStorage.getItem("cif"),
+        "ngrok-skip-browser-warning": "true"
+      },
+      timeout: 4000,
     });
 
     if (res.status >= 200 && res.status < 300) {
-      console.info("✅ Split Bill berhasil dikirim ke API backend.");
-      return normalizeBill(res.data.data || newBill);
+      return res.data;
     }
-
-    console.warn("⚠️ API merespons tidak sesuai. Gunakan dummy.");
   } catch (err) {
-    console.warn("⚠️ Gagal kirim ke API, fallback ke dummy:", err.message);
+    console.warn("⚠️ Gagal API, fallback dummy:", err.message);
   }
 
-  // fallback ke dummy lokal
-  DUMMY_STORAGE.unshift(newBill);
-  return normalizeBill(newBill);
+  if (API_WORKED_BEFORE) {
+    throw new Error("Server sedang maintance, silahkan coba beberapa saat lagi");
+  }
+
+  const _dummyNew = {
+    split_bill_id: "SB" + String(DUMMY_STORAGE.length + 1).padStart(3, "0"),
+    split_bill_title: newBill.splitBillTitle,
+    total_bill: newBill.totalAmount,
+    created_time: new Date().toISOString(),
+    ref_id: newBill.transactionId,
+    members: newBill.billMembers.map(m => ({
+      member_name: m.memberName,
+      amount: m.amountShare,
+      status: "Unpaid",
+    })),
+  };
+
+  DUMMY_STORAGE.unshift(_dummyNew);
+  return _dummyNew;
 }
