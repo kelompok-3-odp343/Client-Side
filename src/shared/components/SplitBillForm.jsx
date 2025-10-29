@@ -117,23 +117,28 @@ export default function SplitBillForm({ onClose, transaction }) {
     setIsSaving(true);
 
     const payload = {
-      split_bill_title: transaction.detail,
-      total_bill: totalBill,
-      ref_id: transaction.id,
-      members: participants.map((p) => ({
-        member_name: p.participantName,
-        amount: Number(p.participantAmount),
-        status: "Unpaid",
-      })),
+      accountNumber: transaction.accountNumber,
+      transactionId: transaction.transactionId,
+      splitBillTitle: transaction.detail,
+      totalAmount: totalBill,
+      billMembers: participants.map((p) => ({
+        memberName: p.participantName,
+        amountShare: Number(p.participantAmount)
+      }))
     };
+
 
     try {
       await createSplitBill(payload);
       setShowSuccess(true);
-    } catch {
-      setErrorMessage("Failed saving data, please try again.");
-    } finally {
-      setIsSaving(false);
+    } catch (err) {
+      const msg = err?.message || "Unknown error";
+
+      if (msg.includes("Server sedang maintance")) {
+        setErrorMessage("Server sedang maintance, silahkan coba beberapa saat lagi");
+      } else {
+        setErrorMessage("Failed saving data, please try again.");
+      }
     }
   }
 
