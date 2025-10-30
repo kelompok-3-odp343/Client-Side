@@ -1,8 +1,10 @@
 import axios from "axios";
-
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+});
 export const getTimeDeposits = async (userId) => {
     try {
-        const response = await axios.get(`/api/time-deposits/${userId}`);
+        const response = await api.get(`/api/time-deposits/${userId}`);
 
         // Pastikan response valid
         if (response.data && response.data.status === true) {
@@ -22,23 +24,23 @@ export const getTimeDeposits = async (userId) => {
                 total_balance: 5100000,
                 count_accounts: 2,
                 items: [{
-                        item_id: "TDA001",
-                        deposit_account_number: "TD123456",
-                        balance: 1000000,
-                        tenor_months: 3,
-                        maturity_date: "2025-11-28T00:00:00Z",
-                        interest_rate: 0.4,
-                        status: "ACTIVE",
-                    },
-                    {
-                        item_id: "TDA002",
-                        deposit_account_number: "TD987654",
-                        balance: 31000000,
-                        tenor_months: 6,
-                        maturity_date: "2026-01-10T00:00:00Z",
-                        interest_rate: 0.5,
-                        status: "ACTIVE",
-                    },
+                    item_id: "TDA001",
+                    deposit_account_number: "TD123456",
+                    balance: 1000000,
+                    tenor_months: 3,
+                    maturity_date: "2025-11-28T00:00:00Z",
+                    interest_rate: 0.4,
+                    status: "ACTIVE",
+                },
+                {
+                    item_id: "TDA002",
+                    deposit_account_number: "TD987654",
+                    balance: 31000000,
+                    tenor_months: 6,
+                    maturity_date: "2026-01-10T00:00:00Z",
+                    interest_rate: 0.5,
+                    status: "ACTIVE",
+                },
                 ],
             },
         };

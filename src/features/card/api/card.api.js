@@ -1,10 +1,12 @@
 import axios from "axios";
 import { DUMMY_CARDS, DUMMY_TRANSACTIONS } from "../data/card.dummy";
 import { DUMMY_TRX_HISTORY } from "../data/trx_history.dummy";
-
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+});
 export async function fetchAllCards() {
   try {
-    const res = await axios.get("/api/cards");
+    const res = await api.get("/api/cards");
     if (res.data?.data?.length) return res.data.data;
     return DUMMY_CARDS;
   } catch {
@@ -14,7 +16,7 @@ export async function fetchAllCards() {
 
 export async function fetchCardTransactions(accountId) {
   try {
-    const res = await axios.get(`/api/cards/${accountId}/transactions`);
+    const res = await api.get(`/api/cards/${accountId}/transactions`);
     if (res.data?.data?.length) return res.data.data;
     return DUMMY_TRANSACTIONS[accountId] || [];
   } catch {
@@ -31,7 +33,7 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
       accountNumber
     };
 
-    const respTrxHistory = await axios.post(`/api/v1/transaction-history`, payload, {
+    const respTrxHistory = await api.post(`/api/v1/transaction-history`, payload, {
       headers: {
         Authorization: `Bearer ${token}`,
         "User-Id": sessionStorage.getItem("user_id"),

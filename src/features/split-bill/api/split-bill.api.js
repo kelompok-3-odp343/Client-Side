@@ -3,7 +3,9 @@ import SPLIT_BILL_DUMMY_DATA from "../data/split-bill.dummy";
 
 let DUMMY_STORAGE = [...SPLIT_BILL_DUMMY_DATA]; // penyimpanan sementara di memori
 let API_WORKED_BEFORE = false;
-
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+});
 function normalizeBill(b) {
   const bill = {
     ...b,
@@ -29,7 +31,7 @@ function normalizeBill(b) {
  */
 export async function fetchSplitBills() {
   try {
-    const res = await axios.get("/api/split-bill/all", {
+    const res = await api.get("/api/split-bill/all", {
       headers: { "Content-Type": "application/json" },
     });
 
@@ -76,7 +78,7 @@ export async function createSplitBill(payload) {
 
   try {
     const token = sessionStorage.getItem("token")
-    const res = await axios.post("/api/split-bill/add", newBill, {
+    const res = await api.post("/api/split-bill/add", newBill, {
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",

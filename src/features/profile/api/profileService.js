@@ -1,8 +1,10 @@
 import axios from 'axios';
-
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+});
 export const getUserProfile = async () => {
     try {
-        const response = await axios.get("/api/user/profile");
+        const response = await api.get("/api/user/profile");
 
         if (response.data && response.data.status === true) {
             console.log("api profil");

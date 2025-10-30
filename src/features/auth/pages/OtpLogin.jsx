@@ -10,6 +10,7 @@ export default function OtpLogin() {
   const [message, setMessage] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
   const [attempts, setAttempts] = useState(0);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const inputsRef = useRef([]);
 
@@ -26,13 +27,14 @@ export default function OtpLogin() {
     const otp_code = otp.join("");
     if (otp_code.length !== 6) {
       setMessage("Masukkan 6 digit OTP.");
+      setShowModal(true);
       return;
     }
 
     const sessionID = sessionStorage.getItem("sessionID");
-
     if (!sessionID) {
       setMessage("OTP session expired. Silahkan Login Kembali.");
+      setShowModal(true);
       setTimeout(() => navigate("/"), 2500);
       return;
     }
@@ -44,27 +46,30 @@ export default function OtpLogin() {
       setAttempts(newAttempts);
 
       if (newAttempts >= 3) {
-        setMessage("Salah OTP sebanyak 3 kali.");
+        setMessage("Salah OTP sebanyak 3 kali. Akun diblokir sementara.");
+        setShowModal(true);
         setTimeout(() => navigate("/popupblock"), 2500);
       } else {
-        setMessage(`Salah OTP sebanyak .Attempt ${newAttempts}/3`);
+        setMessage(
+          respOTP.message ||
+          `Salah OTP. Attempt ${newAttempts}/3`
+        );
+        setShowModal(true);
         setOtp(["", "", "", "", "", ""]);
         inputsRef.current[0].focus();
-        setTimeout(() => setMessage(""), 2500);
       }
       return;
     }
 
-    sessionStorage.setItem("token", respOTP.data.token)
-    sessionStorage.setItem("user_id", respOTP.data.user.userId)
-    sessionStorage.setItem("username", respOTP.data.user.username)
-    sessionStorage.setItem("role", respOTP.data.user.role)
-    sessionStorage.setItem('cif', respOTP.data.user.cif)
-    sessionStorage.setItem('attempt', respOTP.data.attemptCount)
+    sessionStorage.setItem("token", respOTP.data.token);
+    sessionStorage.setItem("user_id", respOTP.data.user.userId);
+    sessionStorage.setItem("username", respOTP.data.user.username);
+    sessionStorage.setItem("role", respOTP.data.user.role);
+    sessionStorage.setItem("cif", respOTP.data.user.cif);
+    sessionStorage.setItem("attempt", respOTP.data.attemptCount);
 
     setMessage("✅ OTP Verified!");
     setTimeout(() => navigate("/dashboard"), 800);
-
   };
 
   const handleResend = () => {
@@ -110,8 +115,6 @@ export default function OtpLogin() {
           Verify OTP
         </button>
 
-        {message && <p className="otp-message">{message}</p>}
-
         <p className="otp-resend">
           Didn’t receive the email?{" "}
           <span
@@ -126,6 +129,18 @@ export default function OtpLogin() {
           ← Back to Sign In
         </div>
       </div>
+
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content fade-in">
+            <h3 className="modal-title">⚠️ OTP Verification Failed</h3>
+            <p className="modal-message">{message}</p>
+            <button className="modal-btn" onClick={() => setShowModal(false)}>
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

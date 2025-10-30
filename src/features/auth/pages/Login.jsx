@@ -11,12 +11,18 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState("error");
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!username.trim() || !password.trim()) {
-      setMessage("Please fill in both fields")
+      setMessage("Please fill in both fields");
+      setModalType("error");
+      setShowModal(true);
       return;
     }
 
@@ -25,19 +31,27 @@ export default function Login() {
 
     const respLogin = await postAuthLogin({
       username: username,
-      password: password
+      password: password,
     });
 
     setLoading(false);
 
-    if (!respLogin.ok) {
-      setMessage(respLogin.message || 'Invalid Username or Password');
+    if (!respLogin.ok || respLogin.data.status === false) {
+      setMessage(respLogin.message || "Invalid Username or Password");
+      setModalType("error");
+      setShowModal(true);
       return;
     }
+    sessionStorage.setItem("sessionID", respLogin.data.sessionId);
 
-    sessionStorage.setItem("sessionID", respLogin.data.sessionId)
+    setMessage(respLogin.data.message || "Kode OTP telah dikirim ke email Anda");
+    setModalType("success");
+    setShowModal(true);
 
-    navigate("/otpLogin");
+    setTimeout(() => {
+      setShowModal(false);
+      navigate("/otpLogin");
+    }, 2000);
   };
 
   return (
@@ -69,7 +83,8 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <i
-              className={`far ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-eye`}
+              className={`far ${showPassword ? "fa-eye-slash" : "fa-eye"
+                } toggle-eye`}
               onClick={() => setShowPassword(!showPassword)}
             ></i>
           </div>
@@ -82,9 +97,26 @@ export default function Login() {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-
-        {message && <p className="login-error">{message}</p>}
       </div>
+
+      {showModal && (
+        <div className="modal-overlay">
+          <div className={`modal-content ${modalType}`}>
+            <h3>
+              {modalType === "success" ? "Login Successful" : "Login Failed"}
+            </h3>
+            <p>{message}</p>
+            {modalType === "error" && (
+              <button
+                onClick={() => setShowModal(false)}
+                className="modal-close-btn"
+              >
+                Close
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
