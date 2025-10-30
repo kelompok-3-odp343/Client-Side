@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
 import "../styles/auth-login.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
+import { postAuthLogin } from "../api/authService";
 
 export default function Login() {
-  const [userId, setUserId] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -14,35 +15,29 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!userId.trim() || !password.trim()) {
-      setMessage("⚠️ Please fill in both fields.");
+    if (!username.trim() || !password.trim()) {
+      setMessage("Please fill in both fields")
       return;
     }
 
     setLoading(true);
     setMessage("");
 
-    await new Promise((r) => setTimeout(r, 800));
-    const dummyUsers = [
-      { userId: "admin", password: "12345", email: "admin@demo.com" },
-      { userId: "test", password: "abcd", email: "test@demo.com" },
-    ];
-
-    const user = dummyUsers.find(
-      (u) => u.userId === userId && u.password === password
-    );
+    const respLogin = await postAuthLogin({
+      username: username,
+      password: password
+    });
 
     setLoading(false);
 
-    if (user) {
-      localStorage.setItem("userEmail", user.email);
-      navigate("/otpLogin");
-    } else {
-      setMessage("❌ Invalid User ID or Password.");
-      setUserId("");
-      setPassword("");
-      setTimeout(() => setMessage(""), 2500);
+    if (!respLogin.ok) {
+      setMessage(respLogin.message || 'Invalid Username or Password');
+      return;
     }
+
+    sessionStorage.setItem("sessionID", respLogin.data.sessionId)
+
+    navigate("/otpLogin");
   };
 
   return (
@@ -59,9 +54,9 @@ export default function Login() {
             <i className="fas fa-user"></i>
             <input
               type="text"
-              placeholder="User ID"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
 

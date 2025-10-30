@@ -1,83 +1,105 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/Navbar";
+import LifeGoalsCard from "../components/LifeGoalsCard";
 import "../styles/life-goals-detail.css";
-import { fetchLifeGoalTransactions, fetchLifeGoalDetail } from "../api/life-goals.api";
+import {
+  fetchLifeGoalTransactions,
+  fetchLifeGoalDetail,
+} from "../api/life-goals.api";
 
 export default function LifeGoalDetail() {
-  const { id } = useParams();
-  const location = useLocation();
-  const goal = location.state?.goal;
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const goal = state?.goal || {};
+  const accountNumber = state?.accountNumber;
+
   const [transactions, setTransactions] = useState({});
   const [goalDetail, setGoalDetail] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("May");
   const [loading, setLoading] = useState(false);
 
-  const months = ["May","Jun","Jul","Aug","Sept","Oct","Nov","Dec","Jan","Feb","Mar","Apr"];
+  const months = [
+    "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov",
+    "Dec", "Jan", "Feb", "Mar", "Apr",
+  ];
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const [txData, detailData] = await Promise.all([
-        fetchLifeGoalTransactions("USER001", id),
-        fetchLifeGoalDetail("USER001", id),
-      ]);
-      setTransactions(txData);
-      setGoalDetail(detailData);
-      setLoading(false);
+      try {
+        const [txRes, detailRes] = await Promise.all([
+          fetchLifeGoalTransactions(accountNumber),
+          fetchLifeGoalDetail(accountNumber),
+        ]);
+        setTransactions(txRes || {});
+        setGoalDetail(detailRes?.data || null);
+      } catch {
+        setTransactions({});
+        setGoalDetail(null);
+      } finally {
+        setLoading(false);
+      }
     }
-    loadData();
-  }, [id]);
+    if (accountNumber) loadData();
+  }, [accountNumber]);
 
-  if (loading || !goalDetail) return <div className="loading">Loading...</div>;
+  if (loading || !goalDetail)
+    return <div className="loading">Loading...</div>;
+
+  const toDate = (str) => {
+    if (!str) return "";
+    const [d, m, rest] = str.split("-");
+    const y = (rest || "").split("T")[0];
+    if (!y) return str;
+    return new Date(`${y}-${m}-${d}`);
+  };
+
+  const handleMouseMove = (e) => {
+    const button = e.currentTarget;
+    const rect = button.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    button.style.setProperty("--x", `${x}px`);
+    button.style.setProperty("--y", `${y}px`);
+  };
 
   return (
-    <div className="lg-container" style={{ "--theme": goal.color }}>
+    <div
+      className="lg-container"
+      style={{
+        "--theme": goal.color || "#71d9d0",
+        "--accent-gradient": `linear-gradient(135deg, ${goal.color ||
+          "#71d9d0"} 0%, #ffffff 100%)`,
+      }}
+    >
       <Navbar />
       <main className="lg-main">
+        <header className="lg-header">
+          <button
+            className="lg-back shimmer"
+            onClick={() => navigate(-1)}
+            onMouseMove={handleMouseMove}
+          >
+            ← Back to Life Goals
+          </button>
+        </header>
+
         <div className="lg-grid">
-          <div className="left-column">
-            <header className="section-header">
-              <h1 className="lg-title">{goal.title} Progress</h1>
-              <p className="lg-sub">{goal.desc}</p>
-            </header>
+          {/* LEFT COLUMN */}
+          <section className="left-column">
+            <LifeGoalsCard
+              goal={{
+                title: goal.title,
+                lifegoalsSubtitle: goal.desc,
+                current: goal.current,
+                target: goal.target,
+                color: goal.color,
+              }}
+              onClick={() => {}}
+            />
 
-            <section className="lg-topcard">
-              <div className="topcard-left" style={{ background: "var(--theme)" }}>
-                <img src={goal.icon} alt={goal.title} />
-              </div>
-
-              <div className="topcard-right">
-                <div className="top-row">
-                  <div>
-                    <h2 className="goal-title">{goal.title}</h2>
-                    <p className="goal-desc">{goal.desc}</p>
-                  </div>
-                  <div className="meta">
-                    <div className="meta-left">Current</div>
-                    <div className="meta-right">Target</div>
-                  </div>
-                </div>
-
-                <div className="top-progress">
-                  <div className="progress-track">
-                    <div
-                      className="progress-fill"
-                      style={{
-                        width: `${goal.progress}%`,
-                        background: "var(--theme)",
-                      }}
-                    />
-                  </div>
-                  <div className="progress-values">
-                    <span>Rp{goal.current.toLocaleString("id-ID")}</span>
-                    <span>Rp{goal.target.toLocaleString("id-ID")}</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="history-panel">
+            <div className="history-panel glass-card">
               <div className="panel-header">
                 <h3 className="panel-title">Transaction History</h3>
               </div>
@@ -86,7 +108,9 @@ export default function LifeGoalDetail() {
                 {months.map((m) => (
                   <button
                     key={m}
-                    className={`month-pill ${selectedMonth === m ? "active" : ""}`}
+                    className={`month-pill ${
+                      selectedMonth === m ? "active" : ""
+                    }`}
                     onClick={() => setSelectedMonth(m)}
                   >
                     {m}
@@ -95,70 +119,102 @@ export default function LifeGoalDetail() {
               </div>
 
               <div className="tx-list">
-                {transactions[selectedMonth]?.map((group, gi) => (
-                  <div key={gi} className="tx-group">
-                    <div className="tx-date">{group.date}</div>
-                    {group.items.map((tx, i) => (
-                      <div key={i} className="tx-row">
-                        <div className="tx-left">
-                          <div className="tx-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.2" />
-                            </svg>
+                {Array.isArray(transactions[selectedMonth]) &&
+                transactions[selectedMonth].length > 0 ? (
+                  // 🔽 reverse the array to show newest first
+                  [...transactions[selectedMonth]]
+                    .reverse()
+                    .map((group, gi) => (
+                      <div key={gi} className="tx-group">
+                        <div className="tx-date">{group.date}</div>
+                        {group.items.map((tx, i) => (
+                          <div key={i} className="tx-row">
+                            <div className="tx-left">
+                              <div className="tx-dot" />
+                              <div className="tx-text">
+                                <div className="tx-type">{tx.type}</div>
+                                <div className="tx-sub">{tx.desc}</div>
+                              </div>
+                            </div>
+                            <div
+                              className={`tx-amount ${
+                                String(tx.amount).startsWith("-")
+                                  ? "neg"
+                                  : "pos"
+                              }`}
+                            >
+                              {tx.amount}
+                            </div>
                           </div>
-                          <div className="tx-text">
-                            <div className="tx-type">{tx.type}</div>
-                            <div className="tx-sub">{tx.desc}</div>
-                          </div>
-                        </div>
-                        <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
-                          {tx.amount}
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    ))
+                ) : (
+                  <div className="tx-empty">
+                    No transactions for {selectedMonth}.
                   </div>
-                ))}
+                )}
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
 
-          <aside className="info-column">
-            <h3 className="info-title">Life Goals Information</h3>
-            <div className="info-card">
-              <h4 className="info-heading">Life Goals Detail</h4>
-              <div className="info-grid">
-                <div className="label">Life Goals Account</div>
-                <div className="value">{goalDetail.life_goals_account}</div>
+          {/* RIGHT COLUMN */}
+          <aside className="info-column glass-card">
+            <h3 className="info-title">Life Goal Details</h3>
+            <div className="info-grid">
+              <div className="label">Account Number</div>
+              <div className="value">{goalDetail.accountNumber}</div>
 
-                <div className="label">Estimated Accumulated Funds</div>
-                <div className="value">
-                  Rp{goalDetail.estimated_accumulated_funds.toLocaleString("id-ID")}
-                </div>
+              <div className="label">Estimated Accumulated Funds</div>
+              <div className="value">
+                Rp{Number(
+                  goalDetail.estimatedAccumulatedBalance || 0
+                ).toLocaleString("id-ID")}
+              </div>
 
-                <div className="label">Initial Deposit</div>
-                <div className="value">
-                  Rp{goalDetail.initial_deposit.toLocaleString("id-ID")}
-                </div>
+              <div className="label">Initial Deposit</div>
+              <div className="value">
+                Rp{Number(goalDetail.initalDeposit || 0).toLocaleString(
+                  "id-ID"
+                )}
+              </div>
 
-                <div className="label">Annual Interest Rate</div>
-                <div className="value">{goalDetail.annual_interest_rate}</div>
+              <div className="label">Annual Interest Rate</div>
+              <div className="value">
+                {(Number(goalDetail.interestRate || 0) * 100)
+                  .toFixed(2)
+                  .replace(/\.00$/, "")}
+                %
+              </div>
 
-                <div className="label">Duration</div>
-                <div className="value">{goalDetail.duration_years} years</div>
+              <div className="label">Duration</div>
+              <div className="value">
+                {goalDetail.lifegoalsDuration} years
+              </div>
 
-                <div className="label">Creation Date</div>
-                <div className="value">{goalDetail.creation_date}</div>
+              <div className="label">Created On</div>
+              <div className="value">
+                {toDate(goalDetail.createdTime).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
               </div>
 
               <div className="divider" />
 
-              <h4 className="info-heading small">Disbursement Details</h4>
-              <div className="info-grid">
-                <div className="label">Disbursement Date</div>
-                <div className="value">{goalDetail.disbursement_date}</div>
+              <div className="label">Maturity Date</div>
+              <div className="value">
+                {toDate(goalDetail.maturityDate).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </div>
 
-                <div className="label">Disbursement Account</div>
-                <div className="value">{goalDetail.life_goals_account}</div>
+              <div className="label">Disbursement Account</div>
+              <div className="value">
+                {goalDetail.disbursementAccountNumber}
               </div>
             </div>
           </aside>

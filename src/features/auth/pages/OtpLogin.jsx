@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
 import "../styles/auth-otp.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
+import { postVerifyOtp } from "../api/authService";
 
 export default function OtpLogin() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -21,24 +22,49 @@ export default function OtpLogin() {
     if (value && index < 5) inputsRef.current[index + 1].focus();
   };
 
-  const handleVerify = () => {
-    const code = otp.join("");
-    if (code === "123456") {
-      setMessage("✅ OTP Verified!");
-      setTimeout(() => navigate("/dashboard"), 1000);
-    } else {
+  const handleVerify = async () => {
+    const otp_code = otp.join("");
+    if (otp_code.length !== 6) {
+      setMessage("Masukkan 6 digit OTP.");
+      return;
+    }
+
+    const sessionID = sessionStorage.getItem("sessionID");
+
+    if (!sessionID) {
+      setMessage("OTP session expired. Silahkan Login Kembali.");
+      setTimeout(() => navigate("/"), 2500);
+      return;
+    }
+
+    const respOTP = await postVerifyOtp({ sessionID, otp_code });
+
+    if (!respOTP.ok) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
+
       if (newAttempts >= 3) {
-        setMessage("🚫 Too many failed attempts. Redirecting...");
-        setTimeout(() => navigate("/popupblock"), 1500);
+        setMessage("Salah OTP sebanyak 3 kali.");
+        setTimeout(() => navigate("/popupblock"), 2500);
       } else {
-        setMessage(`❌ Invalid OTP. Attempt ${newAttempts}/3.`);
+        setMessage(`Salah OTP sebanyak .Attempt ${newAttempts}/3`);
         setOtp(["", "", "", "", "", ""]);
         inputsRef.current[0].focus();
         setTimeout(() => setMessage(""), 2500);
       }
+      return;
     }
+
+    sessionStorage.setItem("token", respOTP.data.token)
+    sessionStorage.setItem("user_id", respOTP.data.user.userId)
+    sessionStorage.setItem("username", respOTP.data.user.username)
+    sessionStorage.setItem("role", respOTP.data.user.role)
+    sessionStorage.setItem('cif', respOTP.data.user.cif)
+    sessionStorage.setItem('attempt', respOTP.data.attemptCount)
+
+    setMessage("✅ OTP Verified!");
+    setTimeout(() => navigate("/dashboard"), 800);
+
   };
 
   const handleResend = () => {

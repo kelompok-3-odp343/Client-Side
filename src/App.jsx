@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 
 import Login from "./features/auth/pages/Login";
@@ -15,6 +15,8 @@ import DetailMyCard from "./features/card/pages/DetailMyCard";
 import SavingsDashboard from "./features/saving/pages/Saving";
 import PensionFunds from "./features/pension-funds/pages/PensionFunds";
 import SplitBill from "./features/split-bill/pages/SplitBill.jsx";
+import SplitBillDetail from "./features/split-bill/pages/SplitBillDetail.jsx";
+import PrivateRoute from "./routes/PrivateRoute.jsx";
 
 export default function App() {
   const location = useLocation();
@@ -23,18 +25,23 @@ export default function App() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/lifegoals" element={<LifeGoals />} />
-        <Route path="/lifegoal/:id" element={<LifeGoalDetail />} />
-        <Route path="/deposits" element={<DepositsDashboard />} />
-        <Route path="/profile" element={<Profile />} />
         <Route path="/otpLogin" element={<OtpLogin />} />
         <Route path="/popupblock" element={<PopupBlock />} />
-        <Route path="/mycard" element={<CardSection />} />
-        <Route path="/detailmycard" element={<DetailMyCard />} />
-        <Route path="/savings" element={<SavingsDashboard />} />
-        <Route path="/pensionfunds" element={<PensionFunds />} />
-        <Route path="/splitbill" element={<SplitBill />} />
+
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/lifegoals" element={<LifeGoals />} />
+          <Route path="/lifegoal/:id" element={<LifeGoalDetail />} />
+          <Route path="/deposits" element={<DepositsDashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/mycard" element={<CardSection />} />
+          <Route path="/detailmycard" element={<DetailMyCard />} />
+          <Route path="/savings" element={<SavingsDashboard />} />
+          <Route path="/pensionfunds" element={<PensionFunds />} />
+          <Route path="/splitbill" element={<SplitBill />} />
+          <Route path="/splitbill/detail/:id" element={<SplitBillDetail />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </AnimatePresence>
   );

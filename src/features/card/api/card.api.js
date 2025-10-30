@@ -1,5 +1,6 @@
 import axios from "axios";
 import { DUMMY_CARDS, DUMMY_TRANSACTIONS } from "../data/card.dummy";
+import { DUMMY_TRX_HISTORY } from "../data/trx_history.dummy";
 
 export async function fetchAllCards() {
   try {
@@ -18,5 +19,31 @@ export async function fetchCardTransactions(accountId) {
     return DUMMY_TRANSACTIONS[accountId] || [];
   } catch {
     return DUMMY_TRANSACTIONS[accountId] || [];
+  }
+}
+
+export async function fetchTransactionHistory({ month, year, accountNumber }) {
+  try {
+    const token = sessionStorage.getItem("token")
+    const payload = {
+      month,
+      year,
+      accountNumber
+    };
+
+    const respTrxHistory = await axios.post(`/api/v1/transaction-history`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "User-Id": sessionStorage.getItem("user_id"),
+        "Customer-Id": sessionStorage.getItem("cif"),
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      }
+    })
+
+    return respTrxHistory.data;
+  } catch (error) {
+    console.error('err', error);
+    return DUMMY_TRX_HISTORY[accountNumber] || { transactions: [] };
   }
 }

@@ -1,46 +1,98 @@
 import axios from "axios";
-import LIFE_GOALS_DUMMY from "../data/life-goals.dummy";
-import LIFE_GOALS_DETAILS_DUMMY from "../data/life-goals-details.dummy";
+import LIFE_GOALS_DETAILS_DUMMY from "../data/life-goals-details.dummy"
 import LIFE_GOALS_TX_DUMMY from "../data/life-goals-tx.dummy";
 import LIFE_GOALS_REVAMP_DUMMY from "../data/life-goals.revamp.dummy";
+import LIFE_GOALS_DUMMY from "../data/life-goals.dummy";
 
+/* ============================================================
+   HELPER: Mapping accountNumber → dummy key
+   ============================================================ */
+const mapAccountToKey = (accountNumber) => {
+  if (!accountNumber) return "education";
+  const num = String(accountNumber).toLowerCase();
+
+  if (num.includes("edu")) return "education";
+  if (num.includes("vac")) return "vacations";
+  if (num.includes("mar")) return "marriage";
+  if (num.includes("hom")) return "home";
+  if (num.includes("gad")) return "gadget";
+  if (num.includes("veh")) return "vehicles";
+
+  // fallback default
+  return "education";
+};
+
+/* ============================================================
+   MAIN API FUNCTIONS
+   ============================================================ */
 export async function fetchLifeGoals(userId = "USER001") {
   try {
     const res = await axios.get(`/api/life-goals/${userId}`);
-    if (res.data.status && res.data.data?.goals) return res.data.data;
+    if (res?.data?.status && res.data.data?.goals) return res.data.data;
     return LIFE_GOALS_DUMMY.data;
   } catch {
     return LIFE_GOALS_DUMMY.data;
   }
 }
 
-export async function fetchLifeGoalDetail(userId, goalId) {
+export async function fetchLifeGoalDetail(accountNumber) {
   try {
-    const res = await axios.get(`/api/life-goals/${userId}/detail/${goalId}`);
-    if (res.data.status && res.data.data) return res.data.data;
-    return LIFE_GOALS_DETAILS_DUMMY[userId].details[goalId];
+    const token = sessionStorage.getItem("token");
+    const res = await axios.get(`/api/v1/lifegoals-detail/${accountNumber}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "User-Id": sessionStorage.getItem("user_id"),
+        "Customer-Id": sessionStorage.getItem("cif"),
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+
+    if (res?.data) return res;
+    const key = mapAccountToKey(accountNumber);
+    return { data: LIFE_GOALS_DETAILS_DUMMY[key] };
   } catch {
-    return LIFE_GOALS_DETAILS_DUMMY[userId].details[goalId];
+    const key = mapAccountToKey(accountNumber);
+    return { data: LIFE_GOALS_DETAILS_DUMMY[key] };
   }
 }
 
-export async function fetchLifeGoalTransactions(userId, goalId) {
+export async function fetchLifeGoalTransactions(accountNumber) {
   try {
-    const res = await axios.get(`/api/life-goals/${userId}/transactions?goal_id=${goalId}`);
-    if (res.data.status && res.data.data) return res.data.data;
-    return LIFE_GOALS_TX_DUMMY[goalId] || {};
+    const token = sessionStorage.getItem("token");
+    const res = await axios.get(`/api/v1/lifegoals-tx/${accountNumber}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "User-Id": sessionStorage.getItem("user_id"),
+        "Customer-Id": sessionStorage.getItem("cif"),
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+
+    if (res?.data) return res.data;
+    const key = mapAccountToKey(accountNumber);
+    return LIFE_GOALS_TX_DUMMY[key] || LIFE_GOALS_TX_DUMMY.EDU001;
   } catch {
-    return LIFE_GOALS_TX_DUMMY[goalId] || {};
+    const key = mapAccountToKey(accountNumber);
+    return LIFE_GOALS_TX_DUMMY[key] || LIFE_GOALS_TX_DUMMY.EDU001;
   }
 }
 
-export async function fetchLifeGoalsRevamp(userId = "USER001") {
+export async function fetchLifeGoalsRevamp() {
   try {
-    const res = await axios.get(`/api/life-goals-revamp/${userId}`);
-    if (res.data.status) return res.data.data;
-    return LIFE_GOALS_REVAMP_DUMMY;
+    const token = sessionStorage.getItem("token");
+    const res = await axios.get(`/api/v1/lifegoals`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "User-Id": sessionStorage.getItem("user_id"),
+        "Customer-Id": sessionStorage.getItem("cif"),
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+    return res;
   } catch {
-    // return LIFE_GOALS_REVAMP_DUMMY;
-    return LIFE_GOALS_REVAMP_DUMMY;
+    return { data: LIFE_GOALS_REVAMP_DUMMY };
   }
 }

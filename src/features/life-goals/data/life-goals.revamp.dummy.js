@@ -1,80 +1,141 @@
 const LIFE_GOALS_REVAMP_DUMMY = {
-    Education: {
-        totalTarget: 100000000,
+  Education: {
+    totalTarget: 120000000,
+    currentBalance: 60000000,
+    lifeGoalsList: [
+      {
+        id: "EDU-01",
+        accountNumber: 11234566,
+        lifegoalsTitle: "S1",
+        lifegoalsSubtitle: "Kuliah Ulion di Oxford",
+        lifegoalsCategory: "Education",
+        targetBalance: 100000000,
         currentBalance: 50000000,
-        lifeGoalsList: [{
-            id: "EDU-01",
-            accountNumber: "12312512",
-            lifegoalsTitle: "Kuliah S1 di Oxford",
-            lifegoalsCategory: "Education",
-            targetBalance: 25000000,
-            currentBalance: 15000000,
-            createdTime: "2025-10-25T00:00:00.000Z"
-        },
-        {
-            id: "EDU-02",
-            accountNumber: "12312512",
-            lifegoalsTitle: "Kuliah S2 di Harvard",
-            lifegoalsCategory: "Education",
-            targetBalance: 25000000,
-            currentBalance: 15000000,
-            createdTime: "2025-10-25T00:00:00.000Z"
-        }]
-    },
-    Vacation: {
-        totalTarget: 100000000,
+      },
+      {
+        id: "EDU-02",
+        accountNumber: 11234567,
+        lifegoalsTitle: "S2",
+        lifegoalsSubtitle: "Kuliah Ulion di Harvard",
+        lifegoalsCategory: "Education",
+        targetBalance: 100000000,
         currentBalance: 50000000,
-        lifeGoalsList: [
-            {
-                id: "V-01",
-                accountNumber: "555512",
-                lifegoalsTitle: "Bali",
-                lifegoalsCategory: "Vacation",
-                targetBalance: 25000000,
-                currentBalance: 15000000,
-                createdTime: "2025-10-25T00:00:00.000Z"
-            },
-            {
-                id: "V-02",
-                accountNumber: "555512",
-                lifegoalsTitle: "Vacation",
-                lifegoalsCategory: "Gadget",
-                targetBalance: 25000000,
-                currentBalance: 15000000,
-                createdTime: "2025-10-25T00:00:00.000Z"
-            },
-            {
-                id: "V-03",
-                accountNumber: "555512",
-                lifegoalsTitle: "Jepang",
-                lifegoalsCategory: "Vacation",
-                targetBalance: 25000000,
-                currentBalance: 15000000,
-                createdTime: "2025-10-25T00:00:00.000Z"
-            },
-            {
-                id: "V-02",
-                accountNumber: "555512",
-                lifegoalsTitle: "Korea Utara",
-                lifegoalsCategory: "Gadget",
-                targetBalance: 25000000,
-                currentBalance: 15000000,
-                createdTime: "2025-10-25T00:00:00.000Z"
-            }]
-    },
-    Gadget: {
-        totalTarget: 100000000,
+      },
+      {
+        id: "EDU-03",
+        accountNumber: 11234568,
+        lifegoalsTitle: "S3",
+        lifegoalsSubtitle: "Kuliah Ulion di MIT",
+        lifegoalsCategory: "Education",
+        targetBalance: 100000000,
         currentBalance: 50000000,
-        lifeGoalsList: [{
-            id: "G-01",
-            accountNumber: "555512",
-            lifegoalsTitle: "Beli Macbook",
-            lifegoalsCategory: "Gadget",
-            targetBalance: 25000000,
-            currentBalance: 15000000,
-            createdTime: "2025-10-25T00:00:00.000Z"
-        }]
-    }
+      },
+    ],
+  },
+  Vacations: {
+    totalTarget: 100000000,
+    currentBalance: 40000000,
+    lifeGoalsList: [
+      {
+        id: "VAC-01",
+        accountNumber: 11234569,
+        lifegoalsTitle: "Japan",
+        lifegoalsSubtitle: "Travel to Tokyo & Kyoto",
+        lifegoalsCategory: "Vacations",
+        targetBalance: 100000000,
+        currentBalance: 50000000,
+      },
+      {
+        id: "VAC-02",
+        accountNumber: 11234510,
+        lifegoalsTitle: "Bali",
+        lifegoalsSubtitle: "Visit all the beaches",
+        lifegoalsCategory: "Vacations",
+        targetBalance: 100000000,
+        currentBalance: 50000000,
+      },
+      {
+        id: "VAC-03",
+        accountNumber: 11234511,
+        lifegoalsTitle: "South Korea",
+        lifegoalsSubtitle: "Honeymoon trip",
+        lifegoalsCategory: "Vacations",
+        targetBalance: 100000000,
+        currentBalance: 50000000,
+      },
+    ],
+  },
+  Marriage: {
+    totalTarget: 100000000,
+    currentBalance: 50000000,
+    lifeGoalsList: [
+      {
+        id: "M-01",
+        accountNumber: 11234512,
+        lifegoalsTitle: "Lamaran",
+        lifegoalsSubtitle: "Engagement ceremony",
+        lifegoalsCategory: "Marriage",
+        targetBalance: 100000000,
+        currentBalance: 50000000,
+      },
+      {
+        id: "M-02",
+        accountNumber: 11234513,
+        lifegoalsTitle: "Resepsi",
+        lifegoalsSubtitle: "Wedding day",
+        lifegoalsCategory: "Marriage",
+        targetBalance: 100000000,
+        currentBalance: 50000000,
+      },
+    ],
+  },
+  Gadget: {
+    totalTarget: 100000000,
+    currentBalance: 50000000,
+    lifeGoalsList: [
+      {
+        id: "G-01",
+        accountNumber: 11234514,
+        lifegoalsTitle: "Laptop",
+        lifegoalsSubtitle: "MacBook Air M3",
+        lifegoalsCategory: "Gadget",
+        targetBalance: 30000000,
+        currentBalance: 15000000,
+      },
+      {
+        id: "G-02",
+        accountNumber: 11234515,
+        lifegoalsTitle: "Handphone",
+        lifegoalsSubtitle: "iPhone 16 Pro",
+        lifegoalsCategory: "Gadget",
+        targetBalance: 25000000,
+        currentBalance: 15000000,
+      },
+    ],
+  },
+  Vehicles: {
+    totalTarget: 150000000,
+    currentBalance: 75000000,
+    lifeGoalsList: [
+      {
+        id: "V-01",
+        accountNumber: 11234516,
+        lifegoalsTitle: "Car",
+        lifegoalsSubtitle: "Toyota Yaris GR",
+        lifegoalsCategory: "Vehicles",
+        targetBalance: 100000000,
+        currentBalance: 50000000,
+      },
+      {
+        id: "V-02",
+        accountNumber: 11234517,
+        lifegoalsTitle: "Motorcycle",
+        lifegoalsSubtitle: "Yamaha XSR 155",
+        lifegoalsCategory: "Vehicles",
+        targetBalance: 50000000,
+        currentBalance: 25000000,
+      },
+    ],
+  },
 };
-
 export default LIFE_GOALS_REVAMP_DUMMY;

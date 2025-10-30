@@ -1,94 +1,112 @@
+// src/features/cards/pages/DetailMyCard.jsx
 import React, { useState, useEffect } from "react";
 import SplitBillForm from "../../../shared/components/SplitBillForm";
 import "../styles/detail-my-card.css";
 import Navbar from "../../../shared/components/Navbar";
 import { EyeOff, Eye } from "lucide-react";
-import { fetchAllCards, fetchCardTransactions } from "../api/card.api";
-import { DUMMY_CARDS, DUMMY_TRANSACTIONS } from "../data/card.dummy";
+import { fetchAllCards, fetchTransactionHistory } from "../api/card.api";
+import { DUMMY_CARDS } from "../data/card.dummy";
+import { useNavigate } from "react-router-dom";
 
 export default function DetailMyCard() {
-  const months = [
-    "May",
-    "June",
-    "July",
-    "Aug",
-    "Sept",
-    "Oct",
-    "Nov",
-    "Dec",
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-  ];
+  // --- Helpers ---
+  const getLastMonths = () => {
+    const now = new Date();
+    const arr = [];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      arr.push({
+        label: d.toLocaleString("en-US", { month: "short" }), // UI label
+        month: d.getMonth() + 1,
+        year: d.getFullYear(),
+      });
+    }
+    return arr.reverse();
+  };
+
+  const toISOFromDMY = (dateTimeStr) => {
+    if (!dateTimeStr) return null;
+    const [dPart, tPart = "00:00:00"] = dateTimeStr.split("T");
+    const [dd, mm, yyyy] = dPart.split("-");
+    if (!dd || !mm || !yyyy) return null;
+    return `${yyyy}-${mm}-${dd}T${tPart}`;
+  };
+
+  const mapTransactionsToGroups = (flat) => {
+    const groups = {};
+    flat.forEach((trx) => {
+      const iso = toISOFromDMY(trx.transactionDate);
+      const d = iso ? new Date(iso) : new Date(trx.transactionDate); // fallback just in case
+      const key = d.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+      }); // ex: "25 Sep"
+
+      if (!groups[key]) {
+        groups[key] = { date: key, sortKey: d.getTime(), items: [] };
+      }
+
+      groups[key].items.push({
+        transactionId: trx.transactionId,
+        type: trx.transactionType,
+        detail: trx.partyName,
+        amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
+        jenisTransaksi: trx.debit_credit === "D" ? "Pengeluaran" : "Pemasukan",
+        split_bill_id: trx.split_bill_id ?? null
+      });
+    });
+
+    // sort by date (newest first) and return without sortKey
+    return Object.values(groups)
+      .sort((a, b) => b.sortKey - a.sortKey)
+      .map(({ sortKey, ...rest }) => rest);
+  };
 
   const [cards, setCards] = useState(DUMMY_CARDS);
   const [selectedCard, setSelectedCard] = useState(DUMMY_CARDS[0]);
-  const [selectedMonth, setSelectedMonth] = useState("May");
   const [showBalance, setShowBalance] = useState(true);
+  const navigate = useNavigate();
+
+  const [months] = useState(getLastMonths());
+  const [selectedMonth, setSelectedMonth] = useState(
+    getLastMonths()[getLastMonths().length - 1]
+  );
+
   const [showSplitModal, setShowSplitModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+
   const [transactions, setTransactions] = useState([]);
   const [chartData, setChartData] = useState({ income: 0, expense: 0 });
 
-  // helper: normalize month to 3-letter lowercase for robust matching
-  const normalize = (m) => (m || "").toString().toLowerCase().slice(0, 3);
-
-  // load cards (api-ready, fallback to dummy)
   useEffect(() => {
     let mounted = true;
-    async function loadCards() {
+    (async () => {
       try {
         const data = await fetchAllCards();
         if (!mounted) return;
         if (Array.isArray(data) && data.length) {
           setCards(data);
-          // keep current selection if present, otherwise pick first
           const current =
             data.find((c) => c.account_id === selectedCard?.account_id) ||
             data[0];
           setSelectedCard(current);
         }
       } catch {
-        /* fallback already set */
+
       }
-    }
-    loadCards();
+    })();
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // load transactions when selectedCard or month changes
   useEffect(() => {
-    let mounted = true;
-    async function loadTx() {
-      try {
-        const res = await fetchCardTransactions(selectedCard.account_id);
-        const arr = Array.isArray(res) ? res : [];
-        if (!mounted) return;
-        // filter by month (robust)
-        const filtered = arr.filter(
-          (g) => normalize(g.month) === normalize(selectedMonth)
-        );
-        setTransactions(filtered);
-      } catch {
-        // fallback to dummy transactions if api fails
-        const arr = DUMMY_TRANSACTIONS[selectedCard.account_id] || [];
-        const filtered = arr.filter(
-          (g) => normalize(g.month) === normalize(selectedMonth)
-        );
-        if (mounted) setTransactions(filtered);
-      }
-    }
-    if (selectedCard?.account_id) loadTx();
-    return () => {
-      mounted = false;
-    };
-  }, [selectedCard, selectedMonth]);
+    if (!selectedCard) return;
+    const last = months[months.length - 1];
+    setSelectedMonth(last);
+    handleSelectedMonth(last);
+  }, [selectedCard]);
 
-  // compute chart data based on current transactions
   useEffect(() => {
     const flatItems = transactions.flatMap((g) => g.items || []);
     const income = flatItems
@@ -100,28 +118,48 @@ export default function DetailMyCard() {
     setChartData({ income, expense });
   }, [transactions]);
 
-  // when user changes selected card via select
-  const handleChangeCard = (accountId) => {
+  const handleChangeCard = async (accountId) => {
     const found = cards.find((c) => c.account_id === accountId);
-    if (found) {
-      setSelectedCard(found);
-      // reset month to default May so charts update predictably
-      setSelectedMonth("May");
-      setSelectedTransaction(null);
-    }
+    if (!found) return;
+    setSelectedCard(found);
+
+    const last = months[months.length - 1];
+    setSelectedMonth(last);
+    await handleSelectedMonth(last, found);
   };
 
-  // open split bill form with the exact transaction clicked
   const handleOpenSplit = (group, itemIndex) => {
     const item = group.items[itemIndex];
     setSelectedTransaction({
-      id: `${group.date}-${itemIndex}`,
+      transactionId: item.transactionId,
       date: group.date,
       detail: item.detail,
       amount: item.amount,
       account_id: selectedCard.account_id,
     });
     setShowSplitModal(true);
+  };
+
+  const handleSelectedMonth = async (m, forcedCard) => {
+    const card = forcedCard || selectedCard;
+    if (!card) return;
+
+    setSelectedMonth(m);
+
+    const data = await fetchTransactionHistory({
+      month: m.month,
+      year: m.year,
+      accountNumber: card.account_number,
+    });
+
+    if (!data?.transactions) {
+      setTransactions([]);
+      return;
+    }
+
+    const grouped = mapTransactionsToGroups(data.transactions);
+    setTransactions(grouped);
+    console.log('cc', card.account_number);
   };
 
   return (
@@ -137,7 +175,7 @@ export default function DetailMyCard() {
                 <strong>Account Details</strong>
               </h2>
               <select
-                value={selectedCard.account_id}
+                value={selectedCard?.account_id}
                 onChange={(e) => handleChangeCard(e.target.value)}
               >
                 {cards.map((c) => (
@@ -155,13 +193,15 @@ export default function DetailMyCard() {
             <div className="account-card">
               <div className="account-header">
                 <div>
-                  <h4>{selectedCard.type}</h4>
+                  <h4>{selectedCard?.type}</h4>
                   <p className="acc-number">
-                    <strong>{selectedCard.account_number}</strong>
+                    <strong>{selectedCard?.account_number}</strong>
                   </p>
-                  <p className="acc-name">{selectedCard.account_holder_name}</p>
+                  <p className="acc-name">
+                    {selectedCard?.account_holder_name}
+                  </p>
                 </div>
-                {selectedCard.is_main && (
+                {selectedCard?.is_main && (
                   <div className="account-card-badge">
                     <span>Main Account</span>
                   </div>
@@ -172,9 +212,9 @@ export default function DetailMyCard() {
               <div className="balance-container">
                 <h3>
                   {showBalance
-                    ? `Rp ${Number(selectedCard.effective_balance).toLocaleString(
-                        "id-ID"
-                      )}`
+                    ? `Rp ${Number(
+                      selectedCard?.effective_balance || 0
+                    ).toLocaleString("id-ID")}`
                     : "•••••••••"}
                 </h3>
                 <span
@@ -223,18 +263,34 @@ export default function DetailMyCard() {
                 className="bar income-bar"
                 style={{
                   height: `${chartData.income
-                    ? Math.max(10, (chartData.income / Math.max(chartData.income, chartData.expense || 1)) * 100)
+                    ? Math.max(
+                      10,
+                      (chartData.income /
+                        Math.max(
+                          chartData.income,
+                          chartData.expense || 1
+                        )) *
+                      100
+                    )
                     : 8
-                  }%`,
+                    }%`,
                 }}
               />
               <div
                 className="bar expense-bar"
                 style={{
                   height: `${chartData.expense
-                    ? Math.max(6, (chartData.expense / Math.max(chartData.income || 1, chartData.expense)) * 100)
+                    ? Math.max(
+                      6,
+                      (chartData.expense /
+                        Math.max(
+                          chartData.income || 1,
+                          chartData.expense
+                        )) *
+                      100
+                    )
                     : 6
-                  }%`,
+                    }%`,
                 }}
               />
             </div>
@@ -251,11 +307,16 @@ export default function DetailMyCard() {
             <div className="months">
               {months.map((m) => (
                 <button
-                  key={m}
-                  className={normalize(m) === normalize(selectedMonth) ? "active" : ""}
-                  onClick={() => setSelectedMonth(m)}
+                  key={m.month + "-" + m.year}
+                  className={
+                    m.month === selectedMonth?.month &&
+                      m.year === selectedMonth?.year
+                      ? "active"
+                      : ""
+                  }
+                  onClick={() => handleSelectedMonth(m)}
                 >
-                  {m}
+                  {m.label}
                 </button>
               ))}
             </div>
@@ -276,18 +337,23 @@ export default function DetailMyCard() {
                         </div>
                         <div className="transaction-amount-modern">
                           <span
-                            className={`amount ${
-                              item.amount.startsWith("+") ? "credit" : "debit"
-                            }`}
+                            className={`amount ${item.amount.startsWith("+") ? "credit" : "debit"
+                              }`}
                           >
                             {item.amount}
                           </span>
                           {item.jenisTransaksi === "Pengeluaran" && (
                             <button
                               className="split-btn"
-                              onClick={() => handleOpenSplit(group, iIdx)}
+                              onClick={() => {
+                                if (item.split_bill_id) {
+                                  navigate(`/split-bill/view/${item.split_bill_id}`)
+                                } else {
+                                  handleOpenSplit(group, iIdx)
+                                }
+                              }}
                             >
-                              Split bill?
+                              {item.split_bill_id ? "View Split Bill" : "Split Bill?"}
                             </button>
                           )}
                         </div>
@@ -296,7 +362,10 @@ export default function DetailMyCard() {
                   </div>
                 ))
               ) : (
-                <p className="no-data">No transactions available for {selectedMonth}</p>
+                <p className="no-data">
+                  No transactions available for {selectedMonth?.label}{" "}
+                  {selectedMonth?.year}
+                </p>
               )}
             </div>
           </div>
