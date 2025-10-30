@@ -47,23 +47,6 @@ export async function fetchSplitBills() {
   }
 }
 
-export async function getSplitBillById(id) {
-  const found = DUMMY_STORAGE.find((b) => b.split_bill_id === id);
-  return found ? normalizeBill(found) : null;
-}
-
-export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
-  const idx = DUMMY_STORAGE.findIndex((b) => b.split_bill_id === split_bill_id);
-  if (idx !== -1) {
-    DUMMY_STORAGE[idx].members = updatedMembers;
-    // hitung ulang remaining_bill
-    DUMMY_STORAGE[idx].remaining_bill = updatedMembers
-      .filter((m) => m.status !== "Paid")
-      .reduce((s, m) => s + (Number(m.amount) || 0), 0);
-  }
-  return DUMMY_STORAGE[idx];
-}
-
 export async function createSplitBill(payload) {
   const newBill = {
     accountNumber: payload.accountNumber,
