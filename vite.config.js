@@ -2,11 +2,11 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [['babel-plugin-react-compiler']],
+  plugins: [react()],
   server: {
     proxy: {
       "/api": {
-        target: "https://2535102e169c.ngrok-free.app",
+        target: "https://api-dev.wandoor.my.id",
         changeOrigin: true,
         secure: false,
       },

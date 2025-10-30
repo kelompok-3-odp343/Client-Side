@@ -21,13 +21,15 @@ const mapAccountToKey = (accountNumber) => {
   // fallback default
   return "education";
 };
-
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+});
 /* ============================================================
    MAIN API FUNCTIONS
    ============================================================ */
 export async function fetchLifeGoals(userId = "USER001") {
   try {
-    const res = await axios.get(`/api/life-goals/${userId}`);
+    const res = await api.get(`/api/life-goals/${userId}`);
     if (res?.data?.status && res.data.data?.goals) return res.data.data;
     return LIFE_GOALS_DUMMY.data;
   } catch {
@@ -38,7 +40,7 @@ export async function fetchLifeGoals(userId = "USER001") {
 export async function fetchLifeGoalDetail(accountNumber) {
   try {
     const token = sessionStorage.getItem("token");
-    const res = await axios.get(`/api/v1/lifegoals-detail/${accountNumber}`, {
+    const res = await api.get(`/api/v1/lifegoals-detail/${accountNumber}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "User-Id": sessionStorage.getItem("user_id"),
@@ -60,7 +62,7 @@ export async function fetchLifeGoalDetail(accountNumber) {
 export async function fetchLifeGoalTransactions(accountNumber) {
   try {
     const token = sessionStorage.getItem("token");
-    const res = await axios.get(`/api/v1/lifegoals-tx/${accountNumber}`, {
+    const res = await api.get(`/api/v1/lifegoals-tx/${accountNumber}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "User-Id": sessionStorage.getItem("user_id"),
@@ -82,7 +84,7 @@ export async function fetchLifeGoalTransactions(accountNumber) {
 export async function fetchLifeGoalsRevamp() {
   try {
     const token = sessionStorage.getItem("token");
-    const res = await axios.get(`/api/v1/lifegoals`, {
+    const res = await api.get(`/api/v1/lifegoals`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "User-Id": sessionStorage.getItem("user_id"),

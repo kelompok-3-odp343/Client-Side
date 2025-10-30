@@ -1,8 +1,10 @@
 import axios from 'axios'
-
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+});
 export const getPensionFunds = async (userId) => {
     try {
-        const response = await axios.get(`/api/pension-funds/${userId}`);
+        const response = await api.get(`/api/pension-funds/${userId}`);
 
         if (response.data && response.data.status === true) {
             console.log("get pension funds");
@@ -17,31 +19,31 @@ export const getPensionFunds = async (userId) => {
             status: true,
             message: "Pension fund fetched successfully (dummy)",
             data: [{
-                    fund_id: "DPLK_0001",
-                    title: "Pension Funds - DPLK12345",
-                    total_balance: 50000000,
-                    items: [{
-                        item_id: "DPLK_0001",
-                        deposit_account_number: "DPLK12345",
-                        product_name: "Simponi Likuid",
-                        balance: 50000000,
-                        maturity_date: "2026-06-01T00:00:00Z",
-                        currency_code: "IDR",
-                    }, ],
-                },
-                {
-                    fund_id: "DPLK_0002",
-                    title: "Pension Funds - DPLK67890",
-                    total_balance: 8000000,
-                    items: [{
-                        item_id: "DPLK_0002",
-                        deposit_account_number: "DPLK67890",
-                        product_name: "Simponi Likuid Syariah",
-                        balance: 8000000,
-                        maturity_date: "2026-12-15T00:00:00Z",
-                        currency_code: "IDR",
-                    }, ],
-                },
+                fund_id: "DPLK_0001",
+                title: "Pension Funds - DPLK12345",
+                total_balance: 50000000,
+                items: [{
+                    item_id: "DPLK_0001",
+                    deposit_account_number: "DPLK12345",
+                    product_name: "Simponi Likuid",
+                    balance: 50000000,
+                    maturity_date: "2026-06-01T00:00:00Z",
+                    currency_code: "IDR",
+                },],
+            },
+            {
+                fund_id: "DPLK_0002",
+                title: "Pension Funds - DPLK67890",
+                total_balance: 8000000,
+                items: [{
+                    item_id: "DPLK_0002",
+                    deposit_account_number: "DPLK67890",
+                    product_name: "Simponi Likuid Syariah",
+                    balance: 8000000,
+                    maturity_date: "2026-12-15T00:00:00Z",
+                    currency_code: "IDR",
+                },],
+            },
             ],
         };
 

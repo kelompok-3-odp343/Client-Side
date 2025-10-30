@@ -1,7 +1,9 @@
 import { DUMMY_CARDS } from "../data/dashboard.dummy.js";
 import axios from "axios";
 import { DASHBOARD_DUMMY } from "../data/dashboardPage.dummy.js";
-
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+});
 const API_BASE_URL = import.meta.env.BASE_URL;
 
 export async function fetchCards(userId, token) {
@@ -30,7 +32,7 @@ export async function fetchDashboard() {
   try {
     const token = sessionStorage.getItem('token');
 
-    const data = await axios.get(`/api/v1/fetch-dashboard`, {
+    const data = await api.get(`/api/v1/fetch-dashboard`, {
       headers: {
         "Authorization": `Bearer ${token}`,
         "User-Id": sessionStorage.getItem('user_id'),
