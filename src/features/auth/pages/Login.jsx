@@ -35,7 +35,7 @@ export default function Login() {
       return;
     }
 
-    sessionStorage.setItem("otp_ref", respLogin.data.otpRef)
+    sessionStorage.setItem("sessionID", respLogin.data.sessionId)
 
     navigate("/otpLogin");
   };

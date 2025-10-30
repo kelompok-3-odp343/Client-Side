@@ -15,7 +15,6 @@ import DetailMyCard from "./features/card/pages/DetailMyCard";
 import SavingsDashboard from "./features/saving/pages/Saving";
 import PensionFunds from "./features/pension-funds/pages/PensionFunds";
 import SplitBill from "./features/split-bill/pages/SplitBill.jsx";
-import SplitBillDetail from "./features/split-bill/pages/SplitBillDetail.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 
 export default function App() {
@@ -39,7 +38,6 @@ export default function App() {
           <Route path="/savings" element={<SavingsDashboard />} />
           <Route path="/pensionfunds" element={<PensionFunds />} />
           <Route path="/splitbill" element={<SplitBill />} />
-          <Route path="/splitbill/detail/:id" element={<SplitBillDetail />} />
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

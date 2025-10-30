@@ -29,15 +29,15 @@ export default function OtpLogin() {
       return;
     }
 
-    const otp_ref = sessionStorage.getItem("otp_ref");
+    const sessionID = sessionStorage.getItem("sessionID");
 
-    if (!otp_ref) {
+    if (!sessionID) {
       setMessage("OTP session expired. Silahkan Login Kembali.");
       setTimeout(() => navigate("/"), 2500);
       return;
     }
 
-    const respOTP = await postVerifyOtp({ otp_ref, otp_code });
+    const respOTP = await postVerifyOtp({ sessionID, otp_code });
 
     if (!respOTP.ok) {
       const newAttempts = attempts + 1;
@@ -59,6 +59,8 @@ export default function OtpLogin() {
     sessionStorage.setItem("user_id", respOTP.data.user.userId)
     sessionStorage.setItem("username", respOTP.data.user.username)
     sessionStorage.setItem("role", respOTP.data.user.role)
+    sessionStorage.setItem('cif', respOTP.data.user.cif)
+    sessionStorage.setItem('attempt', respOTP.data.attemptCount)
 
     setMessage("✅ OTP Verified!");
     setTimeout(() => navigate("/dashboard"), 800);
