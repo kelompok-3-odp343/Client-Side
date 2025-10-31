@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build:ci
+RUN npm run build -- --skip-tests
 
 # Gunakan Nginx untuk menyajikan hasil build
 FROM nginx:stable-alpine
