@@ -41,17 +41,13 @@ export default function AdminHome() {
 	});
 
 	const pieData = [
-		{ name: "QRIS", value: 40, color: "#FFBC8E" },
-		{ name: "Top Up", value: 35, color: "#FFDDB7" },
-		{ name: "Others", value: 28, color: "#FFE8B0" },
+		{ name: "QRIS", value: 40, color: "#FFA07A" },
+		{ name: "Top Up", value: 35, color: "#FFD700" },
+		{ name: "Others", value: 28, color: "#FFB6C1" },
 	];
 
 	const handleViewTransactions = (transaction) => {
 		navigate("/admin/transactions", { state: { transaction } });
-	};
-
-	const handleUserClick = (transaction) => {
-		navigate(`/admin/users/${transaction.id}`, { state: { transaction } });
 	};
 
 	return (
@@ -133,15 +129,15 @@ export default function AdminHome() {
 
 								<div className="category-percentages">
 									<div className="percentage-item">
-										<span className="percentage-bar" style={{ background: "#FFE8B0", width: "28%" }}></span>
+										<span className="percentage-bar" style={{ background: "#FFB6C1", width: "28%" }}></span>
 										<span className="percentage-text">28% Others</span>
 									</div>
 									<div className="percentage-item">
-										<span className="percentage-bar" style={{ background: "#FFDDB7", width: "35%" }}></span>
+										<span className="percentage-bar" style={{ background: "#FFD700", width: "35%" }}></span>
 										<span className="percentage-text">35% Top Up</span>
 									</div>
 									<div className="percentage-item">
-										<span className="percentage-bar" style={{ background: "#FFBC8E", width: "40%" }}></span>
+										<span className="percentage-bar" style={{ background: "#FFA07A", width: "40%" }}></span>
 										<span className="percentage-text">40% QRIS</span>
 									</div>
 								</div>
@@ -207,14 +203,7 @@ export default function AdminHome() {
 										<td>{index + 1}</td>
 										<td>{transaction.cif}</td>
 										<td>{transaction.nik}</td>
-										<td>
-											<button 
-												className="name-link" 
-												onClick={() => handleUserClick(transaction)}
-											>
-												{transaction.name}
-											</button>
-										</td>
+										<td>{transaction.name}</td>
 										<td>
 											<button 
 												className="view-btn"
