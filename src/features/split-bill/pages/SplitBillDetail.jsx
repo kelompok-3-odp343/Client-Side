@@ -2,25 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/Navbar";
 import "../styles/split-bill-detail.css";
-import { updateSplitBillStatus, getSplitBillById } from "../api/split-bill.api";
-
-// Placeholder modal (nanti diganti dengan SplitBillFormEdit.jsx)
-function SplitBillFormEdit({ bill, onClose }) {
-  return (
-    <div className="modal-overlay">
-      <div className="modal-box">
-        <h2>Edit Split Bill</h2>
-        <p>
-          Form edit untuk <strong>{bill.split_bill_title}</strong> akan
-          ditampilkan di sini.
-        </p>
-        <button className="close-modal-btn" onClick={onClose}>
-          Close
-        </button>
-      </div>
-    </div>
-  );
-}
+import {
+  updateSplitBillStatus,
+  getSplitBillById,
+} from "../api/split-bill.api";
 
 export default function SplitBillDetail() {
   const { state } = useLocation();
@@ -29,7 +14,8 @@ export default function SplitBillDetail() {
   const [bill, setBill] = useState(null);
   const [color, setColor] = useState("#6dddd0");
   const [members, setMembers] = useState([]);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadData() {
@@ -41,6 +27,7 @@ export default function SplitBillDetail() {
         const data = await getSplitBillById(state.billId);
         if (data) {
           setBill(data);
+          setColor(state.color || "#6dddd0");
           setMembers(data.members);
         }
       }
@@ -66,18 +53,73 @@ export default function SplitBillDetail() {
   const totalUnpaid = Math.max(0, bill.total_bill - totalPaid);
   const progressPercent = (totalPaid / Math.max(1, bill.total_bill)) * 100;
 
-  const handleMarkAsPaid = async (index) => {
-    const updated = members.map((m, i) =>
-      i === index ? { ...m, status: "Paid" } : m
+  // === Event Handlers ===
+  const handleToggleStatus = (index) => {
+    setMembers((prev) =>
+      prev.map((m, i) => {
+        if (i !== index) return m;
+        if (m.status === "Paid") {
+          // hanya ubah ke unpaid di edit mode
+          return isEditing ? { ...m, status: "Unpaid" } : m;
+        } else {
+          return { ...m, status: "Paid" };
+        }
+      })
     );
-    setMembers(updated);
-    await updateSplitBillStatus(bill.split_bill_id, updated);
   };
 
+  const handleAddMember = () => {
+    setMembers((prev) => [
+      ...prev,
+      { member_name: "", amount: 0, status: "Unpaid" },
+    ]);
+  };
+
+  const handleRemoveMember = (index) => {
+    if (members.length === 1) return;
+    setMembers((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleChangeName = (index, value) => {
+    setMembers((prev) =>
+      prev.map((m, i) => (i === index ? { ...m, member_name: value } : m))
+    );
+  };
+
+  const handleChangeAmount = (index, value) => {
+    const sanitized = value.replace(/[^\d]/g, "");
+    setMembers((prev) =>
+      prev.map((m, i) =>
+        i === index ? { ...m, amount: Number(sanitized) || 0 } : m
+      )
+    );
+  };
+
+  const handleCancelEdit = () => {
+    setMembers(bill.members);
+    setIsEditing(false);
+    setError("");
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      await updateSplitBillStatus(bill.split_bill_id, members);
+      setBill((prev) => ({ ...prev, members }));
+      setIsEditing(false);
+    } catch {
+      setError("Failed to save changes.");
+    }
+  };
+
+  // === Render ===
   return (
     <div className="sb-detail-container" style={{ "--theme": color }}>
       <Navbar />
-      <main className="sb-detail-main">
+      <main
+        className={`sb-detail-main ${isEditing ? "edit-mode" : ""}`}
+        style={{ "--theme": color }}
+      >
+        {/* HEADER BAR */}
         <div className="sb-top-row">
           <button className="back-btn" onClick={() => navigate("/splitbill")}>
             ← Back to Split Bill
@@ -99,29 +141,50 @@ export default function SplitBillDetail() {
             </p>
           </div>
 
-          <button className="edit-btn" onClick={() => setShowEditModal(true)}>
-            Edit
-          </button>
+          <div className="action-buttons-right">
+            {isEditing ? (
+              <>
+                <button className="cancel-btn" onClick={handleCancelEdit}>
+                  Cancel
+                </button>
+                <button className="edit-btn" onClick={handleSaveEdit}>
+                  Save
+                </button>
+              </>
+            ) : (
+              <button className="edit-btn" onClick={() => setIsEditing(true)}>
+                Edit
+              </button>
+            )}
+          </div>
         </div>
 
+        {/* BILL SUMMARY */}
         <section className="bill-summary">
           <div className="summary-left">
             <div className="label">Bill Total</div>
-            <div className="total">Rp{bill.total_bill.toLocaleString("id-ID")}</div>
+            <div className="total">
+              Rp{bill.total_bill.toLocaleString("id-ID")}
+            </div>
           </div>
 
           <div className="summary-right">
             <div className="label-inline">
               <div className="label-small">Paid Amount</div>
-              <div className="value paid">Rp{totalPaid.toLocaleString("id-ID")}</div>
+              <div className="value paid">
+                Rp{totalPaid.toLocaleString("id-ID")}
+              </div>
             </div>
             <div className="label-inline">
               <div className="label-small">Unpaid Amount</div>
-              <div className="value unpaid">Rp{totalUnpaid.toLocaleString("id-ID")}</div>
+              <div className="value unpaid">
+                Rp{totalUnpaid.toLocaleString("id-ID")}
+              </div>
             </div>
           </div>
         </section>
 
+        {/* PROGRESS BAR */}
         <div className="progress-section">
           <div className="progress-track">
             <div
@@ -131,54 +194,121 @@ export default function SplitBillDetail() {
           </div>
         </div>
 
+        {/* TABLE */}
         <div className="table-card">
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>No</th>
-                  <th>Bill Member</th>
-                  <th>Amount</th>
-                  <th>Payment Status</th>
-                  <th>Status Update</th>
+                  <th style={{ width: "6%" }}>No</th>
+                  <th style={{ width: "32%" }}>Bill Member</th>
+                  <th style={{ width: "25%" }}>Amount</th>
+                  <th style={{ width: "20%" }}>Payment Status</th>
+                  <th style={{ width: "17%" }}>Status Update</th>
                 </tr>
               </thead>
               <tbody>
                 {members.map((m, i) => (
                   <tr key={i}>
                     <td>{i + 1}</td>
-                    <td>{m.member_name}</td>
-                    <td>Rp{Number(m.amount).toLocaleString("id-ID")}</td>
-                    <td className={`status ${m.status.toLowerCase()}`}>{m.status}</td>
                     <td>
-                      <button
-                        className="mark-btn"
-                        style={
-                          m.status === "Paid"
-                            ? {
-                                border: `1.5px solid ${color}`,
-                                color,
-                                background: "transparent",
-                              }
-                            : { background: color, color: "#fff", border: "none" }
-                        }
-                        onClick={() => handleMarkAsPaid(i)}
-                        disabled={m.status === "Paid"}
-                      >
-                        Mark as Paid
-                      </button>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={m.member_name}
+                          placeholder="Enter name"
+                          onChange={(e) =>
+                            handleChangeName(i, e.target.value)
+                          }
+                        />
+                      ) : (
+                        m.member_name
+                      )}
+                    </td>
+                    <td>
+                      <div className="amount-input-wrap">
+                        <span className="rp-prefix">Rp</span>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={m.amount.toLocaleString("id-ID")}
+                            onChange={(e) =>
+                              handleChangeAmount(i, e.target.value)
+                            }
+                          />
+                        ) : (
+                          <span>{Number(m.amount).toLocaleString("id-ID")}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td
+                      className={`status ${m.status.toLowerCase()}`}
+                      style={{ textTransform: "capitalize" }}
+                    >
+                      {m.status}
+                    </td>
+                    <td className="action-cell">
+                      <div className="action-flex">
+                        <button
+                          className="mark-btn"
+                          onClick={() => handleToggleStatus(i)}
+                          disabled={
+                            m.status === "Paid" && !isEditing // only disable Mark as Unpaid outside edit
+                          }
+                          style={
+                            m.status === "Paid"
+                              ? {
+                                  border: `1.5px solid ${color}`,
+                                  color,
+                                  background: "transparent",
+                                }
+                              : { background: color, color: "#fff" }
+                          }
+                        >
+                          {m.status === "Paid"
+                            ? "Mark as Unpaid"
+                            : "Mark as Paid"}
+                        </button>
+                        {isEditing && (
+                          <button
+                            className="remove-member-small"
+                            onClick={() => handleRemoveMember(i)}
+                          >
+                            −
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {isEditing && (
+            <div className="edit-actions-row">
+              <button
+                className="add-member"
+                onClick={handleAddMember}
+                style={{ borderColor: color, color }}
+              >
+                + Add Participant
+              </button>
+              <div className="right-actions">
+                Total per participants:{" "}
+                <strong>
+                  Rp
+                  {members
+                    .reduce((s, m) => s + Number(m.amount || 0), 0)
+                    .toLocaleString("id-ID")}
+                </strong>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Modal edit */}
-        {showEditModal && (
-          <SplitBillFormEdit bill={bill} onClose={() => setShowEditModal(false)} />
-        )}
+        {error && <div className="global-error">{error}</div>}
       </main>
     </div>
   );
