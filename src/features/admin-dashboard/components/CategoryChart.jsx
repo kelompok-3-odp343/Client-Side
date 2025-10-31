@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import "../styles/category-chart.css";
 
@@ -9,16 +10,16 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 
 			<div className="category-content">
 				<div className="category-list">
-					{data.map((item, index) => (
-						<div key={index} className="category-item">
+					{data.map((item) => (
+						<div key={item.name} className="category-item">
 							<span className="category-name">{item.name}</span>
 							<span className="category-amount">: {item.amount}</span>
 						</div>
 					))}
 
 					<div className="category-percentages">
-						{data.map((item, index) => (
-							<div key={index} className="percentage-item">
+						{data.map((item) => (
+							<div key={item.name} className="percentage-item">
 								<span
 									className="percentage-bar"
 									style={{ background: item.color, width: `${item.value}%` }}
@@ -43,8 +44,8 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 								startAngle={90}
 								endAngle={450}
 							>
-								{data.map((entry, index) => (
-									<Cell key={`cell-${index}`} fill={entry.color} />
+								{data.map((entry) => (
+									<Cell key={entry.name} fill={entry.color} />
 								))}
 							</Pie>
 							<Tooltip />
@@ -55,3 +56,15 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 		</section>
 	);
 }
+
+CategoryChart.propTypes = {
+	data: PropTypes.arrayOf(
+		PropTypes.shape({
+			name: PropTypes.string.isRequired,
+			value: PropTypes.number.isRequired,
+			color: PropTypes.string.isRequired,
+			amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+		})
+	).isRequired,
+	title: PropTypes.string,
+};

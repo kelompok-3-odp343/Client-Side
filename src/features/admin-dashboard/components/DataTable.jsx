@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "../styles/data-table.css";
 
 export default function DataTable({
@@ -30,9 +31,9 @@ export default function DataTable({
 				<table className={`data-table ${tableClassName} header-${headerColor}`}>
 					<thead>
 						<tr>
-							{columns.map((column, index) => (
+							{columns.map((column) => (
 								<th
-									key={index}
+									key={column.key}
 									className={column.sortable ? "sortable" : ""}
 									onClick={column.sortable ? () => onSort(column.key) : undefined}
 								>
@@ -45,11 +46,11 @@ export default function DataTable({
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((row, rowIndex) => (
-							<tr key={row.id || rowIndex}>
-								{columns.map((column, colIndex) => (
-									<td key={colIndex}>
-										{renderCell ? renderCell(row, column, rowIndex) : row[column.key]}
+						{data.map((row) => (
+							<tr key={row.id || JSON.stringify(row)}>
+								{columns.map((column) => (
+									<td key={column.key}>
+										{renderCell ? renderCell(row, column) : row[column.key]}
 									</td>
 								))}
 							</tr>
@@ -62,3 +63,24 @@ export default function DataTable({
 		</section>
 	);
 }
+
+DataTable.propTypes = {
+	title: PropTypes.string.isRequired,
+	columns: PropTypes.arrayOf(
+		PropTypes.shape({
+			key: PropTypes.string.isRequired,
+			label: PropTypes.string.isRequired,
+			sortable: PropTypes.bool,
+		})
+	).isRequired,
+	data: PropTypes.arrayOf(PropTypes.object).isRequired,
+	sortConfig: PropTypes.shape({
+		key: PropTypes.string,
+		direction: PropTypes.oneOf(["asc", "desc"]),
+	}),
+	onSort: PropTypes.func,
+	renderCell: PropTypes.func,
+	searchBar: PropTypes.node,
+	tableClassName: PropTypes.string,
+	headerColor: PropTypes.string,
+};

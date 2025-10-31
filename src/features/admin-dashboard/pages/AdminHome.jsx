@@ -21,12 +21,12 @@ export default function AdminHome() {
 	const toggleSort = () => setSortAsc(!sortAsc);
 
 	const transactions = [
-		{ id: 1, cif: "9285711832", nik: "3277017005000007", name: "Della Puspita" },
-		{ id: 2, cif: "9285711834", nik: "3277017005000009", name: "Erlangga Wahyu Utomo" },
-		{ id: 3, cif: "9285711831", nik: "3277017005000006", name: "Khairuddin Nasty" },
-		{ id: 4, cif: "9285711833", nik: "3277017005000008", name: "Oktavia Qurrota A'yuni" },
-		{ id: 5, cif: "9285711830", nik: "3277017005000005", name: "Ridwan Surya Ghani" },
-		{ id: 6, cif: "9285711829", nik: "3277017005000004", name: "Ulion Pardede" },
+		{ id: "T1", cif: "9285711832", nik: "3277017005000007", name: "Della Puspita" },
+		{ id: "T2", cif: "9285711834", nik: "3277017005000009", name: "Erlangga Wahyu Utomo" },
+		{ id: "T3", cif: "9285711831", nik: "3277017005000006", name: "Khairuddin Nasty" },
+		{ id: "T4", cif: "9285711833", nik: "3277017005000008", name: "Oktavia Qurrota A'yuni" },
+		{ id: "T5", cif: "9285711830", nik: "3277017005000005", name: "Ridwan Surya Ghani" },
+		{ id: "T6", cif: "9285711829", nik: "3277017005000004", name: "Ulion Pardede" },
 	];
 
 	const categoryData = [
@@ -57,9 +57,7 @@ export default function AdminHome() {
 			<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
 			<main className="admin-home-main">
-				{/* TOP ROW: Assets & Category */}
 				<div className="top-row">
-					{/* ASSET CARD */}
 					<section className="asset-panel">
 						<div className="asset-header">
 							<h2 className="asset-title">Assets Total</h2>
@@ -109,11 +107,9 @@ export default function AdminHome() {
 						</div>
 					</section>
 
-					{/* CATEGORY CARD */}
 					<CategoryChart data={categoryData} />
 				</div>
 
-				{/* TABLE SECTION */}
 				<section className="table-section">
 					<div className="table-header">
 						<h2>Transaction History</h2>
@@ -131,7 +127,7 @@ export default function AdminHome() {
 									<th>CIF</th>
 									<th>NIK</th>
 									<th onClick={toggleSort} className="sortable">
-										Customer Name
+										Customer Name{" "}
 										<span className="sort-icon">{sortAsc ? "▲" : "▼"}</span>
 									</th>
 									<th>Action</th>
@@ -148,6 +144,7 @@ export default function AdminHome() {
 											<button
 												className="view-btn"
 												onClick={() => handleViewTransactions(transaction)}
+												type="button"
 											>
 												View transaction history
 											</button>
