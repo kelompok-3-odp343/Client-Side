@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
+import SearchBar from "../components/SearchBar";
+import CategoryChart from "../components/CategoryChart";
 import "../styles/admin-home.css";
 
 import iconDeposit from "../../../assets/images/dashboard-deposits-icon.png";
@@ -28,6 +29,12 @@ export default function AdminHome() {
 		{ id: 6, cif: "9285711829", nik: "3277017005000004", name: "Ulion Pardede" },
 	];
 
+	const categoryData = [
+		{ name: "QRIS", value: 40, amount: "2.000.000", color: "#FFA07A" },
+		{ name: "Top Up", value: 35, amount: "1.750.000", color: "#FFD700" },
+		{ name: "Others", value: 28, amount: "1.250.000", color: "#FFB6C1" },
+	];
+
 	const filteredTransactions = transactions.filter(
 		(t) =>
 			t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -39,12 +46,6 @@ export default function AdminHome() {
 		if (sortAsc) return a.name.localeCompare(b.name);
 		return b.name.localeCompare(a.name);
 	});
-
-	const pieData = [
-		{ name: "QRIS", value: 40, color: "#FFA07A" },
-		{ name: "Top Up", value: 35, color: "#FFD700" },
-		{ name: "Others", value: 28, color: "#FFB6C1" },
-	];
 
 	const handleViewTransactions = (transaction) => {
 		navigate("/admin/transactions", { state: { transaction } });
@@ -109,78 +110,17 @@ export default function AdminHome() {
 					</section>
 
 					{/* CATEGORY CARD */}
-					<section className="category-panel">
-						<h2 className="category-title">Transaction Category</h2>
-
-						<div className="category-content">
-							<div className="category-list">
-								<div className="category-item">
-									<span className="category-name">QRIS</span>
-									<span className="category-amount">: 2.000.000</span>
-								</div>
-								<div className="category-item">
-									<span className="category-name">Top Up</span>
-									<span className="category-amount">: 1.750.000</span>
-								</div>
-								<div className="category-item">
-									<span className="category-name">Others</span>
-									<span className="category-amount">: 1.250.000</span>
-								</div>
-
-								<div className="category-percentages">
-									<div className="percentage-item">
-										<span className="percentage-bar" style={{ background: "#FFB6C1", width: "28%" }}></span>
-										<span className="percentage-text">28% Others</span>
-									</div>
-									<div className="percentage-item">
-										<span className="percentage-bar" style={{ background: "#FFD700", width: "35%" }}></span>
-										<span className="percentage-text">35% Top Up</span>
-									</div>
-									<div className="percentage-item">
-										<span className="percentage-bar" style={{ background: "#FFA07A", width: "40%" }}></span>
-										<span className="percentage-text">40% QRIS</span>
-									</div>
-								</div>
-							</div>
-
-							<div className="category-chart">
-								<ResponsiveContainer width="100%" height={220}>
-									<PieChart>
-										<Pie
-											data={pieData}
-											cx="50%"
-											cy="50%"
-											outerRadius={95}
-											dataKey="value"
-											startAngle={90}
-											endAngle={450}
-										>
-											{pieData.map((entry, index) => (
-												<Cell key={`cell-${index}`} fill={entry.color} />
-											))}
-										</Pie>
-										<Tooltip />
-									</PieChart>
-								</ResponsiveContainer>
-							</div>
-						</div>
-					</section>
+					<CategoryChart data={categoryData} />
 				</div>
 
 				{/* TABLE SECTION */}
 				<section className="table-section">
 					<div className="table-header">
 						<h2>Transaction History</h2>
-						<div className="search-container">
-							<input
-								type="text"
-								placeholder="Search..."
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								className="search-input"
-							/>
-							<i className="fas fa-search search-icon"></i>
-						</div>
+						<SearchBar
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+						/>
 					</div>
 
 					<div className="table-wrapper">
@@ -205,7 +145,7 @@ export default function AdminHome() {
 										<td>{transaction.nik}</td>
 										<td>{transaction.name}</td>
 										<td>
-											<button 
+											<button
 												className="view-btn"
 												onClick={() => handleViewTransactions(transaction)}
 											>

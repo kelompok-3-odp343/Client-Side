@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
+import SearchBar from "../components/SearchBar";
+import DataTable from "../components/DataTable";
+import StatusBadge from "../components/StatusBadge";
 import "../styles/admin-users.css";
 
 export default function AdminUsers() {
@@ -57,6 +60,15 @@ export default function AdminUsers() {
 		},
 	];
 
+	const tableColumns = [
+		{ key: "no", label: "No", sortable: false },
+		{ key: "customerName", label: "Customer Name", sortable: true },
+		{ key: "accountNumber", label: "Account Number", sortable: true },
+		{ key: "accountType", label: "Account Type", sortable: true },
+		{ key: "status", label: "Status", sortable: true },
+		{ key: "action", label: "Action", sortable: false },
+	];
+
 	const filteredUsers = users.filter((user) =>
 		Object.values(user).some((val) =>
 			val.toString().toLowerCase().includes(searchQuery.toLowerCase())
@@ -88,8 +100,36 @@ export default function AdminUsers() {
 
 	const handleUnblock = (userId, e) => {
 		e.stopPropagation();
-		// Logic untuk unblock user
 		console.log("Unblock user:", userId);
+	};
+
+	const renderCell = (row, column, index) => {
+		if (column.key === "no") return index + 1;
+		
+		if (column.key === "customerName") {
+			return (
+				<button className="name-link" onClick={() => handleUserClick(row)}>
+					{row.customerName}
+				</button>
+			);
+		}
+		
+		if (column.key === "status") {
+			return <StatusBadge status={row.status} type="user" />;
+		}
+		
+		if (column.key === "action") {
+			return row.status === "Blocked" ? (
+				<button
+					className="unblock-btn"
+					onClick={(e) => handleUnblock(row.id, e)}
+				>
+					Unblock
+				</button>
+			) : null;
+		}
+		
+		return row[column.key];
 	};
 
 	return (
@@ -98,116 +138,22 @@ export default function AdminUsers() {
 			<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
 			<main className="admin-users-main">
-				<section className="users-section">
-					<div className="users-header">
-						<h2>Users List</h2>
-						<div className="search-container">
-							<input
-								type="text"
-								placeholder="Search..."
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								className="search-input"
-							/>
-							<i className="fas fa-search search-icon"></i>
-						</div>
-					</div>
-
-					<div className="table-wrapper">
-						<table className="users-table">
-							<thead>
-								<tr>
-									<th>No</th>
-									<th
-										className="sortable"
-										onClick={() => handleSort("customerName")}
-									>
-										Customer Name
-										{sortConfig.key === "customerName" && (
-											<span className="sort-icon">
-												{sortConfig.direction === "asc" ? "▲" : "▼"}
-											</span>
-										)}
-									</th>
-									<th
-										className="sortable"
-										onClick={() => handleSort("accountNumber")}
-									>
-										Account Number
-										{sortConfig.key === "accountNumber" && (
-											<span className="sort-icon">
-												{sortConfig.direction === "asc" ? "▲" : "▼"}
-											</span>
-										)}
-									</th>
-									<th
-										className="sortable"
-										onClick={() => handleSort("accountType")}
-									>
-										Account Type
-										{sortConfig.key === "accountType" && (
-											<span className="sort-icon">
-												{sortConfig.direction === "asc" ? "▲" : "▼"}
-											</span>
-										)}
-									</th>
-									<th
-										className="sortable"
-										onClick={() => handleSort("status")}
-									>
-										Status
-										{sortConfig.key === "status" && (
-											<span className="sort-icon">
-												{sortConfig.direction === "asc" ? "▲" : "▼"}
-											</span>
-										)}
-									</th>
-									<th>Action</th>
-								</tr>
-							</thead>
-							<tbody>
-								{sortedUsers.map((user, index) => (
-									<tr key={user.id}>
-										<td>{index + 1}</td>
-										<td>
-											<button
-												className="name-link"
-												onClick={() => handleUserClick(user)}
-											>
-												{user.customerName}
-											</button>
-										</td>
-										<td>{user.accountNumber}</td>
-										<td>{user.accountType}</td>
-										<td>
-											<span
-												className={`status-badge ${
-													user.status === "Active"
-														? "status-active"
-														: "status-blocked"
-												}`}
-											>
-												{user.status}
-											</span>
-										</td>
-										<td>
-											{user.status === "Blocked" && (
-												<button
-													className="unblock-btn"
-													onClick={(e) => handleUnblock(user.id, e)}
-												>
-													Unblock
-												</button>
-											)}
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
-
-					<div className="table-footer">{sortedUsers.length} rows</div>
-				</section>
+				<DataTable
+					title="Users List"
+					columns={tableColumns}
+					data={sortedUsers}
+					sortConfig={sortConfig}
+					onSort={handleSort}
+					renderCell={renderCell}
+					searchBar={
+						<SearchBar
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+						/>
+					}
+					tableClassName="users-list-table"
+					headerColor="peach"
+				/>
 			</main>
 		</div>
 	);
