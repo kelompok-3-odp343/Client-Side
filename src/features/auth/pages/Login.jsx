@@ -30,8 +30,8 @@ export default function Login() {
     setMessage("");
 
     const respLogin = await postAuthLogin({
-      username: username,
-      password: password,
+      username,
+      password,
     });
 
     setLoading(false);
@@ -42,16 +42,30 @@ export default function Login() {
       setShowModal(true);
       return;
     }
-    sessionStorage.setItem("sessionID", respLogin.data.sessionId);
 
-    setMessage(respLogin.data.message || "Kode OTP telah dikirim ke email Anda");
+    // simpan session
+    sessionStorage.setItem("sessionID", respLogin.data.sessionId);
+    sessionStorage.setItem("token", respLogin.data.token || "DUMMY_TOKEN");
+
+    // deteksi role (dari API atau fallback)
+    const role =
+      respLogin.data.role ||
+      (username.toLowerCase().includes("admin") ? "admin" : "user");
+
+    sessionStorage.setItem("role", role);
+
+    setMessage("Login success");
     setModalType("success");
     setShowModal(true);
 
     setTimeout(() => {
       setShowModal(false);
-      navigate("/otpLogin");
-    }, 2000);
+      if (role === "admin") {
+        navigate("/admin/home");
+      } else {
+        navigate("/otpLogin");
+      }
+    }, 1000);
   };
 
   return (
@@ -83,8 +97,9 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <i
-              className={`far ${showPassword ? "fa-eye-slash" : "fa-eye"
-                } toggle-eye`}
+              className={`far ${
+                showPassword ? "fa-eye-slash" : "fa-eye"
+              } toggle-eye`}
               onClick={() => setShowPassword(!showPassword)}
             ></i>
           </div>
