@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"; 
 import "../styles/admin-navbar.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
 
@@ -13,7 +14,9 @@ export default function AdminNavBar({ onMenuToggle }) {
 			</div>
 
 			<div className="nav-right">
-				<img src={logo} alt="Wandoor" className="nav-logo" />
+				<Link to="/admin/home">
+					<img src={logo} alt="Wandoor" className="nav-logo" />
+				</Link>
 			</div>
 		</header>
 	);

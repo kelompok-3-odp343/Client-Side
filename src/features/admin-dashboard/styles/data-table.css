@@ -1,0 +1,108 @@
+.data-table-section {
+	background: #ffffff;
+	border-radius: 12px;
+	padding: 1.5rem;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	flex: 1;
+	overflow: hidden;
+}
+
+.table-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+	flex-shrink: 0;
+}
+
+.table-header h2 {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #1f2937;
+	margin: 0;
+}
+
+.table-wrapper {
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: auto;
+	border-radius: 8px;
+	border: 1px solid #e5e7eb;
+	min-height: 0;
+}
+
+.data-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.data-table thead {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+}
+
+/* Header Color Variants */
+.data-table.header-teal thead {
+	background: linear-gradient(180deg, #6dddcf 0%, #a8ece1 100%);
+}
+
+.data-table.header-peach thead {
+	background: linear-gradient(180deg, #ffcdb2 0%, #ffe5d9 100%);
+}
+
+.data-table th {
+	padding: 0.875rem 1rem;
+	text-align: left;
+	font-weight: 600;
+	font-size: 0.875rem;
+	color: #1f2937;
+	white-space: nowrap;
+}
+
+.data-table th.sortable {
+	cursor: pointer;
+	user-select: none;
+	transition: background 0.2s;
+}
+
+.data-table th.sortable:hover {
+	background: rgba(255, 255, 255, 0.15);
+}
+
+.sort-icon {
+	margin-left: 0.5rem;
+	font-size: 0.75rem;
+}
+
+.data-table tbody tr {
+	border-bottom: 1px solid #f3f4f6;
+	transition: background 0.2s;
+}
+
+.data-table tbody tr:hover {
+	background: #f9fafb;
+}
+
+.data-table td {
+	padding: 1rem;
+	font-size: 0.875rem;
+	color: #1f2937;
+}
+
+.table-footer {
+	margin-top: 1rem;
+	text-align: right;
+	font-size: 0.875rem;
+	color: #6b7280;
+	flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+	.data-table {
+		min-width: 700px;
+	}
+}

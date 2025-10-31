@@ -1,0 +1,48 @@
+.admin-users-main {
+	padding: 1.5rem;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.name-link {
+	background: none;
+	border: none;
+	color: #1f2937;
+	font-size: 0.875rem;
+	cursor: pointer;
+	text-align: left;
+	padding: 0;
+	text-decoration: none;
+	transition: color 0.2s;
+	font-weight: 500;
+}
+
+.name-link:hover {
+	color: #6dddcf;
+	text-decoration: underline;
+}
+
+.unblock-btn {
+	background: #fff7ed;
+	color: #ea580c;
+	border: 1px solid #fed7aa;
+	padding: 0.5rem 1rem;
+	border-radius: 6px;
+	font-size: 0.875rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.unblock-btn:hover {
+	background: #ffedd5;
+	border-color: #fb923c;
+}
+
+@media (max-width: 768px) {
+	.admin-users-main {
+		padding: 1rem;
+	}
+}
