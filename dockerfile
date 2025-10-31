@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build
+RUN npm run build -x test
 
 # Gunakan Nginx untuk menyajikan hasil build
 FROM nginx:stable-alpine
