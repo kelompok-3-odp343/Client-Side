@@ -30,9 +30,9 @@ export default function AdminHome() {
 	];
 
 	const categoryData = [
-		{ name: "QRIS", value: 40, amount: "2.000.000", color: "#FFA07A" },
-		{ name: "Top Up", value: 35, amount: "1.750.000", color: "#FFD700" },
-		{ name: "Others", value: 28, amount: "1.250.000", color: "#FFB6C1" },
+		{ name: "QRIS", value: 40, amount: "Rp2.000.000", color: "#FFBC8E" },
+		{ name: "Top Up", value: 35, amount: "Rp1.750.000", color: "#FFE8B0" },
+		{ name: "Others", value: 25, amount: "Rp1.250.000", color: "#FFDDB7" },
 	];
 
 	const filteredTransactions = transactions.filter(
