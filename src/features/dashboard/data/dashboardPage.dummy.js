@@ -1,3 +1,4 @@
+// ga jadi dipakai, isinya udah dipindahkan ke dashboard.dummy.js
 export const DASHBOARD_DUMMY = {
     assetoverview: {
         totalAsset: 152350000,
