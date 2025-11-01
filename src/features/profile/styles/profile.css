@@ -1,23 +1,22 @@
-/* ===================== profile.css ===================== */
 :root {
   font-size: 16px;
-  --orange: #f47b2b;
-  --orange-dark: #e56b1e;
-  --bg-gradient: linear-gradient(180deg, #fffaf5 0%, #f9fdfc 100%);
-  --border: #e6e9ec;
 }
 
-/* === GLOBAL PAGE === */
+/* ============================
+   GLOBAL PAGE
+============================ */
 .profile-page {
   font-family: "Poppins", sans-serif;
   min-height: 100vh;
-  background: var(--bg-gradient);
+  background: linear-gradient(180deg, #fffaf5 0%, #f9fdfc 100%);
   display: flex;
   flex-direction: column;
   padding-top: 6.25rem;
 }
 
-/* === WRAPPER === */
+/* ============================
+   MAIN WRAPPER
+============================ */
 .profile-wrapper {
   display: flex;
   justify-content: center;
@@ -30,7 +29,9 @@
   flex-wrap: wrap;
 }
 
-/* === LEFT COLUMN === */
+/* ============================
+   LEFT COLUMN
+============================ */
 .profile-left {
   background: #fff7f1;
   border-radius: 1rem;
@@ -84,7 +85,6 @@
   font-size: 0.9rem;
   color: #2f2f2f;
   margin: 0;
-  line-height: 1.2;
 }
 
 .cif-card .value {
@@ -94,7 +94,9 @@
   margin-top: 0.125rem;
 }
 
-/* === RIGHT COLUMN === */
+/* ============================
+   RIGHT COLUMN
+============================ */
 .profile-right {
   flex: 1;
   min-width: 30rem;
@@ -125,7 +127,7 @@
 
 .info-box i {
   font-size: clamp(1.5rem, 2vw, 1.875rem);
-  color: var(--orange);
+  color: #f2994a;
 }
 
 .label {
@@ -141,172 +143,245 @@
   margin: 0;
 }
 
-/* === BUTTONS === */
+/* ============================
+   BUTTONS
+============================ */
 .bottom-buttons {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 3rem;
-  gap: 1rem;
   flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.update-pass-btn {
-  background: var(--orange);
+.update-pass-btn,
+.signout-btn,
+.primary-btn,
+.cancel-btn,
+.verify-btn,
+.save-btn {
+  background: #f47b2b;
   color: #fff;
   font-weight: 600;
   border: none;
   border-radius: 0.75rem;
-  padding: 1rem 2rem;
+  padding: 0.9rem 2rem;
   cursor: pointer;
-  box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.2);
-  transition: 0.2s ease;
+  box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease;
 }
 
-.update-pass-btn:hover {
-  background: var(--orange-dark);
+.update-pass-btn:hover,
+.signout-btn:hover,
+.primary-btn:hover,
+.verify-btn:hover,
+.save-btn:hover {
+  background: #e0691f;
 }
 
-.signout-btn {
-  background: var(--orange);
-  color: #fff;
-  font-weight: 600;
-  border: none;
-  border-radius: 0.75rem;
-  padding: 1rem 2rem;
-  cursor: pointer;
-  box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.2);
-  transition: 0.2s ease;
+.cancel-btn {
+  background: #f0f0f0;
+  color: #333;
+}
+.cancel-btn:hover {
+  background: #d9d9d9;
 }
 
-.signout-btn:hover {
-  background: var(--orange-dark);
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-/* === MODALS === */
+/* ============================
+   MODAL BASE
+============================ */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(17, 17, 17, 0.55);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 1000;
 }
 
 .modal-card {
   background: #fff;
-  padding: 2.5rem 2rem;
-  border-radius: 1rem;
-  width: 100%;
+  border-radius: 12px;
+  padding: 2rem 2.2rem;
+  width: 90%;
   max-width: 420px;
   text-align: center;
   position: relative;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.modal-card h2 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 1rem;
-}
-
-.modal-card p {
-  font-size: 0.95rem;
-  color: #444;
-  margin-bottom: 1.25rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .modal-close {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: transparent;
+  top: 12px;
+  right: 14px;
+  background: #f0f0f0;
   border: none;
-  font-size: 1.5rem;
-  color: #777;
+  color: #333;
+  font-size: 1.1rem;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: background 0.2s ease;
 }
 .modal-close:hover {
-  color: var(--orange-dark);
+  background: #e2e2e2;
 }
 
-/* OTP */
+/* ============================
+   SEND VERIFICATION MODAL
+============================ */
+.modal-card.confirm-otp h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.8rem;
+}
+
+.otp-info-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #444;
+  margin-bottom: 0.75rem;
+}
+
+.otp-email {
+  font-weight: 600;
+  color: #000;
+  background: #f8f8f8;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  margin: 0.5rem auto 1.2rem;
+  width: fit-content;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* ============================
+   OTP MODAL
+============================ */
+.modal-card.otp-verification {
+  max-width: 420px;
+  padding: 2.2rem 2rem;
+  text-align: center;
+}
+
+.modal-card.otp-verification h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.6rem;
+}
+
+.otp-desc {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+
 .otp-inputs {
   display: flex;
   justify-content: center;
   gap: 0.6rem;
-  margin-bottom: 1.25rem;
-}
-.otp-inputs input {
-  width: 2.6rem;
-  height: 2.8rem;
-  border: 1.5px solid #ccc;
-  text-align: center;
-  font-size: 1.1rem;
-  border-radius: 0.4rem;
-}
-.otp-inputs input:focus {
-  border-color: var(--orange);
-  box-shadow: 0 0 6px rgba(244, 123, 43, 0.25);
-  outline: none;
+  margin-bottom: 1.4rem;
 }
 
-/* Verify Button */
-.primary-btn {
-  background: var(--orange);
-  color: #fff;
+.otp-inputs input {
+  width: 44px;
+  height: 44px;
+  font-size: 1.2rem;
+  text-align: center;
+  border: 1.6px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.otp-inputs input:focus {
+  border-color: #f47b2b;
+  box-shadow: 0 0 3px rgba(244, 123, 43, 0.4);
+}
+
+.verify-btn {
+  background: #f47b2b;
   border: none;
-  border-radius: 0.6rem;
-  padding: 0.7rem 1.5rem;
+  color: #fff;
   font-weight: 600;
-  font-size: 1rem;
+  padding: 0.8rem 1.8rem;
+  border-radius: 0.6rem;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.25s ease;
 }
-.primary-btn:hover {
-  background: var(--orange-dark);
+.verify-btn:hover {
+  background: #e0691f;
 }
-.primary-btn:disabled {
+.verify-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #f0f0f0;
-  color: #9b9b9b;
 }
 
-/* Resend */
-.resend-text {
-  margin-top: 0.8rem;
+.resend-wrapper {
+  margin-top: 1rem;
   font-size: 0.9rem;
-  color: #666;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
 }
+
 .resend-btn {
-  color: var(--orange);
+  background: none;
   border: none;
-  background: transparent;
+  color: #f47b2b;
+  font-weight: 600;
   cursor: pointer;
-  text-decoration: underline;
-  font-weight: 500;
+  transition: color 0.2s ease;
 }
 .resend-btn:hover {
-  color: var(--orange-dark);
+  color: #e0691f;
+}
+.resend-btn:disabled {
+  color: #aaa;
+  cursor: not-allowed;
 }
 
-/* Password Modal */
+/* ============================
+   PASSWORD MODAL
+============================ */
+.password-modal h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.8rem;
+}
+
 .rules-list {
   text-align: left;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
+  padding-left: 1.2rem;
   font-size: 0.9rem;
-  list-style: none;
-  padding-left: 0;
+  line-height: 1.4;
 }
 .rules-list li {
-  margin-bottom: 0.25rem;
+  list-style-type: disc;
+  margin-bottom: 0.3rem;
 }
 .rules-list .valid {
   color: #16a34a;
@@ -316,153 +391,85 @@
 }
 
 .password-field {
-  position: relative;
-  margin-bottom: 0.8rem;
-}
-.password-field input {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  padding: 0.7rem 2.5rem 0.7rem 1rem;
-  font-size: 1rem;
-}
-.password-field input:focus {
-  border-color: var(--orange);
-  box-shadow: 0 0 4px rgba(244, 123, 43, 0.3);
-}
-.eye-btn {
-  position: absolute;
-  right: 0.6rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  color: #666;
-  cursor: pointer;
-  width: 2.4rem;
-  height: 2.4rem;
   display: flex;
   align-items: center;
+  background: #f8f8f8;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+  padding: 0 0.5rem;
+  border: 1px solid #ddd;
+}
+.password-field input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.95rem;
+  outline: none;
+}
+.eye-btn {
+  background: #f47b2b;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
   justify-content: center;
-  transition: color 0.15s ease;
+  align-items: center;
+  transition: background 0.2s ease;
 }
 .eye-btn:hover {
-  color: var(--orange-dark);
-}
-.error-text {
-  color: #dc2626;
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-  text-align: left;
+  background: #e0691f;
 }
 
-/* Success Modal */
+.error-text {
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin: 0.4rem 0 0.6rem;
+}
+
+/* ============================
+   SUCCESS MODAL
+============================ */
 .modal-card.success {
   text-align: center;
-  padding: 2rem;
+  padding: 2.2rem 2rem;
 }
 .modal-card.success i {
-  font-size: 3rem;
   color: #16a34a;
+  font-size: 3rem;
   margin-bottom: 1rem;
 }
 .modal-card.success h3 {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: #222;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.4rem;
 }
 
-/* === RESPONSIVE === */
+/* ============================
+   RESPONSIVE
+============================ */
 @media (max-width: 768px) {
   .profile-wrapper {
     flex-direction: column;
     align-items: center;
     padding: 3rem 8vw;
   }
+
   .profile-left {
     width: 100%;
     flex: none;
     max-width: 28rem;
   }
+
   .info-grid {
     grid-template-columns: 1fr;
   }
+
   .bottom-buttons {
     justify-content: center;
   }
-}
-
-/* ===================== OVERRIDES ===================== */
-:root {
-  --override-orange: #f47b2b;
-  --override-orange-dark: #e56b1e;
-}
-
-.profile-page .modal-card .modal-close {
-  color: #666 !important;
-  background: transparent !important;
-}
-.profile-page .modal-card .modal-close:hover {
-  color: var(--override-orange-dark) !important;
-  background: transparent !important;
-}
-
-.profile-page .modal-card .resend-btn,
-.profile-page .modal-card .resend-text .resend-btn {
-  color: var(--override-orange) !important;
-  background: transparent !important;
-  padding: 0 !important;
-  border: none !important;
-  text-decoration: underline !important;
-}
-.profile-page .modal-card .resend-btn:hover,
-.profile-page .modal-card .resend-text .resend-btn:hover {
-  color: var(--override-orange-dark) !important;
-}
-
-.profile-page .modal-card .primary-btn:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-  background: #f0f0f0 !important;
-  color: #9b9b9b !important;
-}
-.profile-page .modal-card .primary-btn:not(:disabled):hover {
-  background: var(--override-orange-dark) !important;
-}
-
-.profile-page .modal-card .password-field input {
-  padding-right: 3.4rem !important;
-  box-sizing: border-box;
-}
-.profile-page .modal-card .eye-btn {
-  position: absolute !important;
-  right: 0.6rem !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  width: 2.4rem !important;
-  height: 2.4rem !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border-radius: 0.45rem !important;
-  border: none !important;
-  background: transparent !important;
-  color: #666 !important;
-  cursor: pointer !important;
-  transition: color 0.12s ease !important;
-  z-index: 5 !important;
-}
-.profile-page .modal-card .eye-btn:hover {
-  color: var(--override-orange-dark) !important;
-}
-
-.profile-page .modal-card .otp-inputs input {
-  width: 2.6rem !important;
-  height: 2.8rem !important;
-  border: 1.5px solid #ccc !important;
-}
-.profile-page .modal-card .otp-inputs input:focus {
-  border-color: var(--override-orange) !important;
-  box-shadow: 0 0 6px rgba(244, 123, 43, 0.25) !important;
 }
