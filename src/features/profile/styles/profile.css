@@ -184,6 +184,7 @@
   background: #f0f0f0;
   color: #333;
 }
+
 .cancel-btn:hover {
   background: #d9d9d9;
 }
@@ -220,22 +221,23 @@ button:disabled {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
+/* close button fix */
 .modal-close {
   position: absolute;
-  top: 12px;
+  top: 10px;
   right: 14px;
-  background: #f0f0f0;
+  background: none !important;
   border: none;
-  color: #333;
-  font-size: 1.1rem;
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
+  color: #555;
+  font-size: 1.3rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: color 0.2s ease;
 }
+
 .modal-close:hover {
-  background: #e2e2e2;
+  background: none !important;
+  color: #f47b2b !important;
 }
 
 /* ============================
@@ -328,9 +330,11 @@ button:disabled {
   cursor: pointer;
   transition: background 0.25s ease;
 }
+
 .verify-btn:hover {
   background: #e0691f;
 }
+
 .verify-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -354,9 +358,11 @@ button:disabled {
   cursor: pointer;
   transition: color 0.2s ease;
 }
+
 .resend-btn:hover {
   color: #e0691f;
 }
+
 .resend-btn:disabled {
   color: #aaa;
   cursor: not-allowed;
@@ -379,13 +385,16 @@ button:disabled {
   font-size: 0.9rem;
   line-height: 1.4;
 }
+
 .rules-list li {
   list-style-type: disc;
   margin-bottom: 0.3rem;
 }
+
 .rules-list .valid {
   color: #16a34a;
 }
+
 .rules-list .invalid {
   color: #dc2626;
 }
@@ -399,6 +408,7 @@ button:disabled {
   padding: 0 0.5rem;
   border: 1px solid #ddd;
 }
+
 .password-field input {
   flex: 1;
   border: none;
@@ -407,6 +417,7 @@ button:disabled {
   font-size: 0.95rem;
   outline: none;
 }
+
 .eye-btn {
   background: #f47b2b;
   border: none;
@@ -420,6 +431,7 @@ button:disabled {
   align-items: center;
   transition: background 0.2s ease;
 }
+
 .eye-btn:hover {
   background: #e0691f;
 }
@@ -437,16 +449,44 @@ button:disabled {
   text-align: center;
   padding: 2.2rem 2rem;
 }
+
 .modal-card.success i {
   color: #16a34a;
   font-size: 3rem;
   margin-bottom: 1rem;
 }
+
 .modal-card.success h3 {
   font-size: 1.25rem;
   font-weight: 700;
   color: #222;
   margin-bottom: 1.4rem;
+}
+
+/* ============================
+   SIGN OUT CONFIRMATION MODAL
+============================ */
+.modal-card.logout-confirm {
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-card.logout-confirm h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+
+.modal-card.logout-confirm p {
+  font-size: 0.95rem;
+  color: #444;
+  margin-bottom: 1.2rem;
+}
+
+.modal-card.logout-confirm .confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
 }
 
 /* ============================

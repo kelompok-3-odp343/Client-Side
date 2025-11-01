@@ -11,6 +11,7 @@ export default function Profile() {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [resendTimer, setResendTimer] = useState(0);
@@ -77,7 +78,6 @@ export default function Profile() {
 
   const handleOtpChange = (e, index) => {
     const value = e.target.value.replace(/\D/, "");
-    if (!value) return;
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
@@ -134,7 +134,6 @@ export default function Profile() {
     setShowSuccessModal(true);
   };
 
-  // ===== Validation indicators =====
   const passwordValidation = {
     length: newPassword.length >= 8,
     case: /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword),
@@ -203,14 +202,14 @@ export default function Profile() {
             <button className="update-pass-btn" onClick={() => setShowOtpConfirm(true)}>
               Update Password
             </button>
-            <button className="signout-btn" onClick={() => (window.location.href = "/")}>
+            <button className="signout-btn" onClick={() => setShowLogoutConfirm(true)}>
               Sign Out
             </button>
           </div>
         </section>
       </main>
 
-      {/* ================= Modal 1 - Confirm Send OTP ================= */}
+      {/* ========== Modal: Confirm Send OTP ========== */}
       {showOtpConfirm && (
         <div className="modal-overlay">
           <div className="modal-card confirm-otp">
@@ -229,15 +228,13 @@ export default function Profile() {
         </div>
       )}
 
-      {/* ================= Modal 2 - OTP Verification ================= */}
+      {/* ========== Modal: OTP Verification ========== */}
       {showOtpModal && (
         <div className="modal-overlay">
           <div className="modal-card otp-verification">
             <button className="modal-close" onClick={handleCloseOtp}>×</button>
-            <h2>Verify Your OTP</h2>
-            <p className="otp-desc">Please enter the 6-digit code we sent to your registered email:</p>
-            <p className="otp-email">{profile.email_address}</p>
-
+            <h2>Enter Verification Code</h2>
+            <p className="otp-desc">We’ve sent a 6-digit code to your email</p>
             <div className="otp-inputs">
               {otp.map((digit, index) => (
                 <input
@@ -261,20 +258,20 @@ export default function Profile() {
             </button>
 
             <div className="resend-wrapper">
-              <p>Didn’t receive the email?</p>
+              <p>Didn’t get the code? {resendTimer > 0 ? `${resendTimer}s` : ""}</p>
               <button
                 className="resend-btn"
                 onClick={handleResendOtp}
                 disabled={resendTimer > 0}
               >
-                {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Click to resend"}
+                {resendTimer > 0 ? "" : "Click to resend"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ================= Modal 3 - New Password ================= */}
+      {/* ========== Modal: New Password ========== */}
       {showPasswordModal && (
         <div className="modal-overlay">
           <div className="modal-card password-modal">
@@ -321,7 +318,7 @@ export default function Profile() {
         </div>
       )}
 
-      {/* ================= Modal 4 - Success ================= */}
+      {/* ========== Modal: Password Success ========== */}
       {showSuccessModal && (
         <div className="modal-overlay">
           <div className="modal-card success">
@@ -330,6 +327,25 @@ export default function Profile() {
             <button className="primary-btn" onClick={() => setShowSuccessModal(false)}>
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ========== Modal: Sign Out Confirmation ========== */}
+      {showLogoutConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-card logout-confirm">
+            <button className="modal-close" onClick={() => setShowLogoutConfirm(false)}>×</button>
+            <h2>Confirm Sign Out</h2>
+            <p>Are you sure you want to sign out from your account?</p>
+            <div className="confirm-actions">
+              <button className="primary-btn" onClick={() => (window.location.href = "/")}>
+                Yes, Sign Out
+              </button>
+              <button className="cancel-btn" onClick={() => setShowLogoutConfirm(false)}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
