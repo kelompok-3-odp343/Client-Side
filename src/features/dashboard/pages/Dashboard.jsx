@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../../shared/components/Navbar";
-import { ChartPie, Eye, EyeOff } from "lucide-react";
+import { ChartPie, Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { fetchDashboard } from "../api/dashboard.api.js";
@@ -36,7 +36,8 @@ export default function Dashboard() {
         const totalBill = d.splitBillOverview?.totalBillAmount ?? 0;
         const remainingBill = d.splitBillOverview?.remainingBillAmount ?? 0;
         const paidBill = totalBill - remainingBill;
-        const progress = totalBill > 0 ? Math.round((paidBill / totalBill) * 100) : 0;
+        const progress =
+          totalBill > 0 ? Math.round((paidBill / totalBill) * 100) : 0;
 
         const pf = d.portfolioOverview ?? [];
         const amt = (name) =>
@@ -85,6 +86,15 @@ export default function Dashboard() {
       return () => clearInterval(interval);
     }
   }, [cards]);
+
+  // === Manual slide controls ===
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % cards.length);
+  };
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
   if (!data) return <div className="empty">No data found</div>;
@@ -287,7 +297,6 @@ export default function Dashboard() {
 
         {/* ========== MY CARDS & EARNINGS ========== */}
         <section className="bottom-grid">
-          {/* MY CARDS */}
           <div className="card cards-panel">
             <div className="cards-layout">
               <div className="cards-info">
@@ -303,6 +312,14 @@ export default function Dashboard() {
               <div className="auto-slider">
                 {cards.length > 0 ? (
                   <>
+                    <button
+                      className="nav-arrow left-arrow"
+                      onClick={handlePrev}
+                      aria-label="Previous Card"
+                    >
+                      <ChevronLeft size={28} />
+                    </button>
+
                     <div
                       key={cards[currentIndex]?.account_number}
                       className="bank-card slide-in"
@@ -319,8 +336,10 @@ export default function Dashboard() {
                         <div className="card-number-row">
                           <p className="card-number">
                             {cards[currentIndex]?.showCardNumber
-                              ? (cards[currentIndex]?.card_number ?? "")
-                                  .replace(/(\d{4})(?=\d)/g, "$1 ")
+                              ? (cards[currentIndex]?.card_number ?? "").replace(
+                                  /(\d{4})(?=\d)/g,
+                                  "$1 "
+                                )
                               : "**** **** **** " +
                                 String(
                                   cards[currentIndex]?.card_number ?? ""
@@ -350,13 +369,19 @@ export default function Dashboard() {
                       </div>
                     </div>
 
+                    <button
+                      className="nav-arrow right-arrow"
+                      onClick={handleNext}
+                      aria-label="Next Card"
+                    >
+                      <ChevronRight size={28} />
+                    </button>
+
                     <div className="dots">
                       {cards.map((_, i) => (
                         <span
                           key={i}
-                          className={`dot ${
-                            i === currentIndex ? "active" : ""
-                          }`}
+                          className={`dot ${i === currentIndex ? "active" : ""}`}
                         />
                       ))}
                     </div>
@@ -368,7 +393,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* EARNINGS OVERVIEW */}
           <div className="card earnings-panel">
             <h3>Earnings Overview</h3>
             <div className="earnings-charts">
