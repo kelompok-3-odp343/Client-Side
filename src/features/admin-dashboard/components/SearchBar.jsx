@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "../styles/search-bar.css";
 
 export default function SearchBar({ value, onChange, placeholder = "Search..." }) {
@@ -15,3 +16,9 @@ export default function SearchBar({ value, onChange, placeholder = "Search..." }
 		</div>
 	);
 }
+
+SearchBar.propTypes = {
+	value: PropTypes.string.isRequired,
+	onChange: PropTypes.func.isRequired,
+	placeholder: PropTypes.string,
+};

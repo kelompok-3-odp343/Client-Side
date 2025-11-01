@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Home, Users, LogOut } from "lucide-react";
 import logo from "../../../assets/images/wandoor-logo-2.png";
@@ -24,13 +25,34 @@ export default function AdminSideBar({ isOpen, onClose }) {
 		onClose();
 	};
 
+	const handleOverlayKeyDown = (event) => {
+		if (event.key === "Enter" || event.key === " ") {
+			onClose();
+		}
+	};
+
 	return (
 		<>
-			{isOpen && <div className="sidebar-overlay" onClick={onClose}></div>}
+			{isOpen && (
+				<div
+					className="sidebar-overlay"
+					onClick={onClose}
+					onKeyDown={handleOverlayKeyDown}
+					role="button"
+					tabIndex={0}
+					aria-label="Close sidebar overlay"
+				></div>
+			)}
+
 			<aside className={`admin-sidebar ${isOpen ? "open" : ""}`}>
 				<div className="sidebar-header">
 					<img src={logo} alt="Wandoor Logo" className="sidebar-logo" />
-					<button className="close-btn" onClick={onClose} aria-label="Close sidebar">
+					<button
+						className="close-btn"
+						onClick={onClose}
+						aria-label="Close sidebar"
+						type="button"
+					>
 						×
 					</button>
 				</div>
@@ -41,10 +63,13 @@ export default function AdminSideBar({ isOpen, onClose }) {
 						return (
 							<button
 								key={item.name}
-								className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
+								className={`sidebar-item ${
+									location.pathname === item.path ? "active" : ""
+								}`}
 								onClick={() => handleMenuClick(item.path)}
+								type="button"
 							>
-								<Icon size={20} />
+								<Icon size={20} aria-hidden="true" />
 								<span>{item.name}</span>
 							</button>
 						);
@@ -52,8 +77,8 @@ export default function AdminSideBar({ isOpen, onClose }) {
 				</nav>
 
 				<div className="sidebar-footer">
-					<button className="logout-btn" onClick={handleLogout}>
-						<LogOut size={20} />
+					<button className="logout-btn" onClick={handleLogout} type="button">
+						<LogOut size={20} aria-hidden="true" />
 						<span>Log Out</span>
 					</button>
 				</div>
@@ -61,3 +86,8 @@ export default function AdminSideBar({ isOpen, onClose }) {
 		</>
 	);
 }
+
+AdminSideBar.propTypes = {
+	isOpen: PropTypes.bool.isRequired,
+	onClose: PropTypes.func.isRequired,
+};

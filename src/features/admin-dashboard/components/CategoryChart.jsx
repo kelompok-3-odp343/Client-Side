@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import "../styles/category-chart.css";
 
@@ -9,16 +10,16 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 
 			<div className="category-content">
 				<div className="category-list">
-					{data.map((item, index) => (
-						<div key={index} className="category-item">
+					{data.map((item) => (
+						<div key={item.name} className="category-item">
 							<span className="category-name">{item.name}</span>
 							<span className="category-amount">: {item.amount}</span>
 						</div>
 					))}
 
-					<div className="category-percentages">
-						{data.map((item, index) => (
-							<div key={index} className="percentage-item">
+					{/* <div className="category-percentages">
+						{data.map((item) => (
+							<div key={item.name} className="percentage-item">
 								<span
 									className="percentage-bar"
 									style={{ background: item.color, width: `${item.value}%` }}
@@ -28,7 +29,7 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 								</span>
 							</div>
 						))}
-					</div>
+					</div> */}
 				</div>
 
 				<div className="category-chart">
@@ -41,13 +42,41 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 								outerRadius={95}
 								dataKey="value"
 								startAngle={90}
-								endAngle={450}
+								endAngle={-270}
+								labelLine={false}
+								label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
+								const RADIAN = Math.PI / 180;
+								const radius = outerRadius * 1.35;
+								const x = cx + radius * Math.cos(-midAngle * RADIAN);
+								const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+								return (
+								<text
+									x={x}
+									y={y}
+									fill="#000"
+									// textAnchor={x > cx ? "start" : "end"}
+									textAnchor="middle"
+									dominantBaseline="central"
+									fontSize="1rem"
+									fontWeight="800"
+								>
+									<tspan x={x} dy="-0.6em">{`${(percent * 100).toFixed(0)}%`}</tspan>
+        							<tspan
+										x={x}
+										dy="1.2em"
+										fontSize="0.9rem"
+										fontWeight="700"
+									>
+										{name}</tspan>
+								</text>
+								);
+							}}
 							>
-								{data.map((entry, index) => (
-									<Cell key={`cell-${index}`} fill={entry.color} />
+								{data.map((entry) => (
+									<Cell key={entry.name} fill={entry.color} />
 								))}
 							</Pie>
-							<Tooltip />
 						</PieChart>
 					</ResponsiveContainer>
 				</div>
@@ -55,3 +84,15 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 		</section>
 	);
 }
+
+CategoryChart.propTypes = {
+	data: PropTypes.arrayOf(
+		PropTypes.shape({
+			name: PropTypes.string.isRequired,
+			value: PropTypes.number.isRequired,
+			color: PropTypes.string.isRequired,
+			amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+		})
+	).isRequired,
+	title: PropTypes.string,
+};
