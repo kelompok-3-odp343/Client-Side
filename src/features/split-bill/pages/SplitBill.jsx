@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/Navbar";
-import "../styles/split-bill.css";
 import { fetchSplitBills } from "../api/split-bill.api";
+import "../styles/split-bill.css";
 
 export default function SplitBill() {
   const [bills, setBills] = useState([]);

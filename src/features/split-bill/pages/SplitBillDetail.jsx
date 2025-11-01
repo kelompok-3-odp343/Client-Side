@@ -53,19 +53,28 @@ export default function SplitBillDetail() {
   const totalUnpaid = Math.max(0, bill.total_bill - totalPaid);
   const progressPercent = (totalPaid / Math.max(1, bill.total_bill)) * 100;
 
-  // === Event Handlers ===
-  const handleToggleStatus = (index) => {
+  const handleToggleStatus = async (index) => {
     setMembers((prev) =>
       prev.map((m, i) => {
         if (i !== index) return m;
         if (m.status === "Paid") {
-          // hanya ubah ke unpaid di edit mode
           return isEditing ? { ...m, status: "Unpaid" } : m;
         } else {
           return { ...m, status: "Paid" };
         }
       })
     );
+
+    // Jika bukan edit mode, langsung update storage agar progress tersimpan
+    if (!isEditing) {
+      const updated = members.map((m, i) => {
+        if (i !== index) return m;
+        if (m.status === "Paid") return m; 
+        return { ...m, status: "Paid" };
+      });
+      await updateSplitBillStatus(bill.split_bill_id, updated);
+      setBill((prev) => ({ ...prev, members: updated }));
+    }
   };
 
   const handleAddMember = () => {
