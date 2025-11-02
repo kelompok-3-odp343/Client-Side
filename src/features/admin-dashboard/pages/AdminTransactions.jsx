@@ -25,9 +25,9 @@ export default function AdminTransactions() {
 	};
 
 	const categoryData = [
-		{ name: "QRIS", value: 40, amount: "2.000.000", color: "#FFA07A" },
-		{ name: "Top Up", value: 35, amount: "1.750.000", color: "#FFD700" },
-		{ name: "Others", value: 28, amount: "1.250.000", color: "#FFB6C1" },
+		{ name: "QRIS", value: 40, amount: "Rp2.000.000", color: "#FFBC8E" },
+		{ name: "Top Up", value: 35, amount: "Rp1.750.000", color: "#FFE8B0" },
+		{ name: "Others", value: 25, amount: "Rp1.250.000", color: "#FFDDB7" },
 	];
 
 	const accountDetailsData = [
@@ -102,7 +102,7 @@ export default function AdminTransactions() {
 	const tableColumns = [
 		{ key: "no", label: "No", sortable: false },
 		{ key: "productType", label: "Product Type", sortable: true },
-		{ key: "accountNumber", label: "Account Number", sortable: true },
+		{ key: "accountNumber", label: "Account Number", sortable: false },
 		{ key: "transactionId", label: "Transaction ID", sortable: false },
 		{ key: "dateTime", label: "Date & Time", sortable: true },
 		{ key: "category", label: "Category", sortable: true },
@@ -170,7 +170,6 @@ export default function AdminTransactions() {
 						/>
 					}
 					tableClassName="transaction-details-table"
-					headerColor="teal"
 				/>
 			</main>
 		</div>

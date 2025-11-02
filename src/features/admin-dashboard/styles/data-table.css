@@ -1,8 +1,8 @@
 .data-table-section {
-	background: #ffffff;
-	border-radius: 12px;
-	padding: 1.5rem;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	/* background: #ffffff; */
+	/* border-radius: 12px; */
+	/* padding: 1.5rem; */
+	/* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); */
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
@@ -19,9 +19,9 @@
 }
 
 .table-header h2 {
-	font-size: 1.25rem;
-	font-weight: 600;
-	color: #1f2937;
+	font-size: 1.1rem;
+	font-weight: 800;
+	color: #000;
 	margin: 0;
 }
 
@@ -37,29 +37,33 @@
 .data-table {
 	width: 100%;
 	border-collapse: collapse;
+	table-layout: fixed;
 }
 
 .data-table thead {
+	background: linear-gradient(180deg, #6dddd0 0%, #fff 100%);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	border-radius: 12px;
 	position: sticky;
 	top: 0;
 	z-index: 10;
 }
 
 /* Header Color Variants */
-.data-table.header-teal thead {
+/* .data-table.header-teal thead {
 	background: linear-gradient(180deg, #6dddcf 0%, #a8ece1 100%);
 }
 
 .data-table.header-peach thead {
 	background: linear-gradient(180deg, #ffcdb2 0%, #ffe5d9 100%);
-}
+} */
 
 .data-table th {
-	padding: 0.875rem 1rem;
-	text-align: left;
-	font-weight: 600;
-	font-size: 0.875rem;
-	color: #1f2937;
+	padding: 0.5rem 0;
+	text-align: center;
+	font-weight: 700;
+	font-size: 0.9rem;
+	color: #000;
 	white-space: nowrap;
 }
 
@@ -75,11 +79,11 @@
 
 .sort-icon {
 	margin-left: 0.5rem;
-	font-size: 0.75rem;
+	font-size: 0.9rem;
 }
 
 .data-table tbody tr {
-	border-bottom: 1px solid #f3f4f6;
+	border-bottom: 2px solid #d9d9d9;
 	transition: background 0.2s;
 }
 
@@ -88,9 +92,15 @@
 }
 
 .data-table td {
-	padding: 1rem;
-	font-size: 0.875rem;
-	color: #1f2937;
+	padding: 0.25rem 0;
+	font-size: 0.9rem;
+	color: #000;
+	text-align: center;
+}
+
+.no-col {
+	width: 3rem;
+	max-width: 5rem;
 }
 
 .table-footer {
