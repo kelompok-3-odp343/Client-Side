@@ -25,392 +25,697 @@ export const DUMMY_CARDS = [
   },
 ];
 
-/* ============================================================
-   DUMMY TRANSACTIONS — FULL MONTHS FOR EACH ACCOUNT
-   ============================================================ */
-export const DUMMY_TRANSACTIONS = {
-  /* ================== ACCOUNT 1 — TAPLUS BISNIS ================== */
-  ACCT001: [
-    {
-      month: "May",
-      date: "30 May 2025",
-      items: [
-        { type: "QRIS", detail: "Warung Kak Ros", amount: "-Rp25.000", jenisTransaksi: "Pengeluaran" },
-        { type: "QRIS", detail: "Bakmi Jaya", amount: "-Rp45.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "May",
-      date: "28 May 2025",
-      items: [
-        { type: "Transfer", detail: "BNI Payroll", amount: "+Rp10.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "E-Wallet", detail: "Top Up GoPay", amount: "-Rp100.000", jenisTransaksi: "Pengeluaran" },
-        { type: "QRIS", detail: "Alfamart", amount: "-Rp60.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "May",
-      date: "25 May 2025",
-      items: [
-        { type: "Transfer", detail: "Bayar Kos", amount: "-Rp2.000.000", jenisTransaksi: "Pemasukan" },
-      ],
-    },
+// ====================================================================
+// DUMMY_TRX_HISTORY
+// ====================================================================
 
+export const DUMMY_TRX_HISTORY = {
+  "1234567890": [
     {
-      month: "June",
-      date: "02 June 2025",
-      items: [
-        { type: "Transfer", detail: "BNI - Gajian", amount: "+Rp10.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Starbucks Sudirman", amount: "-Rp75.000", jenisTransaksi: "Pengeluaran" },
+      month: 1,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-001-01",
+          transactionDate: "2025-01-05T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "BNI Payroll",
+          partyDetail: "Monthly salary",
+          amount: 15000000,
+        },
+        {
+          transactionId: "TRX-001-02",
+          transactionDate: "2025-01-07T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Coffee Shop",
+          partyDetail: "Morning coffee",
+          amount: 35000,
+          splitBillId: "SB-101",
+        },
+        {
+          transactionId: "TRX-001-03",
+          transactionDate: "2025-01-15T08:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "Life Goals - Mobil",
+          partyDetail: "Monthly top-up to LFG-001",
+          amount: 1000000,
+        },
+        {
+          transactionId: "TRX-001-04",
+          transactionDate: "2025-01-25T12:00:00",
+          transactionType: "Placement",
+          debitCredit: "D",
+          partyName: "Time Deposit - DEP001",
+          partyDetail: "Placement 3 months",
+          amount: 4000000,
+        },
       ],
     },
     {
-      month: "June",
-      date: "05 June 2025",
-      items: [
-        { type: "E-Wallet", detail: "OVO Top Up", amount: "-Rp100.000", jenisTransaksi: "Pengeluaran" },
-        { type: "QRIS", detail: "Warung Kak Udin", amount: "-Rp35.000", jenisTransaksi: "Pengeluaran" },
+      month: 2,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-002-01",
+          transactionDate: "2025-02-05T09:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Client Project A",
+          partyDetail: "Payment received",
+          amount: 8000000,
+        },
+        {
+          transactionId: "TRX-002-02",
+          transactionDate: "2025-02-06T10:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Bakso Pak Kumis",
+          partyDetail: "Lunch",
+          amount: 45000,
+        },
+        {
+          transactionId: "TRX-002-03",
+          transactionDate: "2025-02-12T09:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "LFG - Gadget Fund",
+          partyDetail: "Monthly goal payment",
+          amount: 500000,
+        },
       ],
     },
     {
-      month: "June",
-      date: "15 June 2025",
-      items: [
-        { type: "Transfer", detail: "Invoice Payment", amount: "+Rp7.500.000", jenisTransaksi: "Pemasukan" },
-      ],
-    },
-
-    {
-      month: "July",
-      date: "10 July 2025",
-      items: [
-        { type: "Transfer", detail: "BNI Payroll", amount: "+Rp45.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "McDonald's", amount: "-Rp65.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "July",
-      date: "12 July 2025",
-      items: [
-        { type: "QRIS", detail: "Indomaret", amount: "-Rp35.000", jenisTransaksi: "Pengeluaran" },
-        { type: "E-Wallet", detail: "ShopeePay", amount: "-Rp120.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-
-    {
-      month: "August",
-      date: "05 Aug 2025",
-      items: [
-        { type: "Transfer", detail: "Client Project Payment", amount: "+Rp20.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Kantin Kampus", amount: "-Rp25.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "August",
-      date: "15 Aug 2025",
-      items: [
-        { type: "Transfer", detail: "BNI Payroll", amount: "+Rp45.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Bakso Pak Gendut", amount: "-Rp30.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-
-    {
-      month: "September",
-      date: "01 Sept 2025",
-      items: [
-        { type: "Transfer", detail: "Client Retainer", amount: "+Rp12.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "E-Wallet", detail: "Top Up Dana", amount: "-Rp200.000", jenisTransaksi: "Pengeluaran" },
+      month: 3,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-003-01",
+          transactionDate: "2025-03-05T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "BNI Payroll",
+          partyDetail: "Monthly salary",
+          amount: 15000000,
+        },
+        {
+          transactionId: "TRX-003-02",
+          transactionDate: "2025-03-10T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Starbucks",
+          partyDetail: "Morning coffee",
+          amount: 48000,
+          splitBillId: "SB-102",
+        },
+        {
+          transactionId: "TRX-003-03",
+          transactionDate: "2025-03-12T11:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "DPLK Pension",
+          partyDetail: "Monthly DPLK contribution",
+          amount: 1000000,
+        },
+        {
+          transactionId: "TRX-003-04",
+          transactionDate: "2025-03-25T10:00:00",
+          transactionType: "Placement",
+          debitCredit: "D",
+          partyName: "Time Deposit - DEP002",
+          partyDetail: "Placement 6 months",
+          amount: 5000000,
+        },
       ],
     },
     {
-      month: "September",
-      date: "20 Sept 2025",
-      items: [
-        { type: "QRIS", detail: "Sate Ayam Pak Min", amount: "-Rp40.000", jenisTransaksi: "Pengeluaran" },
-        { type: "Transfer", detail: "BNI Payroll", amount: "+Rp45.000.000", jenisTransaksi: "Pemasukan" },
-      ],
-    },
-
-    {
-      month: "October",
-      date: "10 Oct 2025",
-      items: [
-        { type: "Transfer", detail: "Invoice Payment", amount: "+Rp10.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Coffee Shop", amount: "-Rp50.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "October",
-      date: "25 Oct 2025",
-      items: [
-        { type: "E-Wallet", detail: "ShopeePay Top Up", amount: "-Rp150.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-
-    {
-      month: "November",
-      date: "05 Nov 2025",
-      items: [
-        { type: "Transfer", detail: "BNI Payroll", amount: "+Rp45.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Restoran Padang", amount: "-Rp90.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "November",
-      date: "19 Nov 2025",
-      items: [
-        { type: "QRIS", detail: "Bakso Cak Man", amount: "-Rp35.000", jenisTransaksi: "Pengeluaran" },
-        { type: "Transfer", detail: "Client Retainer", amount: "+Rp15.000.000", jenisTransaksi: "Pemasukan" },
-      ],
-    },
-
-    {
-      month: "December",
-      date: "01 Dec 2025",
-      items: [
-        { type: "Transfer", detail: "Bonus Akhir Tahun", amount: "+Rp25.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Warung Sederhana", amount: "-Rp40.000", jenisTransaksi: "Pengeluaran" },
+      month: 4,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-004-01",
+          transactionDate: "2025-04-03T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Client B",
+          partyDetail: "Invoice payment",
+          amount: 12000000,
+        },
+        {
+          transactionId: "TRX-004-02",
+          transactionDate: "2025-04-06T08:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Kantin Kampus",
+          partyDetail: "Lunch",
+          amount: 25000,
+          splitBillId: "SB-103",
+        },
+        {
+          transactionId: "TRX-004-03",
+          transactionDate: "2025-04-12T09:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "Life Goals - Rumah",
+          partyDetail: "Goal contribution",
+          amount: 2000000,
+        },
       ],
     },
     {
-      month: "December",
-      date: "20 Dec 2025",
-      items: [
-        { type: "QRIS", detail: "Starbucks", amount: "-Rp75.000", jenisTransaksi: "Pengeluaran" },
-        { type: "Transfer", detail: "Gift Transfer", amount: "-Rp500.000", jenisTransaksi: "Pengeluaran" },
+      month: 5,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-005-01",
+          transactionDate: "2025-05-05T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Client C",
+          partyDetail: "Freelance payment",
+          amount: 9000000,
+        },
+        {
+          transactionId: "TRX-005-02",
+          transactionDate: "2025-05-07T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Warung Padang",
+          partyDetail: "Lunch",
+          amount: 35000,
+        },
+        {
+          transactionId: "TRX-005-03",
+          transactionDate: "2025-05-15T08:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "LFG - Travel Fund",
+          partyDetail: "Goal payment",
+          amount: 1500000,
+        },
+        {
+          transactionId: "TRX-005-04",
+          transactionDate: "2025-05-22T10:00:00",
+          transactionType: "Placement",
+          debitCredit: "D",
+          partyName: "Time Deposit",
+          partyDetail: "Renewal 3 months",
+          amount: 4000000,
+        },
       ],
     },
-
     {
-      month: "January",
-      date: "10 Jan 2025",
-      items: [
-        { type: "Transfer", detail: "BNI Payroll", amount: "+Rp45.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Kopi Nako", amount: "-Rp45.000", jenisTransaksi: "Pengeluaran" },
+      month: 6,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-006-01",
+          transactionDate: "2025-06-03T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "BNI Payroll",
+          partyDetail: "Monthly salary",
+          amount: 15000000,
+        },
+        {
+          transactionId: "TRX-006-02",
+          transactionDate: "2025-06-05T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Cafe Latte House",
+          partyDetail: "Coffee expense",
+          amount: 42000,
+        },
+        {
+          transactionId: "TRX-006-03",
+          transactionDate: "2025-06-10T10:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "DPLK Pension",
+          partyDetail: "Monthly pension fund",
+          amount: 1000000,
+        },
       ],
     },
     {
-      month: "February",
-      date: "05 Feb 2025",
-      items: [
-        { type: "Transfer", detail: "Client Project Fee", amount: "+Rp18.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "E-Wallet", detail: "Top Up Ovo", amount: "-Rp150.000", jenisTransaksi: "Pengeluaran" },
+      month: 7,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-007-01",
+          transactionDate: "2025-07-03T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Client D",
+          partyDetail: "Invoice Payment",
+          amount: 8000000,
+        },
+        {
+          transactionId: "TRX-007-02",
+          transactionDate: "2025-07-07T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "McDonald's",
+          partyDetail: "Lunch",
+          amount: 65000,
+        },
+        {
+          transactionId: "TRX-007-03",
+          transactionDate: "2025-07-12T09:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "LFG - Gadget Fund",
+          partyDetail: "Goal payment",
+          amount: 1000000,
+        },
       ],
     },
     {
-      month: "March",
-      date: "12 Mar 2025",
-      items: [
-        { type: "Transfer", detail: "BNI Payroll", amount: "+Rp45.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Bakso Pak Kumis", amount: "-Rp35.000", jenisTransaksi: "Pengeluaran" },
+      month: 8,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-008-01",
+          transactionDate: "2025-08-02T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "BNI Payroll",
+          partyDetail: "Monthly salary",
+          amount: 15000000,
+        },
+        {
+          transactionId: "TRX-008-02",
+          transactionDate: "2025-08-10T09:00:00",
+          transactionType: "Placement",
+          debitCredit: "D",
+          partyName: "Time Deposit",
+          partyDetail: "New deposit placement",
+          amount: 4000000,
+        },
       ],
     },
     {
-      month: "April",
-      date: "08 Apr 2025",
-      items: [
-        { type: "Transfer", detail: "Project Fee", amount: "+Rp30.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Alfamart", amount: "-Rp50.000", jenisTransaksi: "Pengeluaran" },
+      month: 9,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-009-01",
+          transactionDate: "2025-09-01T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Client E",
+          partyDetail: "Freelance payment",
+          amount: 12000000,
+        },
+        {
+          transactionId: "TRX-009-02",
+          transactionDate: "2025-09-20T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Sate Ayam Pak Min",
+          partyDetail: "Lunch",
+          amount: 40000,
+        },
+      ],
+    },
+    {
+      month: 10,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-010-01",
+          transactionDate: "2025-10-05T09:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Client F",
+          partyDetail: "Project Payment",
+          amount: 9000000,
+        },
+        {
+          transactionId: "TRX-010-02",
+          transactionDate: "2025-10-10T08:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "ShopeePay",
+          partyDetail: "E-wallet top up",
+          amount: 100000,
+        },
+      ],
+    },
+    {
+      month: 11,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-011-01",
+          transactionDate: "2025-11-01T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "BNI Payroll",
+          partyDetail: "Monthly salary",
+          amount: 15000000,
+        },
+        {
+          transactionId: "TRX-011-02",
+          transactionDate: "2025-11-05T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Bakso Cak Man",
+          partyDetail: "Lunch",
+          amount: 35000,
+        },
+      ],
+    },
+    {
+      month: 12,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "001",
+      transaction: [
+        {
+          transactionId: "TRX-012-01",
+          transactionDate: "2025-12-01T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Bonus Akhir Tahun",
+          partyDetail: "Annual bonus",
+          amount: 25000000,
+        },
+        {
+          transactionId: "TRX-012-02",
+          transactionDate: "2025-12-20T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Starbucks",
+          partyDetail: "Morning coffee",
+          amount: 75000,
+        },
+      ],
+    },
+  ],
+  // =====================================================================
+  // REKENING KEDUA
+  // =====================================================================
+  "9876543210": [
+    {
+      month: 1,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "002",
+      transaction: [
+        {
+          transactionId: "TRX2-001-01",
+          transactionDate: "2025-01-04T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Freelance Client X",
+          partyDetail: "Design project payment",
+          amount: 7000000,
+        },
+        {
+          transactionId: "TRX2-001-02",
+          transactionDate: "2025-01-08T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Starbucks",
+          partyDetail: "Morning coffee",
+          amount: 50000,
+          splitBillId: "SB-201",
+        },
+        {
+          transactionId: "TRX2-001-03",
+          transactionDate: "2025-01-15T08:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "Life Goals - Rumah",
+          partyDetail: "Goal contribution to LFG-002",
+          amount: 1500000,
+        },
+      ],
+    },
+    {
+      month: 2,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "002",
+      transaction: [
+        {
+          transactionId: "TRX2-002-01",
+          transactionDate: "2025-02-03T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Upwork",
+          partyDetail: "Freelance payout",
+          amount: 9500000,
+        },
+        {
+          transactionId: "TRX2-002-02",
+          transactionDate: "2025-02-07T09:30:00",
+          transactionType: "Placement",
+          debitCredit: "D",
+          partyName: "Time Deposit - DEP003",
+          partyDetail: "Placement 3 months",
+          amount: 3000000,
+        },
+      ],
+    },
+    {
+      month: 3,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "002",
+      transaction: [
+        {
+          transactionId: "TRX2-003-01",
+          transactionDate: "2025-03-05T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Client Y",
+          partyDetail: "Payment received",
+          amount: 6000000,
+        },
+        {
+          transactionId: "TRX2-003-02",
+          transactionDate: "2025-03-09T08:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Kopi Kenangan",
+          partyDetail: "Afternoon coffee",
+          amount: 35000,
+          splitBillId: null,
+        },
+      ],
+    },
+    {
+      month: 4,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "002",
+      transaction: [
+        {
+          transactionId: "TRX2-004-01",
+          transactionDate: "2025-04-05T09:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "BNI Payroll",
+          partyDetail: "Monthly salary",
+          amount: 10000000,
+        },
+        {
+          transactionId: "TRX2-004-02",
+          transactionDate: "2025-04-10T09:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "DPLK Pension",
+          partyDetail: "Monthly pension top-up",
+          amount: 750000,
+        },
+      ],
+    },
+    {
+      month: 5,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "002",
+      transaction: [
+        {
+          transactionId: "TRX2-005-01",
+          transactionDate: "2025-05-02T09:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Shopee",
+          partyDetail: "Refund from order",
+          amount: 250000,
+        },
+        {
+          transactionId: "TRX2-005-02",
+          transactionDate: "2025-05-06T08:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Warung Soto",
+          partyDetail: "Lunch",
+          amount: 40000,
+        },
+      ],
+    },
+    {
+      month: 6,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "002",
+      transaction: [
+        {
+          transactionId: "TRX2-006-01",
+          transactionDate: "2025-06-03T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Client C",
+          partyDetail: "Freelance project",
+          amount: 8500000,
+        },
+        {
+          transactionId: "TRX2-006-02",
+          transactionDate: "2025-06-07T09:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "Life Goals - Travel",
+          partyDetail: "Auto debit to LFG-003",
+          amount: 1000000,
+        },
       ],
     },
   ],
 
-  /* ================== ACCOUNT 2 — TAPLUS MUDA ================== */
-  ACCT002: [
+  // =====================================================================
+  // REKENING KETIGA
+  // =====================================================================
+  "1122334455": [
     {
-      month: "May",
-      date: "20 May 2025",
-      items: [
-        { type: "Transfer", detail: "Parent Allowance", amount: "+Rp1.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Bakso Malang", amount: "-Rp30.000", jenisTransaksi: "Pengeluaran" },
+      month: 1,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "003",
+      transaction: [
+        {
+          transactionId: "TRX3-001-01",
+          transactionDate: "2025-01-05T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "BNI Payroll",
+          partyDetail: "Monthly salary",
+          amount: 4000000,
+        },
+        {
+          transactionId: "TRX3-001-02",
+          transactionDate: "2025-01-10T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Bakso Bakar",
+          partyDetail: "Dinner",
+          amount: 30000,
+        },
       ],
     },
     {
-      month: "June",
-      date: "10 June 2025",
-      items: [
-        { type: "Transfer", detail: "Freelance Payment", amount: "+Rp2.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "E-Wallet", detail: "Top Up Dana", amount: "-Rp100.000", jenisTransaksi: "Pengeluaran" },
+      month: 2,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "003",
+      transaction: [
+        {
+          transactionId: "TRX3-002-01",
+          transactionDate: "2025-02-02T09:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Shopee",
+          partyDetail: "Refund",
+          amount: 150000,
+        },
+        {
+          transactionId: "TRX3-002-02",
+          transactionDate: "2025-02-07T10:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "LFG - Gadget Goal",
+          partyDetail: "Monthly top-up",
+          amount: 400000,
+        },
       ],
     },
     {
-      month: "July",
-      date: "12 July 2025",
-      items: [
-        { type: "Transfer", detail: "Freelance Payment", amount: "+Rp2.500.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Warung Kopi", amount: "-Rp25.000", jenisTransaksi: "Pengeluaran" },
+      month: 3,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "003",
+      transaction: [
+        {
+          transactionId: "TRX3-003-01",
+          transactionDate: "2025-03-04T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "Freelance Platform",
+          partyDetail: "Payment received",
+          amount: 700000,
+        },
+        {
+          transactionId: "TRX3-003-02",
+          transactionDate: "2025-03-09T09:00:00",
+          transactionType: "QRIS",
+          debitCredit: "D",
+          partyName: "Starbucks",
+          partyDetail: "Coffee",
+          amount: 55000,
+        },
       ],
     },
     {
-      month: "August",
-      date: "05 Aug 2025",
-      items: [
-        { type: "Transfer", detail: "Allowance", amount: "+Rp1.500.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Soto Betawi", amount: "-Rp30.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "September",
-      date: "18 Sept 2025",
-      items: [
-        { type: "Transfer", detail: "Scholarship", amount: "+Rp3.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Starbucks", amount: "-Rp60.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "October",
-      date: "02 Oct 2025",
-      items: [
-        { type: "Transfer", detail: "Allowance", amount: "+Rp1.500.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Kantin Kampus", amount: "-Rp25.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "November",
-      date: "12 Nov 2025",
-      items: [
-        { type: "Transfer", detail: "Side Project", amount: "+Rp2.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "E-Wallet", detail: "ShopeePay", amount: "-Rp80.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "December",
-      date: "05 Dec 2025",
-      items: [
-        { type: "Transfer", detail: "Freelance Bonus", amount: "+Rp2.500.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Burger King", amount: "-Rp50.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "January",
-      date: "08 Jan 2025",
-      items: [
-        { type: "Transfer", detail: "Part-time Salary", amount: "+Rp1.800.000", jenisTransaksi: "Pemasukan" },
-        { type: "E-Wallet", detail: "Top Up GoPay", amount: "-Rp70.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "February",
-      date: "17 Feb 2025",
-      items: [
-        { type: "Transfer", detail: "Allowance", amount: "+Rp1.500.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Indomaret", amount: "-Rp45.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "March",
-      date: "20 Mar 2025",
-      items: [
-        { type: "Transfer", detail: "Project Fee", amount: "+Rp3.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Warteg Sejahtera", amount: "-Rp25.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "April",
-      date: "15 Apr 2025",
-      items: [
-        { type: "Transfer", detail: "Allowance", amount: "+Rp1.500.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Es Teh Indonesia", amount: "-Rp20.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-  ],
-
-  /* ================== ACCOUNT 3 — TAPLUS PELAJAR ================== */
-  ACCT003: [
-    {
-      month: "May",
-      date: "18 May 2025",
-      items: [
-        { type: "Transfer", detail: "Orang Tua", amount: "+Rp500.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Kantin Sekolah", amount: "-Rp20.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "June",
-      date: "04 June 2025",
-      items: [
-        { type: "Transfer", detail: "Beasiswa", amount: "+Rp3.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Bakso Pak Kumis", amount: "-Rp25.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "July",
-      date: "08 July 2025",
-      items: [
-        { type: "Transfer", detail: "Orang Tua", amount: "+Rp500.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Jajanan Sekolah", amount: "-Rp15.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "August",
-      date: "11 Aug 2025",
-      items: [
-        { type: "Transfer", detail: "Beasiswa", amount: "+Rp3.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Kantin Kampus", amount: "-Rp30.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "September",
-      date: "16 Sept 2025",
-      items: [
-        { type: "Transfer", detail: "Uang Jajan", amount: "+Rp400.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Warung Nasi", amount: "-Rp15.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "October",
-      date: "19 Oct 2025",
-      items: [
-        { type: "Transfer", detail: "Beasiswa Tambahan", amount: "+Rp1.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Indomaret", amount: "-Rp25.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "November",
-      date: "10 Nov 2025",
-      items: [
-        { type: "Transfer", detail: "Orang Tua", amount: "+Rp500.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Bakso Pak Kumis", amount: "-Rp15.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "December",
-      date: "15 Dec 2025",
-      items: [
-        { type: "Transfer", detail: "Uang Natal", amount: "+Rp800.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Martabak", amount: "-Rp20.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "January",
-      date: "10 Jan 2025",
-      items: [
-        { type: "Transfer", detail: "Orang Tua", amount: "+Rp400.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Kantin Sekolah", amount: "-Rp10.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "February",
-      date: "08 Feb 2025",
-      items: [
-        { type: "Transfer", detail: "Beasiswa", amount: "+Rp2.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Warung Sederhana", amount: "-Rp15.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "March",
-      date: "05 Mar 2025",
-      items: [
-        { type: "Transfer", detail: "Orang Tua", amount: "+Rp400.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Jajanan", amount: "-Rp10.000", jenisTransaksi: "Pengeluaran" },
-      ],
-    },
-    {
-      month: "April",
-      date: "03 Apr 2025",
-      items: [
-        { type: "Transfer", detail: "Beasiswa", amount: "+Rp3.000.000", jenisTransaksi: "Pemasukan" },
-        { type: "QRIS", detail: "Bakso Pak Kumis", amount: "-Rp25.000", jenisTransaksi: "Pengeluaran" },
+      month: 4,
+      year: "2025",
+      productType: "SAV",
+      productSubCategory: "003",
+      transaction: [
+        {
+          transactionId: "TRX3-004-01",
+          transactionDate: "2025-04-01T08:00:00",
+          transactionType: "Transfer",
+          debitCredit: "C",
+          partyName: "BNI Payroll",
+          partyDetail: "Monthly salary",
+          amount: 4000000,
+        },
+        {
+          transactionId: "TRX3-004-02",
+          transactionDate: "2025-04-08T08:00:00",
+          transactionType: "Auto Debit",
+          debitCredit: "D",
+          partyName: "DPLK Pension",
+          partyDetail: "Monthly contribution",
+          amount: 500000,
+        },
       ],
     },
   ],

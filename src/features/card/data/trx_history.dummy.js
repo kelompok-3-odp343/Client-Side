@@ -1,3 +1,4 @@
+// ga jadi dipake, isinya dipindahkan ke card.dummy.js
 export const DUMMY_TRX_HISTORY = {
     "1234567890": {
         month: "Sept",
