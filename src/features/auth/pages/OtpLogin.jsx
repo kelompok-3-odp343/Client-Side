@@ -51,8 +51,12 @@ export default function OtpLogin() {
 			return;
 		}
 
-		sessionStorage.setItem("token", resp.data.token || "DEV_TOKEN");
-		sessionStorage.setItem("role", "user");
+		sessionStorage.setItem("token", resp.data.token);
+		sessionStorage.setItem("user_id", resp.data.user.userId);
+		sessionStorage.setItem("username", resp.data.user.username);
+		sessionStorage.setItem("role", resp.data.user.role);
+		sessionStorage.setItem("cif", resp.data.user.cif);
+		sessionStorage.setItem("attempt", resp.data.attemptCount);
 
 		setMessage("✅ OTP Verified (DEV MODE)");
 		setShowModal(true);
