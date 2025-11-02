@@ -170,6 +170,7 @@ body {
 .transaction-table {
 	width: 100%;
 	border-collapse: collapse;
+	table-layout: fixed;
 }
 
 .transaction-table thead {
@@ -219,6 +220,12 @@ body {
 	font-size: 0.9rem;
 	color: #000;
 	text-align: center;
+}
+
+.transaction-table th.col-no,
+.transaction-table td.col-no {
+  width: 3rem;
+  max-width: 5rem;
 }
 
 .view-btn {
