@@ -69,7 +69,7 @@ export default function AdminSideBar({ isOpen, onClose }) {
 								onClick={() => handleMenuClick(item.path)}
 								type="button"
 							>
-								<Icon size={20} aria-hidden="true" />
+								<Icon size={28} aria-hidden="true" />
 								<span>{item.name}</span>
 							</button>
 						);
@@ -78,7 +78,7 @@ export default function AdminSideBar({ isOpen, onClose }) {
 
 				<div className="sidebar-footer">
 					<button className="logout-btn" onClick={handleLogout} type="button">
-						<LogOut size={20} aria-hidden="true" />
+						<LogOut size={28} aria-hidden="true" />
 						<span>Log Out</span>
 					</button>
 				</div>

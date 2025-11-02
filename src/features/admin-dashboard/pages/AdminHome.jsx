@@ -123,7 +123,7 @@ export default function AdminHome() {
 						<table className="transaction-table">
 							<thead>
 								<tr>
-									<th>No</th>
+									<th className="col-no">No</th>
 									<th>CIF</th>
 									<th>NIK</th>
 									<th onClick={toggleSort} className="sortable">
@@ -136,7 +136,7 @@ export default function AdminHome() {
 							<tbody>
 								{sortedTransactions.map((transaction, index) => (
 									<tr key={transaction.id}>
-										<td>{index + 1}</td>
+										<td className="col-no">{index + 1}</td>
 										<td>{transaction.cif}</td>
 										<td>{transaction.nik}</td>
 										<td>{transaction.name}</td>
