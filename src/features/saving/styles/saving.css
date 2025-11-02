@@ -235,16 +235,16 @@
 
 .account-item-title {
   font-size: 0.9375rem;
-  font-weight: 600;
-  margin: 0 0 0.625rem 0;
+  font-weight: 200;
+  margin: 0 0 1rem 0;
   color: #111827;
   position: relative;
   z-index: 1;
 }
 
 .account-item-number {
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-size: 1.15rem;
+  font-weight: 200;
   margin: 0 0 auto 0;
   color: #111827;
   letter-spacing: 0.05em;
@@ -253,16 +253,17 @@
 }
 
 .account-item-balance {
-  font-size: 0.875rem;
-  color: #4B5563;
+  font-size: 0.9375rem;
+  color: #111827;
   margin: 1rem 0 0 0;
-  font-weight: 400;
+  font-weight: 200;
   position: relative;
   z-index: 1;
 }
 
 .account-item-balance strong {
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 1000;
   color: #111827;
 }
 
@@ -302,63 +303,53 @@
 }
 
 .metric-card {
-  border-radius: 16px;
-  padding: 1.375rem 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(250, 204, 21, 0.2), 0 2px 4px -1px rgba(250, 204, 21, 0.15);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 20px;
+  padding: 1.25rem 1.5rem;
+  min-height: 120px;
+  background: linear-gradient(to bottom, #FFE89D 0%, #FFF4C9 45%, #FFFFFF 100%);
+  border: none;
+  box-shadow: 0 6px 12px rgba(17, 24, 39, 0.12);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
-  border: 2px solid #FDE047;
-  background: linear-gradient(135deg, #FEFCE8 0%, #FEF08A 50%, #FDE047 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.metric-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, transparent 50%);
-  pointer-events: none;
 }
 
 .metric-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 20px -5px rgba(250, 204, 21, 0.3), 0 4px 6px -2px rgba(250, 204, 21, 0.2);
-  border-color: #FACC15;
+  box-shadow: 0 10px 20px rgba(17, 24, 39, 0.18);
 }
 
 .metric-label {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: #111827;
+  margin: 0 0 0.25rem 0;
   letter-spacing: -0.01em;
-  position: relative;
-  z-index: 1;
 }
 
 .metric-value {
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 700;
   margin: 0;
-  letter-spacing: -0.025em;
-  position: relative;
-  z-index: 1;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
 }
 
+/* Warna teks untuk tiap kategori */
 .metric-income {
-  color: #059669;
+  color: #16A34A; 
 }
 
 .metric-expenses {
-  color: #DC2626;
+  color: #DC2626; 
 }
 
 .metric-net-income {
-  color: #059669;
+  color: #16A34A; 
 }
 
 /* ========== TRANSACTION CATEGORY SECTION ========== */
@@ -369,9 +360,9 @@
 }
 
 .category-box-title {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
-  margin: 0 0 0.375rem 0;
+  margin: 0 0 0.25rem 0;
   color: #111827;
   letter-spacing: -0.02em;
 }
@@ -379,71 +370,58 @@
 .category-box-subtitle {
   font-size: 0.875rem;
   color: #6B7280;
-  margin: 0 0 1.75rem 0;
+  margin: 0 0 1.25rem 0;
   font-weight: 400;
 }
 
 .category-display-grid {
-  display: grid;
-  grid-template-columns: 0.75fr 1fr;
-  gap: 2.5rem;
-  align-items: center;
-  flex: 1;
-}
-
-/* ========== CATEGORY LIST ========== */
-.category-items-box {
-  border: 3px solid #8B5CF6;
-  border-radius: 18px;
-  padding: 1.5rem 1.75rem;
   display: flex;
   flex-direction: column;
-  gap: 1.125rem;
-  box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.1), 0 10px 15px -3px rgba(139, 92, 246, 0.05);
-  background: linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 100%);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 100%;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+/* ========== BOX KATEGORI ========== */
+.category-items-box {
+  background: #FFFFFF;
+  border: 1.5px solid #C4B5FD;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.03);
+  width: 90%;
+  max-width: 340px;
+  transition: all 0.25s ease;
 }
 
 .category-items-box:hover {
-  box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.15), 0 20px 25px -5px rgba(139, 92, 246, 0.1);
-  border-color: #7C3AED;
-  transform: translateX(-4px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
 }
 
 .category-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  transition: all 0.3s ease;
-}
-
-.category-row:hover {
-  transform: translateX(4px);
+  align-items: baseline;
+  padding: 0.15rem 0;
 }
 
 .category-row-name {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 700;
   color: #111827;
-  letter-spacing: -0.01em;
-}
-
-.category-row-values {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
 }
 
 .category-row-amount {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   color: #374151;
   font-weight: 500;
 }
 
 .category-row-percent {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 
@@ -462,85 +440,65 @@
 /* ========== PIE CHART ========== */
 .pie-chart-wrapper {
   position: relative;
-  width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 320px;
+  width: 100%;
+  min-height: 240px;
 }
 
 .pie-svg {
-  width: 280px;
-  height: 280px;
+  width: 180px;
+  height: 180px;
   display: block;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
-  transition: all 0.4s ease;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.08));
+  transition: transform 0.3s ease;
 }
 
 .pie-svg:hover {
-  transform: scale(1.05);
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.15));
+  transform: scale(1.04);
 }
 
 .chart-label-item {
   position: absolute;
   display: flex;
   align-items: center;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.chart-label-item:hover {
-  transform: scale(1.1);
 }
 
 .label-connector {
-  width: 45px;
-  height: 2.5px;
-  background: linear-gradient(to right, #374151 0%, #6B7280 100%);
-  transition: all 0.4s ease;
+  width: 34px;
+  height: 1.5px;
+  background: #6B7280;
   border-radius: 2px;
 }
 
-.chart-label-item:hover .label-connector {
-  background: linear-gradient(to right, #111827 0%, #374151 100%);
-  width: 50px;
-  height: 3px;
-}
-
 .label-info {
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  line-height: 1.4;
   color: #111827;
-  white-space: nowrap;
-  margin-left: 0.625rem;
-  letter-spacing: -0.015em;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  margin-left: 0.4rem;
+  line-height: 1.2;
 }
 
-/* Position labels around the chart */
 .label-pos-food {
   top: 10%;
-  right: 8%;
-  flex-direction: row;
+  right: 22%;
 }
 
 .label-pos-shopping {
-  bottom: 24%;
-  right: 5%;
-  flex-direction: row;
+  bottom: 18%;
+  right: 20%;
 }
 
 .label-pos-others {
-  top: 24%;
-  left: 5%;
+  top: 25%;
+  left: 22%;
   flex-direction: row-reverse;
 }
 
 .label-pos-others .label-info {
+  margin-right: 0.4rem;
   margin-left: 0;
-  margin-right: 0.625rem;
   text-align: right;
 }
 
