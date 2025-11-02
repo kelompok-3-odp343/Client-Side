@@ -6,11 +6,22 @@ const api = axios.create({
 });
 export async function fetchAllCards() {
   try {
-    const res = await api.get("/api/cards");
+    const res = await api.post("/api/v1/account", {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "User-Id": sessionStorage.getItem("user_id"),
+        "Customer-Id": sessionStorage.getItem("cif"),
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      }
+    });
     if (res.data?.data?.length) return res.data.data;
-    return DUMMY_CARDS;
+    // return DUMMY_CARDS;
+    console.log('zxczxc', res);
+
   } catch {
-    return DUMMY_CARDS;
+    console.log('zxczxc123123');
+    // return DUMMY_CARDS;
   }
 }
 
@@ -27,15 +38,17 @@ export async function fetchCardTransactions(accountId) {
 export async function fetchTransactionHistory({ month, year, accountNumber }) {
   try {
     const token = sessionStorage.getItem("token")
+
     const payload = {
       month,
       year,
       accountNumber
     };
 
-    const respTrxHistory = await api.post(`/api/v1/transaction-history`, payload, {
+
+    const respTrxHistory = await api.post(`/api/v1/trx-history`, payload, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "User-Id": sessionStorage.getItem("user_id"),
         "Customer-Id": sessionStorage.getItem("cif"),
         "Content-Type": "application/json",

@@ -6,7 +6,7 @@ import Navbar from "../../../shared/components/Navbar";
 import { EyeOff, Eye } from "lucide-react";
 import { fetchAllCards, fetchTransactionHistory } from "../api/card.api";
 import { DUMMY_CARDS } from "../data/card.dummy";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function DetailMyCard() {
   // --- Helpers ---
@@ -62,8 +62,10 @@ export default function DetailMyCard() {
       .map(({ sortKey, ...rest }) => rest);
   };
 
-  const [cards, setCards] = useState(DUMMY_CARDS);
-  const [selectedCard, setSelectedCard] = useState(DUMMY_CARDS[0]);
+  const location = useLocation();
+  const initialCards = location.state?.cards || [];
+  const [cards, setCards] = useState(initialCards);
+  const [selectedCard, setSelectedCard] = useState(initialCards[0] || null);
   const [showBalance, setShowBalance] = useState(true);
   const navigate = useNavigate();
 
@@ -81,24 +83,25 @@ export default function DetailMyCard() {
   useEffect(() => {
     let mounted = true;
     (async () => {
+      if (cards.length > 0) return;
       try {
         const data = await fetchAllCards();
+        console.log('zxc123', data);
+
         if (!mounted) return;
         if (Array.isArray(data) && data.length) {
           setCards(data);
-          const current =
-            data.find((c) => c.account_id === selectedCard?.account_id) ||
-            data[0];
-          setSelectedCard(current);
+          setSelectedCard(data[0]);
         }
-      } catch {
-
+      } catch (err) {
+        console.error("Failed to fetch cards:", err);
       }
     })();
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [cards]);
+
 
   useEffect(() => {
     if (!selectedCard) return;
@@ -118,8 +121,8 @@ export default function DetailMyCard() {
     setChartData({ income, expense });
   }, [transactions]);
 
-  const handleChangeCard = async (accountId) => {
-    const found = cards.find((c) => c.account_id === accountId);
+  const handleChangeCard = async (accountNumber) => {
+    const found = cards.find((c) => c.account_number === accountNumber);
     if (!found) return;
     setSelectedCard(found);
 
@@ -127,6 +130,7 @@ export default function DetailMyCard() {
     setSelectedMonth(last);
     await handleSelectedMonth(last, found);
   };
+
 
   const handleOpenSplit = (group, itemIndex) => {
     const item = group.items[itemIndex];
@@ -159,7 +163,6 @@ export default function DetailMyCard() {
 
     const grouped = mapTransactionsToGroups(data.transactions);
     setTransactions(grouped);
-    console.log('cc', card.account_number);
   };
 
   return (
@@ -175,11 +178,11 @@ export default function DetailMyCard() {
                 <strong>Account Details</strong>
               </h2>
               <select
-                value={selectedCard?.account_id}
+                value={selectedCard?.account_number}
                 onChange={(e) => handleChangeCard(e.target.value)}
               >
                 {cards.map((c) => (
-                  <option key={c.account_id} value={c.account_id}>
+                  <option key={c.account_number} value={c.account_number}>
                     {c.type} - {c.account_number}
                   </option>
                 ))}
@@ -323,14 +326,14 @@ export default function DetailMyCard() {
 
             <div className="transaction-list-modern">
               {transactions.length ? (
-                transactions.map((group, gIdx) => (
-                  <div key={gIdx} className="transaction-group">
+                transactions.map((group) => (
+                  <div key={group.date} className="transaction-group">
                     <p className="transaction-date">
                       <strong>{group.date}</strong>
                     </p>
                     <hr />
-                    {group.items.map((item, iIdx) => (
-                      <div key={iIdx} className="transaction-modern-item">
+                    {group.items.map((item) => (
+                      <div key={item.transactionId || `${group.date}-${item.detail}-${item.amount}`} className="transaction-modern-item">
                         <div className="transaction-text">
                           <p className="transaction-type">{item.type}</p>
                           <p className="transaction-detail">{item.detail}</p>

@@ -59,13 +59,16 @@ export default function Dashboard() {
       });
 
       const mappedCards = (d.accountList ?? []).map((item) => ({
-        type: item.account_product_name,
-        account_number: item.account_number,
-        card_number: item.debit_card_number || item.account_number,
-        account_holder_name: item.account_name,
+        type: item.accountProductName,
+        account_number: item.accountNumber,
+        card_number: item.debit_card_number || item.accountNumber,
+        account_holder_name: item.accountName,
+        effective_balance: item.effectiveBalance,
         showCardNumber: false,
       }));
       setCards(mappedCards);
+      console.log('zxccc', d.accountList);
+
 
       setLoading(false);
     };
@@ -291,7 +294,7 @@ export default function Dashboard() {
                     <div
                       key={cards[currentIndex]?.account_id}
                       className="bank-card slide-in"
-                      onClick={() => navigate("/detailmycard")}
+                      onClick={() => navigate("/detailmycard", { state: { cards } })}
                     >
                       <div className="card-header">
                         <span className="bank-type">
