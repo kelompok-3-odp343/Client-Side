@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
 import "../styles/auth-otp.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
-import { postVerifyOtp } from "../api/authService";
+import { postVerifyOtp, postResendOtp } from "../api/authService";
 
 export default function OtpLogin() {
 	const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -67,9 +67,28 @@ export default function OtpLogin() {
 		}, 800);
 	};
 
-	const handleResend = () => {
+	const handleResend = async () => {
+		const sessionID = sessionStorage.getItem("sessionID");
+		if (!sessionID) {
+			setMessage("Session expired. Please log in again.");
+			setShowModal(true);
+			setTimeout(() => navigate("/"), 2000);
+			return;
+		}
+
 		if (resendTimer > 0) return;
-		setResendTimer(30);
+
+		const resp = await postResendOtp({ sessionID });
+
+		if (!resp.ok) {
+			setMessage(resp.message);
+			setShowModal(true);
+			return;
+		}
+
+		const cooldown = resp.data?.resendCooldown ?? 30;
+		setResendTimer(cooldown);
+
 		const interval = setInterval(() => {
 			setResendTimer((prev) => {
 				if (prev <= 1) {
@@ -79,6 +98,8 @@ export default function OtpLogin() {
 				return prev - 1;
 			});
 		}, 1000);
+		setMessage(resp.data.message || "Kode OTP baru telah dikirim.");
+		setShowModal(true);
 	};
 
 	return (
@@ -104,7 +125,12 @@ export default function OtpLogin() {
 					))}
 				</div>
 
-				<button type="button" className="otp-btn" onClick={handleVerify} disabled={loading}>
+				<button
+					type="button"
+					className="otp-btn"
+					onClick={handleVerify}
+					disabled={loading}
+				>
 					{loading ? "Verifying..." : "Verify OTP"}
 				</button>
 
