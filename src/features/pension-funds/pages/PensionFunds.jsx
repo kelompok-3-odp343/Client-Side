@@ -145,7 +145,9 @@ export default function PensionFunds() {
             {months.map((m) => (
               <button
                 key={m}
-                className={`month-btn-dplk ${selectedMonth === m ? "active" : ""}`}
+                className={`month-btn-dplk ${
+                  selectedMonth === m ? "active" : ""
+                }`}
                 onClick={() => setSelectedMonth(m)}
               >
                 {m}
@@ -203,24 +205,25 @@ function AccountNumberCard({ title, accountNumber, balance, growth }) {
       </div>
       <hr />
       <div className="account-balance">
-<<<<<<< HEAD
         <p>
-          <span>Accumulated Balance</span>
-          <span>Rp{balance.toLocaleString()}</span>
+          <span>Accumulated balance</span>
+          <span>
+            <strong>Rp{balance.toLocaleString()}</strong>
+          </span>
         </p>
         <p>
           <span>Growth</span>
-          <span>{growth}</span>
+          <span
+            style={{
+              color: growth > 0 ? "#3DBF4A" : growth < 0 ? "#F94449" : "#000",
+            }}
+          >
+            <strong>
+              ({growth > 0 ? "+" : ""}
+              {growth * 100}%)
+            </strong>
+          </span>
         </p>
-=======
-        <p><span>Accumulated balance</span><span><strong>Rp{balance.toLocaleString()}</strong></span></p>
-        <p><span>Growth</span>
-        <span style={{
-          color:
-          growth > 0 ? "#3DBF4A" :
-          growth < 0 ? "#F94449" : "#000"}}
-          ><strong>({growth > 0 ? "+" : ""}{growth*100}%)</strong></span></p>
->>>>>>> 8cfc00a5ffbc020e2ec07761c21dbfa0374d0e2c
       </div>
     </div>
   );
