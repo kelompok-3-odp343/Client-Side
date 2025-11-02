@@ -95,3 +95,19 @@ export async function postVerifyOtp({ sessionID, otp_code }) {
     };
   }
 }
+
+export async function postResendOtp({ sessionID }) {
+  try {
+    const payload = { sessionId: sessionID };
+    const res = await api.post(`/api/auth/resend-otp`, payload);
+    return { ok: true, data: res.data };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Gagal mengirim ulang kode OTP. Silakan coba beberapa saat lagi.",
+    };
+  }
+}
