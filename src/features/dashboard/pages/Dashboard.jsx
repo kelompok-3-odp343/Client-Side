@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../../shared/components/Navbar";
-import { ChartPie, Eye, EyeOff } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { ChartPie, Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { fetchDashboard } from "../api/dashboard.api.js";
 import depositsIcon from "../../../assets/images/dashboard-deposits-icon.png";
@@ -14,64 +14,87 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [cards, setCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
 
   useEffect(() => {
     const dataDashboards = async () => {
-      const raw = await fetchDashboard();
-      if (!raw) {
+      try {
+        const raw = await fetchDashboard();
+        const d = raw?.data;
+
+        if (!d) {
+          console.warn("⚠️ Dashboard dummy digunakan karena data kosong.");
+          setLoading(false);
+          return;
+        }
+
+        const total = d.assetoverview?.totalAsset ?? 0;
+        const income = d.cashFlowOverview?.totalIncome ?? 0;
+        const expenses = d.cashFlowOverview?.totalExpense ?? 0;
+        const receivable = d.cashFlowOverview?.totalReceivable ?? 0;
+
+        const totalBill = d.splitBillOverview?.totalBillAmount ?? 0;
+        const remainingBill = d.splitBillOverview?.remainingBillAmount ?? 0;
+        const paidBill = totalBill - remainingBill;
+        const progress =
+          totalBill > 0 ? Math.round((paidBill / totalBill) * 100) : 0;
+
+        const pf = d.portfolioOverview ?? [];
+        const amt = (name) =>
+          pf.find((p) => p.productName === name)?.totalAmount ?? 0;
+
+        setData({
+          assets_total: { total, extra_this_month: 0 },
+          earnings_overview: { income, expenses },
+          split: {
+            paid: paidBill,
+            remaining: remainingBill,
+            total: totalBill,
+            progress,
+            potential: receivable,
+            ongoing: d.splitBillOverview?.countSplitBill ?? 0,
+          },
+          time_deposits: { total_balance: amt("timeDeposit") },
+          savings: [{ total_balance: amt("accountSavings") }],
+          life_goals: [{ current_savings: amt("lifegoals") }],
+          pension_funds: [{ balance: amt("dplk") }],
+        });
+
+        const mappedCards = (d.accountList ?? []).map((item) => ({
+          type: item.account_product_name,
+          account_number: item.account_number,
+          card_number: item.debit_card_number || item.account_number,
+          account_holder_name: item.account_name,
+          showCardNumber: false,
+        }));
+
+        setCards(mappedCards);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      const d = raw.data;
-
-      const total = d.assetoverview?.totalAsset ?? 0;
-      const income = d.cashFlowOverview?.totalIncome ?? 0;
-      const expenses = d.cashFlowOverview?.totalExpense ?? 0;
-      const receivable = d.cashFlowOverview?.totalReceivable ?? 0;
-
-      const totalBill = d.splitBillOverview?.totalBillAmount ?? 0;
-      const remainingBill = d.splitBillOverview?.remainingBillAmount ?? 0;
-      const paidBill = totalBill - remainingBill;
-      const progress = totalBill > 0 ? Math.round((paidBill / totalBill) * 100) : 0;
-
-      const pf = d.portfolioOverview ?? [];
-      const amt = (name) =>
-        pf.find((p) => p.productName === name)?.totalAmount ?? 0;
-
-      setData({
-        assets_total: { total, extra_this_month: 0 },
-        earnings_overview: { income, expenses },
-        split: {
-          paid: paidBill,
-          remaining: remainingBill,
-          total: totalBill,
-          progress,
-          potential: receivable,
-          ongoing: d.splitBillOverview?.countSplitBill ?? 0,
-        },
-        time_deposits: { total_balance: amt("timeDeposit") },
-        savings: [{ total_balance: amt("accountSavings") }],
-        life_goals: [{ current_savings: amt("lifegoals") }],
-        pension_funds: [{ balance: amt("dplk") }],
-      });
-
-      const mappedCards = (d.accountList ?? []).map((item) => ({
-        type: item.account_product_name,
-        account_number: item.account_number,
-        card_number: item.debit_card_number || item.account_number,
-        account_holder_name: item.account_name,
-        showCardNumber: false,
-      }));
-      setCards(mappedCards);
-
-      setLoading(false);
     };
 
     dataDashboards();
   }, []);
+
+  // === AUTO SLIDE UNTUK CARD ===
+  useEffect(() => {
+    if (cards.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % cards.length);
+      }, 4000);
+      return () => clearInterval(interval);
+    }
+  }, [cards]);
+
+  // === Manual slide controls ===
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % cards.length);
+  };
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
   if (!data) return <div className="empty">No data found</div>;
@@ -173,7 +196,8 @@ export default function Dashboard() {
                     You have {split?.ongoing ?? 0} ongoing split bills
                   </div>
                   <div className="panel-sub">
-                    The remaining bill that can be collected is <strong>Rp{fmt(split?.remaining ?? 0)}</strong>
+                    The remaining bill that can be collected is{" "}
+                    <strong>Rp{fmt(split?.remaining ?? 0)}</strong>
                   </div>
                   <div className="potential">
                     Your potential asset accumulation:
@@ -242,8 +266,8 @@ export default function Dashboard() {
                 {fmt(
                   life_goals?.reduce(
                     (s, g) => s + (g.current_savings || 0),
-                    0,
-                  ) ?? 0,
+                    0
+                  ) ?? 0
                 )}
               </div>
             </div>
@@ -260,7 +284,10 @@ export default function Dashboard() {
               <div className="pill-amount">
                 Rp
                 {fmt(
-                  pension_funds?.reduce((s, p) => s + (p.balance || 0), 0) ?? 0,
+                  pension_funds?.reduce(
+                    (s, p) => s + (p.balance || 0),
+                    0
+                  ) ?? 0
                 )}
               </div>
             </div>
@@ -270,10 +297,8 @@ export default function Dashboard() {
 
         {/* ========== MY CARDS & EARNINGS ========== */}
         <section className="bottom-grid">
-          {/* MY CARDS */}
           <div className="card cards-panel">
             <div className="cards-layout">
-              {/* LEFT SIDE TEXT */}
               <div className="cards-info">
                 <h3>My Cards</h3>
                 {cards.length > 0 && (
@@ -284,18 +309,26 @@ export default function Dashboard() {
                 </p>
               </div>
 
-              {/* RIGHT SIDE CARD SLIDER */}
               <div className="auto-slider">
                 {cards.length > 0 ? (
                   <>
+                    <button
+                      className="nav-arrow left-arrow"
+                      onClick={handlePrev}
+                      aria-label="Previous Card"
+                    >
+                      <ChevronLeft size={28} />
+                    </button>
+
                     <div
-                      key={cards[currentIndex]?.account_id}
+                      key={cards[currentIndex]?.account_number}
                       className="bank-card slide-in"
                       onClick={() => navigate("/detailmycard")}
                     >
                       <div className="card-header">
                         <span className="bank-type">
-                          {cards[currentIndex]?.type} – {cards[currentIndex]?.account_number}
+                          {cards[currentIndex]?.type} –{" "}
+                          {cards[currentIndex]?.account_number}
                         </span>
                       </div>
 
@@ -303,10 +336,14 @@ export default function Dashboard() {
                         <div className="card-number-row">
                           <p className="card-number">
                             {cards[currentIndex]?.showCardNumber
-                              ? (cards[currentIndex]?.card_number ?? "")
-                                .replace(/(\d{4})(?=\d)/g, "$1 ")
+                              ? (cards[currentIndex]?.card_number ?? "").replace(
+                                  /(\d{4})(?=\d)/g,
+                                  "$1 "
+                                )
                               : "**** **** **** " +
-                              String(cards[currentIndex]?.card_number ?? "").slice(-4)}
+                                String(
+                                  cards[currentIndex]?.card_number ?? ""
+                                ).slice(-4)}
                           </p>
                           <span
                             className="eye-icon"
@@ -332,6 +369,14 @@ export default function Dashboard() {
                       </div>
                     </div>
 
+                    <button
+                      className="nav-arrow right-arrow"
+                      onClick={handleNext}
+                      aria-label="Next Card"
+                    >
+                      <ChevronRight size={28} />
+                    </button>
+
                     <div className="dots">
                       {cards.map((_, i) => (
                         <span
@@ -348,7 +393,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* EARNINGS OVERVIEW */}
           <div className="card earnings-panel">
             <h3>Earnings Overview</h3>
             <div className="earnings-charts">
@@ -367,7 +411,7 @@ export default function Dashboard() {
                   className="bar income-bar"
                   style={{
                     height: `${Math.round(
-                      (income / Math.max(1, income + expenses)) * 200,
+                      (income / Math.max(1, income + expenses)) * 200
                     )}px`,
                   }}
                 />
@@ -375,7 +419,7 @@ export default function Dashboard() {
                   className="bar expense-bar"
                   style={{
                     height: `${Math.round(
-                      (expenses / Math.max(1, income + expenses)) * 200,
+                      (expenses / Math.max(1, income + expenses)) * 200
                     )}px`,
                   }}
                 />

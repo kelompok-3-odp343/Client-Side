@@ -5,7 +5,7 @@ import { Plus, Minus } from "lucide-react";
 import { createSplitBill } from "../../features/split-bill/api/split-bill.api";
 import { useNavigate } from "react-router-dom";
 
-export default function SplitBillForm({ onClose, transaction }) {
+export default function SplitBillForm({ onClose, onSuccess, transaction }) {
   const [participants, setParticipants] = useState([
     { id: Date.now(), participantName: "", participantAmount: "" },
   ]);
@@ -123,22 +123,25 @@ export default function SplitBillForm({ onClose, transaction }) {
       totalAmount: totalBill,
       billMembers: participants.map((p) => ({
         memberName: p.participantName,
-        amountShare: Number(p.participantAmount)
-      }))
+        amountShare: Number(p.participantAmount),
+      })),
     };
-
 
     try {
       await createSplitBill(payload);
       setShowSuccess(true);
+
+      // ✅ Tambahan baru:
+      if (typeof onSuccess === "function") onSuccess();
     } catch (err) {
       const msg = err?.message || "Unknown error";
-
       if (msg.includes("Server sedang maintance")) {
         setErrorMessage("Server sedang maintance, silahkan coba beberapa saat lagi");
       } else {
         setErrorMessage("Failed saving data, please try again.");
       }
+    } finally {
+      setIsSaving(false);
     }
   }
 
@@ -150,7 +153,7 @@ export default function SplitBillForm({ onClose, transaction }) {
   const formatAmount = (val) => {
     if (!val) return "";
     return val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  }
+  };
 
   const hasEmptyFields = participants.some(
     (p) => !p.participantName.trim() || !p.participantAmount.trim()

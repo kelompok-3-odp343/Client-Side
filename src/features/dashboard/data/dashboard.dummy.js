@@ -1,29 +1,35 @@
-export const DUMMY_CARDS = [
-  {
-    account_id: "ACCT001",
-    type: "TAPLUS BISNIS",
-    account_number: "1234567890",
-    card_number: "4567123412345678",
-    account_holder_name: "OKTAVIA QURROTA A’YUNI",
-    effective_balance: 25000000,
-    is_main: true,
+export const DASHBOARD_DUMMY = {
+  assetoverview: {
+    totalAsset: 152350000,
   },
-  {
-    account_id: "ACCT002",
-    type: "TAPLUS MUDA",
-    account_number: "9876543210",
-    card_number: "5123987612347890",
-    account_holder_name: "OKTAVIA QURROTA A’YUNI",
-    effective_balance: 20000000,
-    is_main: false,
+  cashFlowOverview: {
+    totalIncome: 8500000,
+    totalExpense: 4300000,
+    totalReceivable: 1200000,
   },
-  {
-    account_id: "ACCT003",
-    type: "TAPLUS PELAJAR",
-    account_number: "1122334455",
-    card_number: "4012888888881881",
-    account_holder_name: "OKTAVIA QURROTA A’YUNI",
-    effective_balance: 15000000,
-    is_main: false,
+  splitBillOverview: {
+    totalBillAmount: 5000000,
+    remainingBillAmount: 2000000,
+    countSplitBill: 3,
   },
-];
+  portfolioOverview: [
+    { productName: "timeDeposit", totalAmount: 25000000 },
+    { productName: "accountSavings", totalAmount: 36000000 },
+    { productName: "lifegoals", totalAmount: 9000000 },
+    { productName: "dplk", totalAmount: 14000000 },
+  ],
+  accountList: [
+    {
+      account_product_name: "Savings Account",
+      account_number: "1234567890",
+      debit_card_number: "5264123412341234",
+      account_name: "John Doe",
+    },
+    {
+      account_product_name: "Time Deposit",
+      account_number: "9876543210",
+      debit_card_number: null,
+      account_name: "John Doe",
+    },
+  ],
+};

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/Navbar";
 import "../styles/split-bill-detail.css";
 import {
@@ -8,6 +8,7 @@ import {
 } from "../api/split-bill.api";
 
 export default function SplitBillDetail() {
+  const { id } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
 
@@ -16,31 +17,53 @@ export default function SplitBillDetail() {
   const [members, setMembers] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
+      // prioritas: state (navigasi langsung)
       if (state && state.bill) {
         setBill(state.bill);
         setColor(state.color || "#6dddd0");
         setMembers(state.bill.members);
-      } else if (state?.billId) {
-        const data = await getSplitBillById(state.billId);
+        setLoading(false);
+        return;
+      }
+
+      // fallback: fetch by URL param
+      if (id) {
+        const data = await getSplitBillById(id);
         if (data) {
           setBill(data);
-          setColor(state.color || "#6dddd0");
+          setColor("#6dddd0");
           setMembers(data.members);
+        } else {
+          setError("Split bill not found.");
         }
+        setLoading(false);
       }
     }
     loadData();
-  }, [state]);
+  }, [state, id]);
+
+  if (loading) {
+    return (
+      <div className="sb-detail-container">
+        <Navbar />
+        <div className="sb-detail-error">
+          <p>Loading...</p>
+          <button onClick={() => navigate("/splitbill")}>Back</button>
+        </div>
+      </div>
+    );
+  }
 
   if (!bill) {
     return (
       <div className="sb-detail-container">
         <Navbar />
         <div className="sb-detail-error">
-          <p>Loading...</p>
+          <p>{error || "Data not found."}</p>
           <button onClick={() => navigate("/splitbill")}>Back</button>
         </div>
       </div>
@@ -53,19 +76,28 @@ export default function SplitBillDetail() {
   const totalUnpaid = Math.max(0, bill.total_bill - totalPaid);
   const progressPercent = (totalPaid / Math.max(1, bill.total_bill)) * 100;
 
-  // === Event Handlers ===
-  const handleToggleStatus = (index) => {
+  const handleToggleStatus = async (index) => {
     setMembers((prev) =>
       prev.map((m, i) => {
         if (i !== index) return m;
         if (m.status === "Paid") {
-          // hanya ubah ke unpaid di edit mode
           return isEditing ? { ...m, status: "Unpaid" } : m;
         } else {
           return { ...m, status: "Paid" };
         }
       })
     );
+
+    // Jika bukan edit mode, langsung update storage agar progress tersimpan
+    if (!isEditing) {
+      const updated = members.map((m, i) => {
+        if (i !== index) return m;
+        if (m.status === "Paid") return m;
+        return { ...m, status: "Paid" };
+      });
+      await updateSplitBillStatus(bill.split_bill_id, updated);
+      setBill((prev) => ({ ...prev, members: updated }));
+    }
   };
 
   const handleAddMember = () => {
@@ -217,9 +249,7 @@ export default function SplitBillDetail() {
                           type="text"
                           value={m.member_name}
                           placeholder="Enter name"
-                          onChange={(e) =>
-                            handleChangeName(i, e.target.value)
-                          }
+                          onChange={(e) => handleChangeName(i, e.target.value)}
                         />
                       ) : (
                         m.member_name
@@ -233,9 +263,7 @@ export default function SplitBillDetail() {
                             type="text"
                             inputMode="numeric"
                             value={m.amount.toLocaleString("id-ID")}
-                            onChange={(e) =>
-                              handleChangeAmount(i, e.target.value)
-                            }
+                            onChange={(e) => handleChangeAmount(i, e.target.value)}
                           />
                         ) : (
                           <span>{Number(m.amount).toLocaleString("id-ID")}</span>
@@ -254,7 +282,7 @@ export default function SplitBillDetail() {
                           className="mark-btn"
                           onClick={() => handleToggleStatus(i)}
                           disabled={
-                            m.status === "Paid" && !isEditing // only disable Mark as Unpaid outside edit
+                            m.status === "Paid" && !isEditing
                           }
                           style={
                             m.status === "Paid"

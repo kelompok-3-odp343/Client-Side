@@ -139,24 +139,27 @@
 /* ================================
    VIEW DETAIL BUTTON — FIXED THEME
 ================================ */
-.view-btn {
-  margin-top: 0.8rem;
+.sb-card .view-btn {
+  margin-top: 0.8rem !important;
   align-self: flex-end;
   background-color: var(--color) !important;
-  color: #fff;
-  border: none;
-  border-radius: 0.4rem;
-  font-size: 0.85rem;
-  padding: 0.45rem 1rem;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.85rem !important;
+  padding: 0.5rem 1.1rem !important;
+  cursor: pointer !important;
+  font-weight: 700 !important;
+  transition: all 0.25s ease !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+  display: inline-block !important;
 }
 
-.view-btn:hover,
-.view-btn:focus {
-  filter: brightness(0.9);
-  outline: none;
+.sb-card .view-btn:hover,
+.sb-card .view-btn:focus {
+  filter: brightness(0.9) !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
 }
 
 /* add split button */
