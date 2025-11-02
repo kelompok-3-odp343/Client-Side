@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
 import "../styles/saving.css";
-import { Download } from "lucide-react";
 import savingsIcon from "../../../assets/images/savings-icon.png";
 import { getSavingsData } from '../api/savings.api';
 
 export default function SavingsDashboard() {
-  const months = [
-    "May", "June", "July", "Aug", "Sept", "Oct",
-    "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"
-  ];
-
-  const [selectedMonth, setSelectedMonth] = useState("May");
   const [savingsData, setSavingsData] = useState(null);
-  const [transactions, setTransactions] = useState([]);
+  const [insightData] = useState({
+    income: 10000000,
+    expenses: 4000000,
+    netIncome: 6000000,
+    categories: [
+      { name: "Food", amount: 2000000, percentage: 40 },
+      { name: "Shopping", amount: 1750000, percentage: 35 },
+      { name: "Others", amount: 1250000, percentage: 25 }
+    ]
+  });
 
-  const dummyTransactions = [
-    { date: "31 May 2025", month: "May", type: "Taplus Pegawai BNI", detail: "QRIS", amount: "-Rp15.000" },
-    { date: "31 May 2025", month: "May", type: "Taplus Bisnis", detail: "Transfer", amount: "+Rp7.000.000" },
-    { date: "30 May 2025", month: "May", type: "Taplus Pegawai BNI", detail: "Biaya Administrasi", amount: "-Rp3.500" },
-    { date: "2 June 2025", month: "June", type: "Taplus Bisnis", detail: "Transfer", amount: "-Rp5.000.000" },
-  ];
-
-  const saving = async () => {
+  const fetchSavingsData = async () => {
     try {
       const userId = "USR001";
       const response = await getSavingsData(userId);
@@ -51,119 +46,148 @@ export default function SavingsDashboard() {
     } catch (error) {
       console.error("error", error);
     }
-  }
-
-  const fetchTransactions = async (month) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/transactions?month=${month}`);
-      if (!response.ok) throw new Error("Failed to fetch transactions");
-      const data = await response.json();
-      setTransactions(data);
-    } catch (error) {
-      console.warn(`⚠️ Backend not available, using dummy transactions for ${month}:`, error.message);
-      const filtered = dummyTransactions.filter((tx) => tx.month === month);
-      setTransactions(filtered);
-    }
   };
 
-  /** ---------- USE EFFECT ---------- **/
   useEffect(() => {
-    saving();
+    fetchSavingsData();
   }, []);
 
-  useEffect(() => {
-    fetchTransactions(selectedMonth);
-  }, [selectedMonth]);
-
-  /** ---------- GROUP TRANSACTIONS BY DATE ---------- **/
-  const groupedTransactions = transactions.reduce((acc, tx) => {
-    acc[tx.date] = acc[tx.date] ? [...acc[tx.date], tx] : [tx];
-    return acc;
-  }, {});
-
   return (
-    <div className="savings-page">
+    <div className="savings-page-revamp">
       <Navbar />
 
-      <main className="savings-container">
-        {/* LEFT PANEL */}
-        <section className="savings-left">
-          <div className="section-header">
-            <h2 className="lg-title">Savings Information</h2>
-            <p className="lg-sub">Track your transaction history and payment information</p>
+      <main className="savings-main-container">
+        {/* LEFT PANEL - Savings Information */}
+        <section className="savings-left-section">
+          <div className="section-header-block">
+            <h2 className="section-main-title">Savings Information</h2>
+            <p className="section-main-subtitle">Track your transaction history and payment information</p>
           </div>
 
-          <div className="savings-summary-card fancy">
-            <div className="savings-summary-left">
-              <div className="savings-icon-circle">
-                <img src={savingsIcon} alt="Savings Icon" />
+          {/* Savings Summary Card */}
+          <div className="savings-summary-box">
+            <div className="summary-icon-area">
+              <div className="summary-icon-bg">
+                <img src={savingsIcon} alt="Savings Icon" className="summary-icon" />
               </div>
             </div>
-            <div className="savings-summary-right">
-              <h3 className="summary-title">Your Savings</h3>
-              <p className="summary-label">Total Balance</p>
-              <p className="summary-balance">
-                Rp{(savingsData?.totalBalance || 0).toLocaleString()}
+            <div className="summary-text-area">
+              <h3 className="summary-title-text">Your Savings</h3>
+              <p className="summary-balance-label">Total Balance</p>
+              <p className="summary-balance-amount">
+                Rp{(savingsData?.totalBalance || 10000000).toLocaleString('id-ID')}
               </p>
-              <div className="summary-divider" />
-              <p className="summary-sub">
-                You have {savingsData?.totalCount || 0} Account Numbers
+              <p className="summary-balance-note">including held balance</p>
+              <div className="summary-line-divider" />
+              <p className="summary-accounts-info">
+                You have {savingsData?.totalCount || 2} Account Numbers.
               </p>
             </div>
           </div>
 
-          <h3 className="your-savings-title">Your Savings Accounts</h3>
-          <div className="savings-grid">
-            {savingsData?.savings?.map((s) => (
-              <SavingsCard key={s.id} {...s} />
-            ))}
+          {/* Your Savings Accounts */}
+          <div className="accounts-wrapper">
+            <h3 className="accounts-main-title">Your Saving Accounts</h3>
+            <div className="accounts-list">
+              {savingsData?.savings?.map((s) => (
+                <SavingsAccountCard key={s.id} {...s} />
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* RIGHT PANEL */}
-        <section className="savings-right">
-          <div className="transaction-header">
-            <h2 className="lg-title">Transaction History</h2>
-            <Download className="download-icon" />
-          </div>
+        {/* RIGHT PANEL - Insight This Month */}
+        <section className="insight-right-section">
+          <div className="insight-main-box">
+            <h2 className="section-main-title">Insight This Month</h2>
 
-          <div className="months">
-            {months.map((m) => (
-              <button
-                key={m}
-                className={`month-btn ${selectedMonth === m ? "active" : ""}`}
-                onClick={() => setSelectedMonth(m)}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
+            {/* Income/Expenses/Net Income Cards */}
+            <div className="insight-metrics-grid">
+              <div className="metric-card metric-card-income">
+                <h4 className="metric-label">Income</h4>
+                <p className="metric-value metric-income">
+                  + Rp{insightData.income.toLocaleString('id-ID')}
+                </p>
+              </div>
+              <div className="metric-card metric-card-expenses">
+                <h4 className="metric-label">Expenses</h4>
+                <p className="metric-value metric-expenses">
+                  - Rp{insightData.expenses.toLocaleString('id-ID')}
+                </p>
+              </div>
+              <div className="metric-card metric-card-net">
+                <h4 className="metric-label">Net Income</h4>
+                <p className="metric-value metric-net-income">
+                  + Rp{insightData.netIncome.toLocaleString('id-ID')}
+                </p>
+              </div>
+            </div>
 
-          <div className="transaction-list">
-            {transactions.length > 0 ? (
-              Object.keys(groupedTransactions).map((date) => (
-                <div key={date} className="transaction-group">
-                  <p className="transaction-date"><strong>{date}</strong></p>
-                  <hr />
-                  {groupedTransactions[date].map((tx, i) => (
-                    <div key={i} className="transaction-item">
-                      <div className="tx-left">
-                        <div className="tx-icon">★</div>
-                        <div className="tx-text">
-                          <p className="tx-type">{tx.type}</p>
-                          <p className="tx-detail">{tx.detail}</p>
-                        </div>
-                      </div>
-                      <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
-                        {tx.amount}
+            {/* Transaction Category */}
+            <div className="category-section">
+              <h3 className="category-box-title">Your Transaction Category</h3>
+              <p className="category-box-subtitle">Your expenses went to ....</p>
+
+              <div className="category-display-grid">
+                {/* Category List */}
+                <div className="category-items-box">
+                  {insightData.categories.map((cat, idx) => (
+                    <div key={idx} className="category-row">
+                      <span className="category-row-name">{cat.name}</span>
+                      <div className="category-row-values">
+                        <span className="category-row-amount">
+                          Rp{cat.amount.toLocaleString('id-ID')}
+                        </span>
+                        <span className={`category-row-percent cat-color-${cat.name.toLowerCase()}`}>
+                          ({cat.percentage}%)
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
-              ))
-            ) : (
-              <p className="no-tx">No transactions available for {selectedMonth}</p>
-            )}
+
+                {/* Pie Chart */}
+                <div className="pie-chart-wrapper">
+                  <svg viewBox="0 0 240 240" className="pie-svg">
+                    {/* Food - 40% - Purple */}
+                    <path
+                      d="M 120 120 L 120 35 A 85 85 0 0 1 204.36 146.5 Z"
+                      fill="#8B5CF6"
+                      stroke="white"
+                      strokeWidth="3"
+                    />
+                    {/* Shopping - 35% - Yellow */}
+                    <path
+                      d="M 120 120 L 204.36 146.5 A 85 85 0 0 1 66.64 179.7 Z"
+                      fill="#FCD34D"
+                      stroke="white"
+                      strokeWidth="3"
+                    />
+                    {/* Others - 25% - Light Purple */}
+                    <path
+                      d="M 120 120 L 66.64 179.7 A 85 85 0 0 1 120 35 Z"
+                      fill="#D8B4FE"
+                      stroke="white"
+                      strokeWidth="3"
+                    />
+                  </svg>
+
+                  {/* Chart Labels with Lines */}
+                  <div className="chart-label-item label-pos-food">
+                    <div className="label-connector"></div>
+                    <span className="label-info">40%<br />Food</span>
+                  </div>
+                  <div className="chart-label-item label-pos-shopping">
+                    <div className="label-connector"></div>
+                    <span className="label-info">35%<br />Shopping</span>
+                  </div>
+                  <div className="chart-label-item label-pos-others">
+                    <div className="label-connector"></div>
+                    <span className="label-info">25%<br />Others</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -171,14 +195,14 @@ export default function SavingsDashboard() {
   );
 }
 
-/* Savings Card */
-function SavingsCard({ title, norekening, balance }) {
+/* Savings Account Card Component */
+function SavingsAccountCard({ title, norekening, balance }) {
   return (
-    <div className="savings-card">
-      <h4 className="savings-title">{title}</h4>
-      <p className="savings-number">{norekening}</p>
-      <p className="savings-balance">
-        Effective balance: <strong>Rp{balance.toLocaleString()}</strong>
+    <div className="account-item-card">
+      <h4 className="account-item-title">{title}</h4>
+      <p className="account-item-number">{norekening}</p>
+      <p className="account-item-balance">
+        Effective balance: <strong>Rp{balance.toLocaleString('id-ID')}</strong>
       </p>
     </div>
   );
