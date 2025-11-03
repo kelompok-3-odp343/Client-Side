@@ -6,39 +6,40 @@
 	overflow: hidden;
 }
 
-.name-link {
-	background: none;
-	border: none;
-	color: #1f2937;
-	font-size: 0.875rem;
-	cursor: pointer;
-	text-align: left;
-	padding: 0;
-	text-decoration: none;
-	transition: color 0.2s;
-	font-weight: 500;
+.view-details-btn {
+    background: none;
+    color: #f97316;
+    border: 1.5px solid rgba(249, 115, 22, 0.35);
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: "Inter", "Poppins", "Segoe UI", sans-serif;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.4;
 }
 
-.name-link:hover {
-	color: #6dddcf;
-	text-decoration: underline;
+.view-details-btn:hover {
+    background: rgba(249, 115, 22, 0.08);
+    border-color: rgba(249, 115, 22, 0.6);
+    color: #ea580c;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(249, 115, 22, 0.12);
 }
 
-.unblock-btn {
-	background: #fff7ed;
-	color: #ea580c;
-	border: 1px solid #fed7aa;
-	padding: 0.5rem 1rem;
-	border-radius: 6px;
-	font-size: 0.875rem;
-	font-weight: 500;
-	cursor: pointer;
-	transition: all 0.2s;
+.view-details-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
-.unblock-btn:hover {
-	background: #ffedd5;
-	border-color: #fb923c;
+.view-details-btn:focus-visible {
+    outline: 2px solid rgba(249, 115, 22, 0.5);
+    outline-offset: 2px;
 }
 
 @media (max-width: 768px) {
