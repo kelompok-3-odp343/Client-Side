@@ -2,6 +2,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import "../styles/data-table.css";
 
+const getSortIcon = (sortConfig, columnKey) => {
+	if (!sortConfig) return "⇅";
+	if (sortConfig.key === columnKey) {
+		return sortConfig.direction === "asc" ? "▲" : "▼";
+	}
+	return "⇅";
+};
+
 export default function DataTable({
 	title,
 	columns,
@@ -14,14 +22,6 @@ export default function DataTable({
 	tableClassName = "",
 	headerColor = "teal",
 }) {
-	const getSortIcon = (columnKey) => {
-		if (!sortConfig) return "⇅";
-		if (sortConfig.key === columnKey) {
-			return sortConfig.direction === "asc" ? "▲" : "▼";
-		}
-		return "⇅";
-	};
-
 	return (
 		<section className="data-table-section">
 			<div className="table-header">
@@ -43,7 +43,9 @@ export default function DataTable({
 										<span className="th-label">{column.label}</span>
 										<div className="th-icons">
 											{column.sortable && (
-												<span className="sort-icon">{getSortIcon(column.key)}</span>
+												<span className="sort-icon">
+													{getSortIcon(sortConfig, column.key)}
+												</span>
 											)}
 											{column.filterable &&
 												renderColumnHeader &&
