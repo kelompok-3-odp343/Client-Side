@@ -9,15 +9,17 @@ export default function DataTable({
 	sortConfig,
 	onSort,
 	renderCell,
+	renderColumnHeader,
 	searchBar,
 	tableClassName = "",
 	headerColor = "teal",
 }) {
 	const getSortIcon = (columnKey) => {
-		if (sortConfig?.key === columnKey) {
+		if (!sortConfig) return "⇅";
+		if (sortConfig.key === columnKey) {
 			return sortConfig.direction === "asc" ? "▲" : "▼";
 		}
-		return null;
+		return "⇅";
 	};
 
 	return (
@@ -37,10 +39,17 @@ export default function DataTable({
 									className={`${column.sortable ? "sortable " : ""}${column.key}-col`}
 									onClick={column.sortable ? () => onSort(column.key) : undefined}
 								>
-									{column.label}
-									{column.sortable && sortConfig && (
-										<span className="sort-icon">{getSortIcon(column.key)}</span>
-									)}
+									<div className="th-content">
+										<span className="th-label">{column.label}</span>
+										<div className="th-icons">
+											{column.sortable && (
+												<span className="sort-icon">{getSortIcon(column.key)}</span>
+											)}
+											{column.filterable &&
+												renderColumnHeader &&
+												renderColumnHeader(column)}
+										</div>
+									</div>
 								</th>
 							))}
 						</tr>
@@ -71,6 +80,7 @@ DataTable.propTypes = {
 			key: PropTypes.string.isRequired,
 			label: PropTypes.string.isRequired,
 			sortable: PropTypes.bool,
+			filterable: PropTypes.bool,
 		})
 	).isRequired,
 	data: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -80,6 +90,7 @@ DataTable.propTypes = {
 	}),
 	onSort: PropTypes.func,
 	renderCell: PropTypes.func,
+	renderColumnHeader: PropTypes.func,
 	searchBar: PropTypes.node,
 	tableClassName: PropTypes.string,
 	headerColor: PropTypes.string,
