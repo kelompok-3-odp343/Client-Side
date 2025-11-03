@@ -170,6 +170,7 @@ export default function AdminTransactions() {
 						/>
 					}
 					tableClassName="transaction-details-table"
+					headerColor="teal"
 				/>
 			</main>
 		</div>

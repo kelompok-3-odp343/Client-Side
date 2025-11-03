@@ -41,7 +41,7 @@
 }
 
 .data-table thead {
-	background: linear-gradient(180deg, #6dddd0 0%, #fff 100%);
+	/* background: linear-gradient(180deg, #6dddd0 0%, #fff 100%); */
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	border-radius: 12px;
 	position: sticky;
@@ -50,13 +50,13 @@
 }
 
 /* Header Color Variants */
-/* .data-table.header-teal thead {
-	background: linear-gradient(180deg, #6dddcf 0%, #a8ece1 100%);
+.data-table.header-teal thead {
+	background: linear-gradient(180deg, #6dddd0 0%, #fff 100%);
 }
 
 .data-table.header-peach thead {
-	background: linear-gradient(180deg, #ffcdb2 0%, #ffe5d9 100%);
-} */
+	background: linear-gradient(180deg, #FFBC8E 0%, #fff 100%);
+}
 
 .data-table th {
 	padding: 0.5rem 0;

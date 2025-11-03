@@ -11,6 +11,7 @@ export default function DataTable({
 	renderCell,
 	searchBar,
 	tableClassName = "",
+	headerColor = "teal",
 }) {
 	const getSortIcon = (columnKey) => {
 		if (sortConfig?.key === columnKey) {
@@ -27,7 +28,7 @@ export default function DataTable({
 			</div>
 
 			<div className="table-wrapper">
-				<table className={`data-table ${tableClassName}`}>
+				<table className={`data-table ${tableClassName} header-${headerColor}`}>
 					<thead>
 						<tr>
 							{columns.map((column) => (
@@ -81,4 +82,5 @@ DataTable.propTypes = {
 	renderCell: PropTypes.func,
 	searchBar: PropTypes.node,
 	tableClassName: PropTypes.string,
+	headerColor: PropTypes.string,
 };
