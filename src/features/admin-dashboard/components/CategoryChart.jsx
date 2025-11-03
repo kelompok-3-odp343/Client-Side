@@ -3,6 +3,32 @@ import PropTypes from "prop-types";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import "../styles/category-chart.css";
 
+const renderCustomLabel = ({ cx, cy, midAngle, outerRadius, percent, name }) => {
+	const RADIAN = Math.PI / 180;
+	const radius = outerRadius * 1.35;
+	const x = cx + radius * Math.cos(-midAngle * RADIAN);
+	const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+	return (
+		<text
+			x={x}
+			y={y}
+			fill="#000"
+			textAnchor="middle"
+			dominantBaseline="central"
+			fontSize="1rem"
+			fontWeight="800"
+		>
+			<tspan x={x} dy="-0.6em">
+				{`${(percent * 100).toFixed(0)}%`}
+			</tspan>
+			<tspan x={x} dy="1.2em" fontSize="0.9rem" fontWeight="700">
+				{name}
+			</tspan>
+		</text>
+	);
+};
+
 export default function CategoryChart({ data, title = "Transaction Category" }) {
 	return (
 		<section className="category-panel">
@@ -31,31 +57,7 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 								endAngle={-270}
 								labelLine={false}
 								isAnimationActive={false}
-								label={({ cx, cy, midAngle, outerRadius, percent, name }) => {
-									const RADIAN = Math.PI / 180;
-									const radius = outerRadius * 1.35;
-									const x = cx + radius * Math.cos(-midAngle * RADIAN);
-									const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-									return (
-										<text
-											x={x}
-											y={y}
-											fill="#000"
-											textAnchor="middle"
-											dominantBaseline="central"
-											fontSize="1rem"
-											fontWeight="800"
-										>
-											<tspan x={x} dy="-0.6em">
-												{`${(percent * 100).toFixed(0)}%`}
-											</tspan>
-											<tspan x={x} dy="1.2em" fontSize="0.9rem" fontWeight="700">
-												{name}
-											</tspan>
-										</text>
-									);
-								}}
+								label={renderCustomLabel}
 							>
 								{data.map((entry) => (
 									<Cell key={entry.name} fill={entry.color} />
