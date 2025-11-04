@@ -2,10 +2,37 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
 import "../styles/saving.css";
 import savingsIcon from "../../../assets/images/savings-icon.png";
-import { getSavingsData } from '../api/savings.api';
+import { getSavingsData } from "../api/savings.api";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+
+/* Custom label using midAngle & outerRadius*/
+const renderCustomLabel = ({ cx, cy, midAngle, outerRadius, percent, name }) => {
+  const RADIAN = Math.PI / 180;
+  const radius = outerRadius * 1.35;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="#000"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize="1rem"
+      fontWeight="800"
+    >
+      <tspan x={x} dy="-0.6em">{`${(percent * 100).toFixed(0)}%`}</tspan>
+      <tspan x={x} dy="1.2em" fontSize="0.9rem" fontWeight="700">
+        {name}
+      </tspan>
+    </text>
+  );
+};
 
 export default function SavingsDashboard() {
   const [savingsData, setSavingsData] = useState(null);
+
   const [insightData] = useState({
     income: 10000000,
     expenses: 4000000,
@@ -13,8 +40,8 @@ export default function SavingsDashboard() {
     categories: [
       { name: "Food", amount: 2000000, percentage: 40 },
       { name: "Shopping", amount: 1750000, percentage: 35 },
-      { name: "Others", amount: 1250000, percentage: 25 }
-    ]
+      { name: "Others", amount: 1250000, percentage: 25 },
+    ],
   });
 
   const fetchSavingsData = async () => {
@@ -52,6 +79,20 @@ export default function SavingsDashboard() {
     fetchSavingsData();
   }, []);
 
+  // Prepare chart data and colors
+  const COLOR_BY_NAME = {
+    Food: "#9C7EDC",
+    Shopping: "#FFE8B0",
+    Others: "#CFBAD7",
+  };
+
+  const chartData = insightData.categories.map((c) => ({
+    name: c.name,
+    value: c.percentage, // use percentage for the pie values
+    amount: c.amount,
+    color: COLOR_BY_NAME[c.name] || "#ccc",
+  }));
+
   return (
     <div className="savings-page-revamp">
       <Navbar />
@@ -61,7 +102,9 @@ export default function SavingsDashboard() {
         <section className="savings-left-section">
           <div className="section-header-block">
             <h2 className="section-main-title">Savings Information</h2>
-            <p className="section-main-subtitle">Track your transaction history and payment information</p>
+            <p className="section-main-subtitle">
+              Track your transaction history and payment information
+            </p>
           </div>
 
           {/* Savings Summary Card */}
@@ -75,7 +118,7 @@ export default function SavingsDashboard() {
               <h3 className="summary-title-text">Your Savings</h3>
               <p className="summary-balance-label">Total Balance</p>
               <p className="summary-balance-amount">
-                Rp{(savingsData?.totalBalance || 10000000).toLocaleString('id-ID')}
+                Rp{(savingsData?.totalBalance || 10000000).toLocaleString("id-ID")}
               </p>
               <p className="summary-balance-note">including held balance</p>
               <div className="summary-line-divider" />
@@ -98,27 +141,29 @@ export default function SavingsDashboard() {
 
         {/* RIGHT PANEL - Insight This Month */}
         <section className="insight-right-section">
-          <div className="insight-main-box">
+          <div className="insight-header">
             <h2 className="section-main-title">Insight This Month</h2>
+          </div>
 
+          <div className="insight-main-box">
             {/* Income/Expenses/Net Income Cards */}
             <div className="insight-metrics-grid">
               <div className="metric-card metric-card-income">
                 <h4 className="metric-label">Income</h4>
                 <p className="metric-value metric-income">
-                  + Rp{insightData.income.toLocaleString('id-ID')}
+                  + Rp{insightData.income.toLocaleString("id-ID")}
                 </p>
               </div>
               <div className="metric-card metric-card-expenses">
                 <h4 className="metric-label">Expenses</h4>
                 <p className="metric-value metric-expenses">
-                  - Rp{insightData.expenses.toLocaleString('id-ID')}
+                  - Rp{insightData.expenses.toLocaleString("id-ID")}
                 </p>
               </div>
               <div className="metric-card metric-card-net">
                 <h4 className="metric-label">Net Income</h4>
                 <p className="metric-value metric-net-income">
-                  + Rp{insightData.netIncome.toLocaleString('id-ID')}
+                  + Rp{insightData.netIncome.toLocaleString("id-ID")}
                 </p>
               </div>
             </div>
@@ -136,7 +181,7 @@ export default function SavingsDashboard() {
                       <span className="category-row-name">{cat.name}</span>
                       <div className="category-row-values">
                         <span className="category-row-amount">
-                          Rp{cat.amount.toLocaleString('id-ID')}
+                          Rp{cat.amount.toLocaleString("id-ID")}
                         </span>
                         <span className={`category-row-percent cat-color-${cat.name.toLowerCase()}`}>
                           ({cat.percentage}%)
@@ -146,45 +191,28 @@ export default function SavingsDashboard() {
                   ))}
                 </div>
 
-                {/* Pie Chart */}
+                {/* Recharts Pie */}
                 <div className="pie-chart-wrapper">
-                  <svg viewBox="0 0 240 240" className="pie-svg">
-                    {/* Food - 40% - Purple */}
-                    <path
-                      d="M 120 120 L 120 35 A 85 85 0 0 1 204.36 146.5 Z"
-                      fill="#8B5CF6"
-                      stroke="white"
-                      strokeWidth="3"
-                    />
-                    {/* Shopping - 35% - Yellow */}
-                    <path
-                      d="M 120 120 L 204.36 146.5 A 85 85 0 0 1 66.64 179.7 Z"
-                      fill="#FCD34D"
-                      stroke="white"
-                      strokeWidth="3"
-                    />
-                    {/* Others - 25% - Light Purple */}
-                    <path
-                      d="M 120 120 L 66.64 179.7 A 85 85 0 0 1 120 35 Z"
-                      fill="#D8B4FE"
-                      stroke="white"
-                      strokeWidth="3"
-                    />
-                  </svg>
-
-                  {/* Chart Labels with Lines */}
-                  <div className="chart-label-item label-pos-food">
-                    <div className="label-connector"></div>
-                    <span className="label-info">40%<br />Food</span>
-                  </div>
-                  <div className="chart-label-item label-pos-shopping">
-                    <div className="label-connector"></div>
-                    <span className="label-info">35%<br />Shopping</span>
-                  </div>
-                  <div className="chart-label-item label-pos-others">
-                    <div className="label-connector"></div>
-                    <span className="label-info">25%<br />Others</span>
-                  </div>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={95}
+                        dataKey="value"
+                        startAngle={90}
+                        endAngle={-270}
+                        labelLine={false}
+                        isAnimationActive={false}
+                        label={renderCustomLabel}
+                      >
+                        {chartData.map((entry) => (
+                          <Cell key={entry.name} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
             </div>
@@ -202,7 +230,7 @@ function SavingsAccountCard({ title, norekening, balance }) {
       <h4 className="account-item-title">{title}</h4>
       <p className="account-item-number">{norekening}</p>
       <p className="account-item-balance">
-        Effective balance: <strong>Rp{balance.toLocaleString('id-ID')}</strong>
+        Effective balance: <strong>Rp{balance.toLocaleString("id-ID")}</strong>
       </p>
     </div>
   );
