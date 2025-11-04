@@ -21,11 +21,11 @@ export const getUserProfile = async () => {
         },
       }
     );
-    if (res.data?.status && res.data?.data?.profile) {
-      return res.data.data.profile;
+    if (res.data?.status && res.data?.data) {
+      return res.data.data;
     } throw new Error("Invalid API response");
   } catch (error) {
-    console.error("Gagal mengambil data Time Deposits:", error.message);
+    console.error("Gagal mengambil data Time Deposits:", error);
     throw error;
   }
 };
