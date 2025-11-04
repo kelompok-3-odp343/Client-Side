@@ -23,12 +23,16 @@ export default function Profile() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
 
-  // ===== Fetch user profile =====
   useEffect(() => {
     const getProfile = async () => {
-      const response = await getUserProfile();
-      setProfile(response.data.profile);
-      setLoading(false);
+      try {
+        const profileData = await getUserProfile();
+        setProfile(profileData);
+      } catch (err) {
+        console.error("Error loading profile:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     getProfile();
   }, []);

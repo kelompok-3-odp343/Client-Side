@@ -6,26 +6,26 @@ const api = axios.create({
 
 export const getUserProfile = async () => {
   try {
-    const res = await api.get("/api/user/profile");
-    if (res.data?.status) return res.data;
-    throw new Error("Invalid API response");
-  } catch {
-    console.warn("Using dummy profile data (fallback)");
-    return {
-      status: true,
-      data: {
-        profile: {
-          id: "USR001",
-          cif: "9285711829",
-          username: "ulion",
-          first_name: "Ulion",
-          middle_name: "",
-          last_name: "Pardede",
-          dob: "1995-08-28T00:00:00Z",
-          phone_number: "082376180082",
-          email_address: "ulion99pardede@gmail.com",
+    const token = sessionStorage.getItem('token');
+    const userId = sessionStorage.getItem('user_id');
+    const cif = sessionStorage.getItem('cif');
+
+    const res = await api.get("/api/v1/profile",
+      {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "User-Id": userId,
+          "Customer-Id": cif,
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
         },
-      },
-    };
+      }
+    );
+    if (res.data?.status && res.data?.data?.profile) {
+      return res.data.data.profile;
+    } throw new Error("Invalid API response");
+  } catch (error) {
+    console.error("Gagal mengambil data Time Deposits:", error.message);
+    throw error;
   }
 };
