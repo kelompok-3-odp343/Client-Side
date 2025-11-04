@@ -18,59 +18,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     const dataDashboards = async () => {
-      try {
-        const raw = await fetchDashboard();
-        const d = raw?.data;
-
-        if (!d) {
-          console.warn("⚠️ Dashboard dummy digunakan karena data kosong.");
-          setLoading(false);
-          return;
-        }
-
-        const total = d.assetoverview?.totalAsset ?? 0;
-        const income = d.cashFlowOverview?.totalIncome ?? 0;
-        const expenses = d.cashFlowOverview?.totalExpense ?? 0;
-        const receivable = d.cashFlowOverview?.totalReceivable ?? 0;
-
-        const totalBill = d.splitBillOverview?.totalBillAmount ?? 0;
-        const remainingBill = d.splitBillOverview?.remainingBillAmount ?? 0;
-        const paidBill = totalBill - remainingBill;
-        const progress =
-          totalBill > 0 ? Math.round((paidBill / totalBill) * 100) : 0;
-
-        const pf = d.portfolioOverview ?? [];
-        const amt = (name) =>
-          pf.find((p) => p.productName === name)?.totalAmount ?? 0;
-
-        setData({
-          assets_total: { total, extra_this_month: 0 },
-          earnings_overview: { income, expenses },
-          split: {
-            paid: paidBill,
-            remaining: remainingBill,
-            total: totalBill,
-            progress,
-            potential: receivable,
-            ongoing: d.splitBillOverview?.countSplitBill ?? 0,
-          },
-          time_deposits: { total_balance: amt("timeDeposit") },
-          savings: [{ total_balance: amt("accountSavings") }],
-          life_goals: [{ current_savings: amt("lifegoals") }],
-          pension_funds: [{ balance: amt("dplk") }],
-        });
-
-        const mappedCards = (d.accountList ?? []).map((item) => ({
-          type: item.account_product_name,
-          account_number: item.account_number,
-          card_number: item.debit_card_number || item.account_number,
-          account_holder_name: item.account_name,
-          showCardNumber: false,
-        }));
-
-        setCards(mappedCards);
-      } finally {
+      const raw = await fetchDashboard();
+      if (!raw) {
         setLoading(false);
+        return;
       }
 
       const d = raw.data;
@@ -115,9 +66,6 @@ export default function Dashboard() {
         showCardNumber: false,
       }));
       setCards(mappedCards);
-      console.log('zxccc', d.accountList);
-
-
       setLoading(false);
     };
 

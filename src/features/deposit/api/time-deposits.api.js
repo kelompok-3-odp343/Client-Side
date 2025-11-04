@@ -1,51 +1,38 @@
 import axios from "axios";
+
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
-export const getTimeDeposits = async (userId) => {
-    try {
-        const response = await api.get(`/api/time-deposits/${userId}`);
 
-        // Pastikan response valid
+export const getTimeDeposits = async () => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const userId = sessionStorage.getItem("user_id");
+        const customerId = sessionStorage.getItem("cif");
+        console.log('s', customerId);
+
+        if (!token || !userId || !customerId) {
+            throw new Error("Missing token, User-Id, or Customer-Id in sessionStorage");
+        }
+
+        const response = await api.get(`/api/v1/detail-deposit`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "User-Id": userId,
+                "Customer-Id": customerId,
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
+            },
+        });
+
         if (response.data && response.data.status === true) {
-            console.log("data dari api");
             return response.data;
         } else {
             throw new Error("Invalid API response structure");
         }
     } catch (error) {
-        console.warn("Coba data jadi dummy dulu", error.message);
-        const dummyResponse = {
-            status: true,
-            message: "Time deposits fetched successfully (dummy)",
-            data: {
-                fund_id: `AGG_TIMEDEPOSITS_${userId}`,
-                title: "Time Deposits",
-                total_balance: 5100000,
-                count_accounts: 2,
-                items: [{
-                    item_id: "TDA001",
-                    deposit_account_number: "TD123456",
-                    balance: 1000000,
-                    tenor_months: 3,
-                    maturity_date: "2025-11-28T00:00:00Z",
-                    interest_rate: 0.4,
-                    status: "ACTIVE",
-                },
-                {
-                    item_id: "TDA002",
-                    deposit_account_number: "TD987654",
-                    balance: 31000000,
-                    tenor_months: 6,
-                    maturity_date: "2026-01-10T00:00:00Z",
-                    interest_rate: 0.5,
-                    status: "ACTIVE",
-                },
-                ],
-            },
-        };
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        return dummyResponse;
+        console.error("Gagal mengambil data Time Deposits:", error.message);
+        throw error;
     }
 };
