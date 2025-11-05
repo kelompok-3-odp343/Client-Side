@@ -11,10 +11,10 @@ export async function fetchDashboard() {
 
     const resp = await api.get(`/api/v1/fetch-dashboard`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "User-Id": sessionStorage.getItem("user_id"),
         "Customer-Id": sessionStorage.getItem("cif"),
-        Accept: "application/json",
+        "Accept": "application/json",
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },

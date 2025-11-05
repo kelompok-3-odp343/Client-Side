@@ -6,6 +6,9 @@ import { AnimatePresence } from "framer-motion";
 import Login from "../features/auth/pages/Login";
 import OtpLogin from "../features/auth/pages/OtpLogin";
 import PopupBlock from "../features/auth/pages/Blocked";
+import ForgotPasswordRequest from '../features/auth/pages/ForgotPasswordRequest';
+import ForgotPasswordOtp from '../features/auth/pages/ForgotPasswordOtp';
+import ForgotPasswordReset from '../features/auth/pages/ForgotPasswordReset';
 
 // === Nasabah (User) ===
 import Dashboard from "../features/dashboard/pages/Dashboard";
@@ -42,6 +45,9 @@ export default function AppRoutes() {
         <Route path="/" element={<Login />} />
         <Route path="/otpLogin" element={<OtpLogin />} />
         <Route path="/popupblock" element={<PopupBlock />} />
+        <Route path="/forgot" element={<ForgotPasswordRequest />} />
+        <Route path="/forgot/otp" element={<ForgotPasswordOtp />} />
+        <Route path="/forgot/reset" element={<ForgotPasswordReset />} />
 
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />

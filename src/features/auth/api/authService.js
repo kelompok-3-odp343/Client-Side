@@ -4,10 +4,6 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-/**
- * Login utama, terintegrasi ke API.
- * Jika API gagal, sistem pakai dummy login (DEV ONLY) agar bisa tes admin & nasabah.
- */
 export async function postAuthLogin({ username, password }) {
   try {
     const payload = { username, password };
@@ -15,7 +11,6 @@ export async function postAuthLogin({ username, password }) {
     const data = resAuth.data;
     return { ok: true, data };
   } catch (error) {
-    // === Fallback development-only (API off, dummy credentials) ===
     if (import.meta.env.MODE !== "production") {
       const uname = username?.toLowerCase?.() || "";
 
@@ -33,7 +28,6 @@ export async function postAuthLogin({ username, password }) {
         };
       }
 
-      // Nasabah dummy
       if (uname === "user" && password === "password") {
         return {
           ok: true,
@@ -47,14 +41,12 @@ export async function postAuthLogin({ username, password }) {
         };
       }
 
-      // OTP dummy untuk keduanya
       return {
         ok: false,
         message: "Invalid username or password (DEV MODE)",
       };
     }
 
-    // === Production: tetap error API ===
     return {
       ok: false,
       message:
@@ -65,9 +57,6 @@ export async function postAuthLogin({ username, password }) {
   }
 }
 
-/**
- * OTP verification — tetap panggil API
- */
 export async function postVerifyOtp({ sessionID, otp_code }) {
   try {
     const payload = {
@@ -77,7 +66,6 @@ export async function postVerifyOtp({ sessionID, otp_code }) {
     const res = await api.post(`/api/auth/verify-otp`, payload);
     return { ok: true, data: res.data };
   } catch (error) {
-    // Fallback OTP untuk DEV mode
     if (import.meta.env.MODE !== "production") {
       if (otp_code === "123456" || otp_code === "000000") {
         return {
@@ -108,6 +96,76 @@ export async function postResendOtp({ sessionID }) {
         error?.response?.data?.message ||
         error?.message ||
         "Gagal mengirim ulang kode OTP. Silakan coba beberapa saat lagi.",
+    };
+  }
+}
+
+/**
+ * @param {string} username
+ */
+export async function postForgotPasswordRequestOtp({ username }) {
+  try {
+    const res = await api.post(`/api/auth/forgot-password/request-otp`, {
+      username,
+    });
+    return { ok: true, data: res.data };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Gagal mengirim OTP. Silakan coba lagi.",
+    };
+  }
+}
+
+/**
+ * @param {string} sessionId
+ * @param {string} otpCode
+ */
+export async function postForgotPasswordVerifyOtp({ sessionId, otpCode }) {
+  try {
+    const res = await api.post(`/api/auth/forgot-password/verify-otp`, {
+      sessionId,
+      otpCode,
+    });
+    return { ok: true, data: res.data };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Verifikasi OTP gagal. Silakan coba lagi.",
+    };
+  }
+}
+
+/**
+ * @param {string} verifiedSession
+ * @param {string} newPassword
+ * @param {string} confirmPassword
+ */
+export async function postForgotPasswordReset({
+  verifiedSession,
+  newPassword,
+  confirmPassword,
+}) {
+  try {
+    const res = await api.post(`/api/auth/forgot-password/reset-password`, {
+      verifiedSession,
+      newPassword,
+      confirmPassword,
+    });
+    return { ok: true, data: res.data };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Gagal memperbarui password. Silakan coba beberapa saat lagi.",
     };
   }
 }
