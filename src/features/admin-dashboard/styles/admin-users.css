@@ -4,46 +4,101 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+	gap: 1.5rem;
+}
+
+/* Statistics Cards */
+.stats-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1rem;
+	flex-shrink: 0;
+}
+
+.stat-card {
+	background: #ffffff;
+	border-radius: 12px;
+	padding: 1.25rem;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stat-total {
+	border-top: 4px solid #6b7280;
+}
+
+.stat-active {
+	border-top: 4px solid #10b981;
+}
+
+.stat-blocked {
+	border-top: 4px solid #ef4444;
+}
+
+.stat-avg {
+	border-top: 4px solid #f59e0b;
+}
+
+.stat-label {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #6b7280;
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.stat-value {
+	font-size: 2rem;
+	font-weight: 700;
+	color: #1f2937;
+	margin: 0;
+}
+
+.stat-value-active {
+	color: #10b981;
+}
+
+.stat-value-blocked {
+	color: #ef4444;
 }
 
 .view-details-btn {
-    background: none;
-    color: #f97316;
-    border: 1.5px solid rgba(249, 115, 22, 0.35);
-    padding: 6px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: "Inter", "Poppins", "Segoe UI", sans-serif;
-    letter-spacing: 0.2px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.4;
+	background: #fff7ed;
+	color: #ea580c;
+	border: 1px solid #fed7aa;
+	padding: 0.5rem 1rem;
+	border-radius: 6px;
+	font-size: 0.875rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s;
+	white-space: nowrap;
 }
 
 .view-details-btn:hover {
-    background: rgba(249, 115, 22, 0.08);
-    border-color: rgba(249, 115, 22, 0.6);
-    color: #ea580c;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(249, 115, 22, 0.12);
-}
-
-.view-details-btn:active {
-    transform: translateY(0);
-    box-shadow: none;
-}
-
-.view-details-btn:focus-visible {
-    outline: 2px solid rgba(249, 115, 22, 0.5);
-    outline-offset: 2px;
+	background: #ffedd5;
+	border-color: #fb923c;
 }
 
 @media (max-width: 768px) {
 	.admin-users-main {
 		padding: 1rem;
+	}
+
+	.stats-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.stat-value {
+		font-size: 1.5rem;
 	}
 }

@@ -15,8 +15,32 @@ export default function AdminUsers() {
 	const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 	const [filterStatus, setFilterStatus] = useState([]);
 	const [showStatusFilter, setShowStatusFilter] = useState(false);
+	const [refreshKey, setRefreshKey] = useState(0);
 
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+	// Listen for status changes from user detail page
+	React.useEffect(() => {
+		const handleStatusChange = () => {
+			setRefreshKey(prev => prev + 1);
+		};
+		
+		window.addEventListener('userStatusChanged', handleStatusChange);
+		
+		// Also refresh when component becomes visible again
+		const handleVisibilityChange = () => {
+			if (!document.hidden) {
+				setRefreshKey(prev => prev + 1);
+			}
+		};
+		
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+		
+		return () => {
+			window.removeEventListener('userStatusChanged', handleStatusChange);
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
+		};
+	}, []);
 
 	// Raw accounts data
 	const rawAccounts = [
@@ -192,6 +216,17 @@ export default function AdminUsers() {
 
 	// Group accounts by CIF to get unique users
 	const users = useMemo(() => {
+		// Get saved statuses from sessionStorage
+		let savedStatuses = {};
+		try {
+			const saved = sessionStorage.getItem('userStatuses');
+			if (saved) {
+				savedStatuses = JSON.parse(saved);
+			}
+		} catch (e) {
+			console.error('Error parsing user statuses:', e);
+		}
+		
 		const groupedByCif = rawAccounts.reduce((acc, account) => {
 			if (!acc[account.cif]) {
 				acc[account.cif] = {
@@ -206,15 +241,17 @@ export default function AdminUsers() {
 
 		return Object.values(groupedByCif).map((user) => {
 			const hasBlocked = user.accounts.some((acc) => acc.status === "Blocked");
+			// Check if status has been manually updated in sessionStorage
+			const manualStatus = savedStatuses[user.cif];
 			return {
 				cif: user.cif,
 				customerName: user.customerName,
-				status: hasBlocked ? "Blocked" : "Active",
+				status: manualStatus || (hasBlocked ? "Blocked" : "Active"),
 				accountCount: user.accounts.length,
 				accounts: user.accounts,
 			};
 		});
-	}, []);
+	}, [refreshKey]); // Re-compute when refreshKey changes
 
 	const tableColumns = [
 		{ key: "no", label: "No", sortable: false },
@@ -227,6 +264,14 @@ export default function AdminUsers() {
 
 	// Get unique statuses
 	const statuses = ["Active", "Blocked"];
+
+	// Calculate statistics
+	const totalUsers = users.length;
+	const activeUsers = users.filter(u => u.status === "Active").length;
+	const blockedUsers = users.filter(u => u.status === "Blocked").length;
+	const avgAccountsPerUser = users.length > 0 
+		? Math.round(users.reduce((sum, u) => sum + u.accountCount, 0) / users.length)
+		: 0;
 
 	// Filter and search
 	const filteredUsers = users.filter((user) => {
@@ -261,7 +306,11 @@ export default function AdminUsers() {
 	});
 
 	const handleViewDetails = (user) => {
-		navigate(`/admin/users/${user.cif}`, { state: { user } });
+		navigate(`/admin/users/${user.cif}`, { 
+			state: { 
+				user: user
+			} 
+		});
 	};
 
 	const toggleStatusFilter = (status) => {
@@ -347,7 +396,11 @@ export default function AdminUsers() {
 
 		if (column.key === "action") {
 			return (
-				<button className="view-details-btn" onClick={() => handleViewDetails(row)}>
+				<button 
+					className="view-details-btn" 
+					onClick={() => handleViewDetails(row)}
+					type="button"
+				>
 					View details
 				</button>
 			);
@@ -362,6 +415,27 @@ export default function AdminUsers() {
 			<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
 			<main className="admin-users-main">
+				{/* Statistics Cards */}
+				<div className="stats-grid">
+					<div className="stat-card stat-total">
+						<h3 className="stat-label">Total Users</h3>
+						<div className="stat-value">{totalUsers.toLocaleString('id-ID')}</div>
+					</div>
+					<div className="stat-card stat-active">
+						<h3 className="stat-label">Active Users</h3>
+						<div className="stat-value stat-value-active">{activeUsers.toLocaleString('id-ID')}</div>
+					</div>
+					<div className="stat-card stat-blocked">
+						<h3 className="stat-label">Blocked Users</h3>
+						<div className="stat-value stat-value-blocked">{blockedUsers.toLocaleString('id-ID')}</div>
+					</div>
+					<div className="stat-card stat-avg">
+						<h3 className="stat-label">Avg. # of Accounts per User</h3>
+						<div className="stat-value">{avgAccountsPerUser}</div>
+					</div>
+				</div>
+
+				{/* Users Table */}
 				<DataTable
 					title="Users List"
 					columns={tableColumns}
