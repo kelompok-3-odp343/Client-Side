@@ -25,6 +25,7 @@ import AdminHome from "../features/admin-dashboard/pages/AdminHome";
 import AdminTransactions from "../features/admin-dashboard/pages/AdminTransactions";
 import AdminUsers from "../features/admin-dashboard/pages/AdminUsers";
 import AdminUserDetail from "../features/admin-dashboard/pages/AdminUserDetail";
+import useAutoLogout from "../shared/hooks/useAutoLogout";
 
 // === Routes ===
 import PrivateRoute from "./PrivateRoute";
@@ -32,15 +33,16 @@ import PrivateRoute from "./PrivateRoute";
 export default function AppRoutes() {
   const location = useLocation();
 
+  useAutoLogout(60, 30);
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* ==== Shared Auth Routes ==== */}
+
         <Route path="/" element={<Login />} />
         <Route path="/otpLogin" element={<OtpLogin />} />
         <Route path="/popupblock" element={<PopupBlock />} />
 
-        {/* ==== Protected Routes (User) ==== */}
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/lifegoals" element={<LifeGoals />} />
@@ -52,10 +54,9 @@ export default function AppRoutes() {
           <Route path="/savings" element={<SavingsDashboard />} />
           <Route path="/pensionfunds" element={<PensionFunds />} />
           <Route path="/splitbill" element={<SplitBill />} />
-          <Route path="/splitbill/detail/:id" element={<SplitBillDetail />} />
+          <Route path="/splitbill/detail" element={<SplitBillDetail />} />
         </Route>
 
-        {/* ==== Protected Routes (Admin) ==== */}
         <Route element={<PrivateRoute />}>
           <Route path="/admin/home" element={<AdminHome />} />
           <Route path="/admin/transactions" element={<AdminTransactions />} />
@@ -63,7 +64,6 @@ export default function AppRoutes() {
           <Route path="/admin/users/:id" element={<AdminUserDetail />} />
         </Route>
 
-        {/* ==== Fallback ==== */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </AnimatePresence>
