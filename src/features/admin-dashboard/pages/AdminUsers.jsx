@@ -419,18 +419,22 @@ export default function AdminUsers() {
 				<div className="stats-grid">
 					<div className="stat-card stat-total">
 						<h3 className="stat-label">Total Users</h3>
+						<hr></hr>
 						<div className="stat-value">{totalUsers.toLocaleString('id-ID')}</div>
 					</div>
 					<div className="stat-card stat-active">
 						<h3 className="stat-label">Active Users</h3>
+						<hr></hr>
 						<div className="stat-value stat-value-active">{activeUsers.toLocaleString('id-ID')}</div>
 					</div>
 					<div className="stat-card stat-blocked">
 						<h3 className="stat-label">Blocked Users</h3>
+						<hr></hr>
 						<div className="stat-value stat-value-blocked">{blockedUsers.toLocaleString('id-ID')}</div>
 					</div>
 					<div className="stat-card stat-avg">
 						<h3 className="stat-label">Avg. # of Accounts per User</h3>
+						<hr></hr>
 						<div className="stat-value">{avgAccountsPerUser}</div>
 					</div>
 				</div>
