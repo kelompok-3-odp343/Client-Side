@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
 import "../styles/auth-otp.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
-import { postVerifyOtp } from "../api/authService";
+import { postVerifyOtp, postResendOtp } from "../api/authService";
 
 export default function OtpLogin() {
 	const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -51,8 +51,12 @@ export default function OtpLogin() {
 			return;
 		}
 
-		sessionStorage.setItem("token", resp.data.token || "DEV_TOKEN");
-		sessionStorage.setItem("role", "user");
+		sessionStorage.setItem("token", resp.data.token);
+		sessionStorage.setItem("user_id", resp.data.user.userId);
+		sessionStorage.setItem("username", resp.data.user.username);
+		sessionStorage.setItem("role", resp.data.user.role);
+		sessionStorage.setItem("cif", resp.data.user.cif);
+		sessionStorage.setItem("attempt", resp.data.attemptCount);
 
 		setMessage("✅ OTP Verified (DEV MODE)");
 		setShowModal(true);
@@ -63,9 +67,28 @@ export default function OtpLogin() {
 		}, 800);
 	};
 
-	const handleResend = () => {
+	const handleResend = async () => {
+		const sessionID = sessionStorage.getItem("sessionID");
+		if (!sessionID) {
+			setMessage("Session expired. Please log in again.");
+			setShowModal(true);
+			setTimeout(() => navigate("/"), 2000);
+			return;
+		}
+
 		if (resendTimer > 0) return;
-		setResendTimer(30);
+
+		const resp = await postResendOtp({ sessionID });
+
+		if (!resp.ok) {
+			setMessage(resp.message);
+			setShowModal(true);
+			return;
+		}
+
+		const cooldown = resp.data?.resendCooldown ?? 30;
+		setResendTimer(cooldown);
+
 		const interval = setInterval(() => {
 			setResendTimer((prev) => {
 				if (prev <= 1) {
@@ -75,6 +98,8 @@ export default function OtpLogin() {
 				return prev - 1;
 			});
 		}, 1000);
+		setMessage(resp.data.message || "Kode OTP baru telah dikirim.");
+		setShowModal(true);
 	};
 
 	return (
@@ -100,7 +125,12 @@ export default function OtpLogin() {
 					))}
 				</div>
 
-				<button type="button" className="otp-btn" onClick={handleVerify} disabled={loading}>
+				<button
+					type="button"
+					className="otp-btn"
+					onClick={handleVerify}
+					disabled={loading}
+				>
 					{loading ? "Verifying..." : "Verify OTP"}
 				</button>
 

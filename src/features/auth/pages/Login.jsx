@@ -59,6 +59,11 @@ export default function Login() {
 		}, 800);
 	};
 
+	const handleForgotPassword = (e) => {
+		e.preventDefault();
+		navigate("/forgot");
+	};
+
 	return (
 		<div className="auth-background">
 			<div className="login-box fade-in">
@@ -94,7 +99,9 @@ export default function Login() {
 					</div>
 
 					<div className="forgot-password">
-						<a href="#">Forgot password?</a>
+						<a href="#" onClick={handleForgotPassword}>
+							Forgot password?
+						</a>
 					</div>
 
 					<button type="submit" className="login-btn" disabled={loading}>

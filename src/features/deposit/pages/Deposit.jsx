@@ -18,8 +18,8 @@ export default function Deposits() {
 
   const dataDeposit = async () => {
     try {
-      const responseData = await getTimeDeposits("USR001");
-      const resApi = responseData.data
+      const responseData = await getTimeDeposits();
+      const resApi = responseData.data;
 
       const formattedData = {
         totalBalance: resApi.total_balance,
@@ -46,30 +46,15 @@ export default function Deposits() {
 
       setDepositsData(formattedData);
     } catch (err) {
-      console.error("test", err);
-
+      console.error("❌ Error get deposits:", err);
     }
-  }
+  };
 
   const dummyTransactions = [
     { date: "31 May 2025", month: "May", type: "Long Term", detail: "Admin fee", amount: "-Rp1.000" },
     { date: "31 May 2025", month: "May", type: "Short Term", detail: "Management fee", amount: "-Rp7" },
     { date: "30 May 2025", month: "May", type: "Short Term", detail: "Deposits", amount: "-Rp3.500" },
   ];
-
-  // Function ambil data
-  // const fetchDeposits = async () => {
-  //   try {
-  //     const res = await fetch("http://localhost:5000/api/deposits");
-  //     if (!res.ok) throw new Error("Failed to fetch deposits");
-  //     const data = await res.json();
-  //     setDepositsData(data);
-  //     console.log("✅ Data deposits diambil dari backend");
-  //   } catch (error) {
-  //     console.warn("⚠️ Backend tidak aktif, gunakan dummyDeposits");
-  //     setDepositsData(dummyDeposits);
-  //   }
-  // };
 
   const fetchTransactions = async (month) => {
     try {

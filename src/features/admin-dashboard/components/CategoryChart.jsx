@@ -1,7 +1,33 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import "../styles/category-chart.css";
+
+const renderCustomLabel = ({ cx, cy, midAngle, outerRadius, percent, name }) => {
+	const RADIAN = Math.PI / 180;
+	const radius = outerRadius * 1.35;
+	const x = cx + radius * Math.cos(-midAngle * RADIAN);
+	const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+	return (
+		<text
+			x={x}
+			y={y}
+			fill="#000"
+			textAnchor="middle"
+			dominantBaseline="central"
+			fontSize="1rem"
+			fontWeight="800"
+		>
+			<tspan x={x} dy="-0.6em">
+				{`${(percent * 100).toFixed(0)}%`}
+			</tspan>
+			<tspan x={x} dy="1.2em" fontSize="0.9rem" fontWeight="700">
+				{name}
+			</tspan>
+		</text>
+	);
+};
 
 export default function CategoryChart({ data, title = "Transaction Category" }) {
 	return (
@@ -16,20 +42,6 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 							<span className="category-amount">: {item.amount}</span>
 						</div>
 					))}
-
-					{/* <div className="category-percentages">
-						{data.map((item) => (
-							<div key={item.name} className="percentage-item">
-								<span
-									className="percentage-bar"
-									style={{ background: item.color, width: `${item.value}%` }}
-								></span>
-								<span className="percentage-text">
-									{item.value}% {item.name}
-								</span>
-							</div>
-						))}
-					</div> */}
 				</div>
 
 				<div className="category-chart">
@@ -44,34 +56,8 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 								startAngle={90}
 								endAngle={-270}
 								labelLine={false}
-								label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
-								const RADIAN = Math.PI / 180;
-								const radius = outerRadius * 1.35;
-								const x = cx + radius * Math.cos(-midAngle * RADIAN);
-								const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-								return (
-								<text
-									x={x}
-									y={y}
-									fill="#000"
-									// textAnchor={x > cx ? "start" : "end"}
-									textAnchor="middle"
-									dominantBaseline="central"
-									fontSize="1rem"
-									fontWeight="800"
-								>
-									<tspan x={x} dy="-0.6em">{`${(percent * 100).toFixed(0)}%`}</tspan>
-        							<tspan
-										x={x}
-										dy="1.2em"
-										fontSize="0.9rem"
-										fontWeight="700"
-									>
-										{name}</tspan>
-								</text>
-								);
-							}}
+								isAnimationActive={false}
+								label={renderCustomLabel}
 							>
 								{data.map((entry) => (
 									<Cell key={entry.name} fill={entry.color} />

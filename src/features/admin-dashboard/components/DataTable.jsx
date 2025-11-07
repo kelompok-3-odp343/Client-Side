@@ -2,6 +2,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import "../styles/data-table.css";
 
+const getSortIcon = (sortConfig, columnKey) => {
+	if (!sortConfig) return "⇅";
+	if (sortConfig.key === columnKey) {
+		return sortConfig.direction === "asc" ? "▲" : "▼";
+	}
+	return "⇅";
+};
+
 export default function DataTable({
 	title,
 	columns,
@@ -9,17 +17,11 @@ export default function DataTable({
 	sortConfig,
 	onSort,
 	renderCell,
+	renderColumnHeader,
 	searchBar,
 	tableClassName = "",
 	headerColor = "teal",
 }) {
-	const getSortIcon = (columnKey) => {
-		if (sortConfig?.key === columnKey) {
-			return sortConfig.direction === "asc" ? "▲" : "▼";
-		}
-		return null;
-	};
-
 	return (
 		<section className="data-table-section">
 			<div className="table-header">
@@ -34,23 +36,32 @@ export default function DataTable({
 							{columns.map((column) => (
 								<th
 									key={column.key}
-									className={column.sortable ? "sortable" : ""}
+									className={`${column.sortable ? "sortable " : ""}${column.key}-col`}
 									onClick={column.sortable ? () => onSort(column.key) : undefined}
 								>
-									{column.label}
-									{column.sortable && sortConfig && (
-										<span className="sort-icon">{getSortIcon(column.key)}</span>
-									)}
+									<div className="th-content">
+										<span className="th-label">{column.label}</span>
+										<div className="th-icons">
+											{column.sortable && (
+												<span className="sort-icon">
+													{getSortIcon(sortConfig, column.key)}
+												</span>
+											)}
+											{column.filterable &&
+												renderColumnHeader &&
+												renderColumnHeader(column)}
+										</div>
+									</div>
 								</th>
 							))}
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((row) => (
+						{data.map((row, rowIndex) => (
 							<tr key={row.id || JSON.stringify(row)}>
 								{columns.map((column) => (
-									<td key={column.key}>
-										{renderCell ? renderCell(row, column) : row[column.key]}
+									<td key={column.key} className={`${column.key}-col`}>
+										{renderCell ? renderCell(row, column, rowIndex) : row[column.key]}
 									</td>
 								))}
 							</tr>
@@ -71,6 +82,7 @@ DataTable.propTypes = {
 			key: PropTypes.string.isRequired,
 			label: PropTypes.string.isRequired,
 			sortable: PropTypes.bool,
+			filterable: PropTypes.bool,
 		})
 	).isRequired,
 	data: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -80,6 +92,7 @@ DataTable.propTypes = {
 	}),
 	onSort: PropTypes.func,
 	renderCell: PropTypes.func,
+	renderColumnHeader: PropTypes.func,
 	searchBar: PropTypes.node,
 	tableClassName: PropTypes.string,
 	headerColor: PropTypes.string,

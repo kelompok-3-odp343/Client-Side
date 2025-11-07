@@ -23,12 +23,16 @@ export default function Profile() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
 
-  // ===== Fetch user profile =====
   useEffect(() => {
     const getProfile = async () => {
-      const response = await getUserProfile();
-      setProfile(response.data.profile);
-      setLoading(false);
+      try {
+        const profileData = await getUserProfile();
+        setProfile(profileData);
+      } catch (err) {
+        console.error("Error loading profile:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     getProfile();
   }, []);
@@ -49,9 +53,9 @@ export default function Profile() {
     return () => clearInterval(interval);
   }, [timerActive, resendTimer]);
 
-  if (loading) return <p><center>Loading profile...</center></p>;
+  if (loading) return <div style={{ textAlign: "center" }}>Loading profile...</div>;
 
-  const fullName = [profile.first_name, profile.middle_name, profile.last_name]
+  const fullName = [profile.firstName, profile.middleName, profile.lastName]
     .filter(Boolean)
     .join(" ");
   const formattedDOB = new Date(profile.dob).toLocaleDateString("id-ID", {
@@ -185,7 +189,7 @@ export default function Profile() {
               <i className="fas fa-envelope"></i>
               <div>
                 <p className="label">Email Address</p>
-                <p className="value">{profile.email_address}</p>
+                <p className="value">{profile.emailAddress}</p>
               </div>
             </div>
 
@@ -193,15 +197,15 @@ export default function Profile() {
               <i className="fas fa-phone"></i>
               <div>
                 <p className="label">Phone Number</p>
-                <p className="value">{profile.phone_number}</p>
+                <p className="value">{profile.phoneNumber}</p>
               </div>
             </div>
           </div>
 
-          <div className="bottom-buttons">
-            <button className="update-pass-btn" onClick={() => setShowOtpConfirm(true)}>
+          <div className="bottom-buttons flex justify-end">
+            {/* <button className="update-pass-btn" onClick={() => setShowOtpConfirm(true)}>
               Update Password
-            </button>
+            </button> */}
             <button className="signout-btn" onClick={() => setShowLogoutConfirm(true)}>
               Sign Out
             </button>

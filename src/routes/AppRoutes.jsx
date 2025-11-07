@@ -6,6 +6,9 @@ import { AnimatePresence } from "framer-motion";
 import Login from "../features/auth/pages/Login";
 import OtpLogin from "../features/auth/pages/OtpLogin";
 import PopupBlock from "../features/auth/pages/Blocked";
+import ForgotPasswordRequest from '../features/auth/pages/ForgotPasswordRequest';
+import ForgotPasswordOtp from '../features/auth/pages/ForgotPasswordOtp';
+import ForgotPasswordReset from '../features/auth/pages/ForgotPasswordReset';
 
 // === Nasabah (User) ===
 import Dashboard from "../features/dashboard/pages/Dashboard";
@@ -25,6 +28,7 @@ import AdminHome from "../features/admin-dashboard/pages/AdminHome";
 import AdminTransactions from "../features/admin-dashboard/pages/AdminTransactions";
 import AdminUsers from "../features/admin-dashboard/pages/AdminUsers";
 import AdminUserDetail from "../features/admin-dashboard/pages/AdminUserDetail";
+import useAutoLogout from "../shared/hooks/useAutoLogout";
 
 // === Routes ===
 import PrivateRoute from "./PrivateRoute";
@@ -32,15 +36,19 @@ import PrivateRoute from "./PrivateRoute";
 export default function AppRoutes() {
   const location = useLocation();
 
+  useAutoLogout(60, 30);
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* ==== Shared Auth Routes ==== */}
+
         <Route path="/" element={<Login />} />
         <Route path="/otpLogin" element={<OtpLogin />} />
         <Route path="/popupblock" element={<PopupBlock />} />
+        <Route path="/forgot" element={<ForgotPasswordRequest />} />
+        <Route path="/forgot/otp" element={<ForgotPasswordOtp />} />
+        <Route path="/forgot/reset" element={<ForgotPasswordReset />} />
 
-        {/* ==== Protected Routes (User) ==== */}
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/lifegoals" element={<LifeGoals />} />
@@ -52,10 +60,9 @@ export default function AppRoutes() {
           <Route path="/savings" element={<SavingsDashboard />} />
           <Route path="/pensionfunds" element={<PensionFunds />} />
           <Route path="/splitbill" element={<SplitBill />} />
-          <Route path="/splitbill/detail/:id" element={<SplitBillDetail />} />
+          <Route path="/splitbill/detail" element={<SplitBillDetail />} />
         </Route>
 
-        {/* ==== Protected Routes (Admin) ==== */}
         <Route element={<PrivateRoute />}>
           <Route path="/admin/home" element={<AdminHome />} />
           <Route path="/admin/transactions" element={<AdminTransactions />} />
@@ -63,7 +70,6 @@ export default function AppRoutes() {
           <Route path="/admin/users/:id" element={<AdminUserDetail />} />
         </Route>
 
-        {/* ==== Fallback ==== */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </AnimatePresence>

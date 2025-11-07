@@ -1,80 +1,87 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/Navbar";
+import Swal from "sweetalert2";
 import "../styles/split-bill-detail.css";
 import {
-  updateSplitBillStatus,
   getSplitBillById,
+  updateSplitBillStatus,
 } from "../api/split-bill.api";
 
 export default function SplitBillDetail() {
-  const { id } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
 
   const [bill, setBill] = useState(null);
-  const [color, setColor] = useState("#6dddd0");
   const [members, setMembers] = useState([]);
+  const [color, setColor] = useState(state?.color || "#6dddd0");
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadData() {
-      // prioritas: state (navigasi langsung)
-      if (state && state.bill) {
-        setBill(state.bill);
-        setColor(state.color || "#6dddd0");
-        setMembers(state.bill.members);
-        setLoading(false);
+    async function fetchDetail() {
+      if (!state?.splitBillId) {
+        await Swal.fire({
+          icon: "info",
+          title: "Data tidak valid",
+          text: "Split Bill ID tidak ditemukan.",
+          confirmButtonText: "Kembali",
+          confirmButtonColor: "#6dddd0",
+        });
+        navigate("/splitbill");
         return;
       }
 
-      // fallback: fetch by URL param
-      if (id) {
-        const data = await getSplitBillById(id);
-        if (data) {
-          setBill(data);
-          setColor("#6dddd0");
-          setMembers(data.members);
-        } else {
-          setError("Split bill not found.");
-        }
-        setLoading(false);
+      const data = await getSplitBillById(state.splitBillId);
+
+      if (!data || !data.members || data.members.length === 0) {
+        await Swal.fire({
+          icon: "warning",
+          title: "Tidak memiliki Split Bill Detail",
+          text: "Data detail tidak ditemukan atau sudah dihapus.",
+          confirmButtonText: "Kembali",
+          confirmButtonColor: "#6dddd0",
+        });
+        navigate("/splitbill");
+        return;
       }
+
+      setBill(data);
+      setMembers(data.members);
+      setColor("#6dddd0");
+      setLoading(false);
     }
-    loadData();
-  }, [state, id]);
 
-  if (loading) {
+    fetchDetail();
+  }, [state, navigate]);
+
+  if (loading)
+    return (
+      <div className="sb-detail-container">
+        <Navbar />
+        <div className="sb-detail-error">Loading...</div>
+      </div>
+    );
+
+  if (!bill)
     return (
       <div className="sb-detail-container">
         <Navbar />
         <div className="sb-detail-error">
-          <p>Loading...</p>
-          <button onClick={() => navigate("/splitbill")}>Back</button>
+          <p>{error || "Data tidak ditemukan."}</p>
+          <button onClick={() => navigate("/splitbill")}>Kembali</button>
         </div>
       </div>
     );
-  }
 
-  if (!bill) {
-    return (
-      <div className="sb-detail-container">
-        <Navbar />
-        <div className="sb-detail-error">
-          <p>{error || "Data not found."}</p>
-          <button onClick={() => navigate("/splitbill")}>Back</button>
-        </div>
-      </div>
-    );
-  }
 
   const totalPaid = members
     .filter((m) => m.status === "Paid")
-    .reduce((s, m) => s + Number(m.amount || 0), 0);
-  const totalUnpaid = Math.max(0, bill.total_bill - totalPaid);
-  const progressPercent = (totalPaid / Math.max(1, bill.total_bill)) * 100;
+    .reduce((sum, m) => sum + Number(m.amount || 0), 0);
+  const totalUnpaid = Math.max(0, (bill.total_bill || 0) - totalPaid);
+  const progressPercent =
+    (totalPaid / Math.max(1, bill.total_bill || 1)) * 100;
 
   const handleToggleStatus = async (index) => {
     setMembers((prev) =>
@@ -88,13 +95,12 @@ export default function SplitBillDetail() {
       })
     );
 
-    // Jika bukan edit mode, langsung update storage agar progress tersimpan
     if (!isEditing) {
-      const updated = members.map((m, i) => {
-        if (i !== index) return m;
-        if (m.status === "Paid") return m;
-        return { ...m, status: "Paid" };
-      });
+      const updated = members.map((m, i) =>
+        i === index
+          ? { ...m, status: m.status === "Paid" ? "Unpaid" : "Paid" }
+          : m
+      );
       await updateSplitBillStatus(bill.split_bill_id, updated);
       setBill((prev) => ({ ...prev, members: updated }));
     }
@@ -138,8 +144,20 @@ export default function SplitBillDetail() {
       await updateSplitBillStatus(bill.split_bill_id, members);
       setBill((prev) => ({ ...prev, members }));
       setIsEditing(false);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil disimpan",
+        text: "Perubahan data telah disimpan.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch {
-      setError("Failed to save changes.");
+      setError("Gagal menyimpan perubahan.");
+      Swal.fire({
+        icon: "error",
+        title: "Gagal menyimpan",
+        text: "Terjadi kesalahan saat menyimpan perubahan.",
+      });
     }
   };
 
@@ -160,16 +178,16 @@ export default function SplitBillDetail() {
           <div className="title-wrap">
             <h1 className="bill-title">{bill.split_bill_title}</h1>
             <p className="bill-meta">
-              Trx Date:{" "}
-              {new Date(bill.created_time).toLocaleString("en-GB", {
+              Ref ID: <span>{bill.ref_id}</span>
+              <br />
+              Created:{" "}
+              {new Date(bill.created_time).toLocaleString("id-ID", {
                 day: "2-digit",
                 month: "long",
                 year: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
               })}
-              <br />
-              Ref ID: <span>{bill.ref_id}</span>
             </p>
           </div>
 
@@ -196,7 +214,7 @@ export default function SplitBillDetail() {
           <div className="summary-left">
             <div className="label">Bill Total</div>
             <div className="total">
-              Rp{bill.total_bill.toLocaleString("id-ID")}
+              Rp{Number(bill.total_bill || 0).toLocaleString("id-ID")}
             </div>
           </div>
 
@@ -204,13 +222,13 @@ export default function SplitBillDetail() {
             <div className="label-inline">
               <div className="label-small">Paid Amount</div>
               <div className="value paid">
-                Rp{totalPaid.toLocaleString("id-ID")}
+                Rp{Number(totalPaid || 0).toLocaleString("id-ID")}
               </div>
             </div>
             <div className="label-inline">
               <div className="label-small">Unpaid Amount</div>
               <div className="value unpaid">
-                Rp{totalUnpaid.toLocaleString("id-ID")}
+                Rp{Number(totalUnpaid || 0).toLocaleString("id-ID")}
               </div>
             </div>
           </div>
@@ -262,11 +280,15 @@ export default function SplitBillDetail() {
                           <input
                             type="text"
                             inputMode="numeric"
-                            value={m.amount.toLocaleString("id-ID")}
-                            onChange={(e) => handleChangeAmount(i, e.target.value)}
+                            value={Number(m.amount || 0).toLocaleString("id-ID")}
+                            onChange={(e) =>
+                              handleChangeAmount(i, e.target.value)
+                            }
                           />
                         ) : (
-                          <span>{Number(m.amount).toLocaleString("id-ID")}</span>
+                          <span>
+                            {Number(m.amount || 0).toLocaleString("id-ID")}
+                          </span>
                         )}
                       </div>
                     </td>
@@ -281,16 +303,14 @@ export default function SplitBillDetail() {
                         <button
                           className="mark-btn"
                           onClick={() => handleToggleStatus(i)}
-                          disabled={
-                            m.status === "Paid" && !isEditing
-                          }
+                          disabled={m.status === "Paid" && !isEditing}
                           style={
                             m.status === "Paid"
                               ? {
-                                  border: `1.5px solid ${color}`,
-                                  color,
-                                  background: "transparent",
-                                }
+                                border: `1.5px solid ${color}`,
+                                color,
+                                background: "transparent",
+                              }
                               : { background: color, color: "#fff" }
                           }
                         >
