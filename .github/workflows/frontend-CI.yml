@@ -58,7 +58,7 @@ jobs:
             jrtr1/wandoor-frontend-app:frontend-${{ github.sha }}
             jrtr1/wandoor-frontend-app:frontend-latest
 
-               # === Find & Replace image tag di repo infra ===
+      # === Find & Replace image tag di repo infra ===
       - name: Checkout infra repository
         uses: actions/checkout@v3
         with:
