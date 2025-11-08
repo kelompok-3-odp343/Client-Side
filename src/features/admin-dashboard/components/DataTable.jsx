@@ -2,12 +2,29 @@ import React from "react";
 import PropTypes from "prop-types";
 import "../styles/data-table.css";
 
-const getSortIcon = (sortConfig, columnKey) => {
-	if (!sortConfig) return "⇅";
-	if (sortConfig.key === columnKey) {
-		return sortConfig.direction === "asc" ? "▲" : "▼";
-	}
-	return "⇅";
+const getSortIcon = (sortConfig, columnKey, onSort) => {
+	const isActive = sortConfig?.key === columnKey;
+	const ascActive = isActive && sortConfig.direction === "asc";
+	const descActive = isActive && sortConfig.direction === "desc";
+
+	return (
+		<span
+			className={`sort-icons ${isActive ? "active" : ""}`}
+			onClick={(e) => {
+				e.stopPropagation();
+				onSort(columnKey);
+			}}
+			role="button"
+			title="Sort"
+			tabIndex={0}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") onSort(columnKey);
+			}}
+		>
+			<span className={`arrow up ${ascActive ? "active" : ""}`}>↑</span>
+			<span className={`arrow down ${descActive ? "active" : ""}`}>↓</span>
+		</span>
+	);
 };
 
 export default function DataTable({
@@ -37,16 +54,12 @@ export default function DataTable({
 								<th
 									key={column.key}
 									className={`${column.sortable ? "sortable " : ""}${column.key}-col`}
-									onClick={column.sortable ? () => onSort(column.key) : undefined}
 								>
 									<div className="th-content">
 										<span className="th-label">{column.label}</span>
 										<div className="th-icons">
-											{column.sortable && (
-												<span className="sort-icon">
-													{getSortIcon(sortConfig, column.key)}
-												</span>
-											)}
+											{column.sortable &&
+												getSortIcon(sortConfig, column.key, onSort)}
 											{column.filterable &&
 												renderColumnHeader &&
 												renderColumnHeader(column)}

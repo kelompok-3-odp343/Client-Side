@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Clock } from "lucide-react";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
@@ -26,7 +27,7 @@ export default function AdminHome() {
 		{ id: "T3", cif: "9285711831", nik: "3277017005000006", name: "Khairuddin Nasty" },
 		{ id: "T4", cif: "9285711833", nik: "3277017005000008", name: "Oktavia Qurrota A'yuni" },
 		{ id: "T5", cif: "9285711830", nik: "3277017005000005", name: "Ridwan Surya Ghani" },
-		{ id: "T6", cif: "9285711829", nik: "3277017005000004", name: "Ulion Pardede" },
+		{ id: "T6", cif: "9285711829", nik: "3277017005000004", name: "Ulion Alberto Perkasa Pardede" },
 	];
 
 	const categoryData = [
@@ -130,7 +131,7 @@ export default function AdminHome() {
 										Customer Name{" "}
 										<span className="sort-icon">{sortAsc ? "▲" : "▼"}</span>
 									</th>
-									<th>Action</th>
+									<th className="col-action">Action</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -140,13 +141,13 @@ export default function AdminHome() {
 										<td>{transaction.cif}</td>
 										<td>{transaction.nik}</td>
 										<td>{transaction.name}</td>
-										<td>
+										<td className="col-action">
 											<button
 												className="view-btn"
 												onClick={() => handleViewTransactions(transaction)}
 												type="button"
 											>
-												View transaction history
+												<Clock size={30} />
 											</button>
 										</td>
 									</tr>
