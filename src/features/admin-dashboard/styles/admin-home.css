@@ -224,27 +224,35 @@ body {
 
 .transaction-table th.col-no,
 .transaction-table td.col-no {
-  width: 3rem;
+  width: 4rem;
   max-width: 5rem;
+}
+
+.transaction-table th.col-action,
+.transaction-table td.col-action {
+  width: 9rem;
+  max-width: 10rem;
 }
 
 .view-btn {
 	background: none;
-	color: var(--teal-primary);
-	border: 2px solid var(--teal-primary);
-	padding: 0.25rem 0.5rem;
-	border-radius: 10px;
+	box-shadow: none;
+	color: #37D4C2;
+	/* border: 2px solid var(--teal-primary); */
+	padding: 0;
+	/* border-radius: 10px; */
 	font-size: 0.9rem;
 	font-weight: 700;
 	margin-top: 0.25rem;
 	margin-bottom: 0.25rem;
 	cursor: pointer;
-	transition: background 0.2s;
+	transition: all 0.2s;
 	white-space: nowrap;
 }
 
 .view-btn:hover {
-	background: var(--teal-primary);
+	color: #9cf0e6;
+	background: none;
 }
 
 .table-footer {

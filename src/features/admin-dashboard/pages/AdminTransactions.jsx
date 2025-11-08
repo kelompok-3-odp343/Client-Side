@@ -249,7 +249,7 @@ export default function AdminTransactions() {
 						/>
 						<div className="filter-dropdown">
 							<div className="filter-dropdown-header">
-								<span className="filter-dropdown-title">Filter {column.label}</span>
+								<span className="filter-dropdown-title">{column.label}</span>
 								{hasFilter && (
 									<button
 										className="clear-filter-btn"
