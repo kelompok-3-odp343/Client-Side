@@ -20,19 +20,12 @@ export async function fetchAllCards() {
       }
     });
     if (res.data?.data?.length) return res.data.data;
-    // return DUMMY_CARDS;
-    console.log('zxczxc', res);
 
   } catch {
-    console.log('zxczxc123123');
-    // return DUMMY_CARDS;
+    return null
   }
 }
 
-/**
- * Fetch transaction history by month, year, and account number
- * Fallback ke dummy data jika API gagal
- */
 export async function fetchTransactionHistory({ month, year, accountNumber }) {
   try {
     const token = sessionStorage.getItem("token")
@@ -54,14 +47,12 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
       },
     });
 
-    // Validasi struktur dari backend
     if (resp.data?.transaction?.length) return resp.data;
     if (resp.data?.transactions?.length) return resp.data;
   } catch (error) {
     console.warn("API unavailable, using dummy", error?.message);
   }
 
-  // --- Dummy fallback ---
   const dummyRecords = DUMMY_TRX_HISTORY[accountNumber];
   if (!dummyRecords) return { transaction: [] };
 
@@ -71,7 +62,6 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
 
   if (!found) return { transaction: [] };
 
-  // Format mirip response backend
   return {
     month: found.month,
     year: found.year,
