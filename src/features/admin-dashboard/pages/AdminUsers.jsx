@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Filter, X } from "lucide-react";
+import { Filter, X, List } from "lucide-react";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
@@ -356,7 +356,7 @@ export default function AdminUsers() {
 						/>
 						<div className="filter-dropdown">
 							<div className="filter-dropdown-header">
-								<span className="filter-dropdown-title">Filter {column.label}</span>
+								<span className="filter-dropdown-title">{column.label}</span>
 								{hasFilter && (
 									<button
 										className="clear-filter-btn"
@@ -401,7 +401,7 @@ export default function AdminUsers() {
 					onClick={() => handleViewDetails(row)}
 					type="button"
 				>
-					View details
+					<List size={30} />
 				</button>
 			);
 		}

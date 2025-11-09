@@ -304,11 +304,18 @@
 	background: #f3f4f6;
 } */
 
-.filter-checkbox-label input[type="checkbox"] {
+.data-table.header-teal .filter-checkbox-label input[type="checkbox"] {
 	cursor: pointer;
 	width: 16px;
 	height: 16px;
 	accent-color: #6dddd0;
+}
+
+.data-table.header-peach .filter-checkbox-label input[type="checkbox"] {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+	accent-color: #ffbc8e;
 }
 
 .filter-checkbox-label span {
