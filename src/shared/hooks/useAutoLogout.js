@@ -14,7 +14,7 @@ export default function useAutoLogout(timeoutMinutes = 5, warningSeconds = 30) {
     const warningTimer = useRef(null);
 
     useEffect(() => {
-        if (location.pathname === "/login") return;
+        if (location.pathname === "/") return;
 
         const totalTimeout = timeoutMinutes * 60 * 1000;
         const warningTimeout = totalTimeout - warningSeconds * 1000;
@@ -27,7 +27,7 @@ export default function useAutoLogout(timeoutMinutes = 5, warningSeconds = 30) {
                 confirmButtonText: "OK",
             });
             sessionStorage.clear();
-            navigate("/login");
+            navigate("/");
         };
 
         const showWarning = async () => {
