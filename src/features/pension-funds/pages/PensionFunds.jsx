@@ -1,40 +1,47 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
-import "../styles/pension-funds.css"; 
+import "../styles/pension-funds.css";
 import { Download } from "lucide-react";
-import pensionfunds from "../../../assets/images/pension.png"; 
-import { getPensionFunds } from '../api/pension-funds.api';
+import pensionfunds from "../../../assets/images/pension.png";
+import { getPensionFunds, fetchDPLKTransactionHistory } from "../api/pension-funds.api";
+
+const getLastMonths = () => {
+  const now = new Date();
+  const arr = [];
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    arr.push({
+      label: d.toLocaleString("en-US", { month: "short" }),
+      month: d.getMonth() + 1,
+      year: d.getFullYear(),
+    });
+  }
+  return arr.reverse();
+};
 
 export default function PensionFunds() {
-  const months = [
-    "May", "June", "July", "Aug", "Sept", "Oct",
-    "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"
-  ];
+  const [months] = useState(getLastMonths());
+  const [selectedMonth, setSelectedMonth] = useState(getLastMonths()[getLastMonths().length - 1]);
 
-  const [selectedMonth, setSelectedMonth] = useState("May");
   const [pensionFundsData, setPensionFundsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [selectedAccount, setSelectedAccount] = useState(null);
 
   const pension = async () => {
     try {
-      const userId = "USR001";
-      const response = await getPensionFunds(userId);
-
+      const response = await getPensionFunds();
       const funds = Array.isArray(response.data) ? response.data : [];
 
-      const totalBalance = funds.reduce(
-        (sum, f) => sum + f.total_balance,
-        0
-      );
+      const totalBalance = funds.reduce((sum, f) => sum + f.totalBalance, 0);
 
       const pensionFunds = funds.flatMap((f, index) =>
-        f.items.map((item) => ({
-          id: index + 1,
-          title: item.product_name,
-          accountNumber: item.deposit_account_number,
-          balance: item.balance,
-          growth: index % 2 === 0 ? 0.006 : -0.004,
-        }))
+        f.items?.map((item) => ({
+          id: `${index}-${item.fundId}`,
+          title: f.title || "-",
+          accountNumber: item.depositAccountNumber,
+          balance: item.accumulatedBalance,
+          growth: item.growth,
+        })) || []
       );
 
       setPensionFundsData({
@@ -42,29 +49,76 @@ export default function PensionFunds() {
         totalCount: pensionFunds.length,
         pensionFunds,
       });
+
+      if (pensionFunds.length) {
+        setSelectedAccount(pensionFunds[0].accountNumber);
+      }
+
     } catch (error) {
       console.error("error", error);
+      setPensionFundsData({
+        totalBalance: 0,
+        totalCount: 0,
+        pensionFunds: [],
+      });
     }
-  }
+  };
 
-  const dummyTransactions = [
-    { date: "31 May 2025", month: "May", type: "Simponi Likuid", detail: "Admin fee", amount: "-Rp1.000" },
-    { date: "31 May 2025", month: "May", type: "Simponi Likuid Syariah", detail: "Management fee", amount: "-Rp7" },
-    { date: "30 May 2025", month: "May", type: "Simponi Likuid Syariah", detail: "Pension Fund Contribution", amount: "-Rp3.500" },
-  ];
+  const mapDPLKTransactions = (list) => {
+    const groups = {};
+
+    list.forEach((tx) => {
+      const d = new Date(tx.transactionDate);
+      const key = d.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+      });
+
+      if (!groups[key]) {
+        groups[key] = { date: key, sortKey: d.getTime(), items: [] };
+      }
+
+      const prefix = tx.debit_credit === "C" ? "+" : "-";
+
+      groups[key].items.push({
+        type: tx.transactionType || "-",
+        detail: tx.description || tx.partyName || "-",
+        amount: prefix + tx.amount,
+      });
+    });
+
+    return Object.values(groups)
+      .sort((a, b) => b.sortKey - a.sortKey)
+      .map(({ sortKey, ...rest }) => rest);
+  };
+
+  const fetchDPLKTransactionsForMonth = async (m) => {
+    if (!selectedAccount) return;
+
+    const data = await fetchDPLKTransactionHistory({
+      month: m.month,
+      year: m.year,
+      accountNumber: selectedAccount,
+    });
+
+    const list = data.transactions || data.transaction || [];
+
+    if (!list.length) {
+      setTransactions([]);
+      return;
+    }
+
+    const grouped = mapDPLKTransactions(list);
+    setTransactions(grouped);
+  };
 
   useEffect(() => {
     pension();
-    // Filter transaksi sesuai bulan yang dipilih
-    const filtered = dummyTransactions.filter((tx) => tx.month === selectedMonth);
-    setTransactions(filtered);
-  }, [selectedMonth]);
+  }, []);
 
-  // Group transaksi berdasarkan tanggal
-  const groupedTransactions = transactions.reduce((acc, tx) => {
-    acc[tx.date] = acc[tx.date] ? [...acc[tx.date], tx] : [tx];
-    return acc;
-  }, {});
+  useEffect(() => {
+    fetchDPLKTransactionsForMonth(selectedMonth);
+  }, [selectedMonth, selectedAccount]);
 
   return (
     <div className="pension-fund-page">
@@ -87,13 +141,21 @@ export default function PensionFunds() {
             <div className="pension-fund-summary-right">
               <h3 className="summary-title">Total Pension Funds</h3>
               <p className="summary-label">Total Balance</p>
-              <p className="summary-balance">Rp{pensionFundsData?.totalBalance.toLocaleString()}</p>
+
+              <p className="summary-balance">
+                Rp{(pensionFundsData?.totalBalance || 0).toLocaleString()}
+              </p>
+
               <div className="summary-divider" />
-              <p className="summary-sub">You have {pensionFundsData?.totalCount} Pension Funds</p>
+
+              <p className="summary-sub">
+                You have {pensionFundsData?.totalCount || 0} Pension Funds
+              </p>
             </div>
           </div>
 
           <h3 className="your-pension-title">Your Account Numbers</h3>
+
           <div className="account-number-grid">
             {pensionFundsData?.pensionFunds?.map((d) => (
               <div key={d.id} className="account-number-column">
@@ -113,22 +175,23 @@ export default function PensionFunds() {
           <div className="months">
             {months.map((m) => (
               <button
-                key={m}
-                className={`month-btn-dplk ${selectedMonth === m ? "active" : ""}`}
+                key={m.month + "-" + m.year}
+                className={`month-btn-dplk ${m.month === selectedMonth.month && m.year === selectedMonth.year ? "active" : ""
+                  }`}
                 onClick={() => setSelectedMonth(m)}
               >
-                {m}
+                {m.label}
               </button>
             ))}
           </div>
 
           <div className="transaction-list">
             {transactions.length > 0 ? (
-              Object.keys(groupedTransactions).map((date) => (
-                <div key={date} className="transaction-group">
-                  <p className="transaction-date"><strong>{date}</strong></p>
+              transactions.map((group) => (
+                <div key={group.date} className="transaction-group">
+                  <p className="transaction-date"><strong>{group.date}</strong></p>
                   <hr />
-                  {groupedTransactions[date].map((tx, i) => (
+                  {group.items.map((tx, i) => (
                     <div key={i} className="transaction-item">
                       <div className="tx-left">
                         <div className="tx-icon">★</div>
@@ -145,7 +208,7 @@ export default function PensionFunds() {
                 </div>
               ))
             ) : (
-              <p className="no-tx">No transactions available for {selectedMonth}</p>
+              <p className="no-tx">No transactions available for {selectedMonth.label}</p>
             )}
           </div>
         </section>
@@ -154,7 +217,6 @@ export default function PensionFunds() {
   );
 }
 
-/* Account Number Card */
 function AccountNumberCard({ title, accountNumber, balance, growth }) {
   return (
     <div className="account-number-card">
@@ -164,13 +226,23 @@ function AccountNumberCard({ title, accountNumber, balance, growth }) {
       </div>
       <hr />
       <div className="account-balance">
-        <p><span>Accumulated balance</span><span><strong>Rp{balance.toLocaleString()}</strong></span></p>
-        <p><span>Growth</span>
-        <span style={{
-          color:
-          growth > 0 ? "#3DBF4A" :
-          growth < 0 ? "#F94449" : "#000"}}
-          ><strong>({growth > 0 ? "+" : ""}{growth*100}%)</strong></span></p>
+        <p>
+          <span>Accumulated balance</span>
+          <span><strong>Rp{balance.toLocaleString()}</strong></span>
+        </p>
+
+        <p>
+          <span>Growth</span>
+          <span style={{
+            color:
+              growth > 0 ? "#3DBF4A" :
+                growth < 0 ? "#F94449" : "#000"
+          }}>
+            <strong>
+              ({growth > 0 ? "+" : ""}{(growth * 100).toFixed(2)}%)
+            </strong>
+          </span>
+        </p>
       </div>
     </div>
   );

@@ -1,54 +1,63 @@
-import axios from 'axios'
+import axios from 'axios';
+
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
-export const getPensionFunds = async (userId) => {
+
+export const getPensionFunds = async () => {
     try {
-        const response = await api.get(`/api/pension-funds/${userId}`);
+        const token = sessionStorage.getItem("token");
 
-        if (response.data && response.data.status === true) {
-            console.log("get pension funds");
-            return response.data;
-        } else {
-            throw new Error("Invalid API response structure");
+        const resp = await api.get(`/api/v1/dplk`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "User-Id": sessionStorage.getItem("user_id"),
+                "Customer-Id": sessionStorage.getItem("cif"),
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
+            },
+        });
+
+        if (resp.data?.data) {
+            return resp.data;
         }
+
+        return { data: [] };
+
     } catch (error) {
-        console.warn("Dummy data dulu", error.message);
-
-        const dummyResponse = {
-            status: true,
-            message: "Pension fund fetched successfully (dummy)",
-            data: [{
-                fund_id: "DPLK_0001",
-                title: "Pension Funds - DPLK12345",
-                total_balance: 50000000,
-                items: [{
-                    item_id: "DPLK_0001",
-                    deposit_account_number: "DPLK12345",
-                    product_name: "Simponi Likuid",
-                    balance: 50000000,
-                    maturity_date: "2026-06-01T00:00:00Z",
-                    currency_code: "IDR",
-                },],
-            },
-            {
-                fund_id: "DPLK_0002",
-                title: "Pension Funds - DPLK67890",
-                total_balance: 8000000,
-                items: [{
-                    item_id: "DPLK_0002",
-                    deposit_account_number: "DPLK67890",
-                    product_name: "Simponi Likuid Syariah",
-                    balance: 8000000,
-                    maturity_date: "2026-12-15T00:00:00Z",
-                    currency_code: "IDR",
-                },],
-            },
-            ],
-        };
-
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        return dummyResponse;
+        console.error("PensionFunds API error", error?.message);
+        return { data: [] };
     }
 };
+
+
+export async function fetchDPLKTransactionHistory({ month, year, accountNumber }) {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const payload = {
+            month,
+            year,
+            accountNumber
+        };
+
+        const resp = await api.post("/api/v1/trx-history", payload, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "User-Id": sessionStorage.getItem("user_id"),
+                "Customer-Id": sessionStorage.getItem("cif"),
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
+            }
+        });
+
+        if (resp.data?.transaction?.length) return resp.data;
+        if (resp.data?.transactions?.length) return resp.data;
+
+        return { transactions: [] };
+
+    } catch (error) {
+        console.error("DPLK trx error:", error?.message);
+        return { transactions: [] };
+    }
+}

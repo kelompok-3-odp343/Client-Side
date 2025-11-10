@@ -51,7 +51,7 @@ export const getTimeDepositTransactions = async ({ month, year, accountNumber })
             accountNumber,
         };
 
-        const response = await api.post(`/api/v1/trx-history-deposit`, payload, {
+        const response = await api.post(`/api/v1/trx-history`, payload, {
             headers: {
                 "Authorization": `Bearer ${token}`,
                 "User-Id": userId,
@@ -69,7 +69,7 @@ export const getTimeDepositTransactions = async ({ month, year, accountNumber })
         }
         return { transactions: [] };
     } catch (error) {
-        console.error("❌ Gagal mengambil transaksi deposito:", error.message);
+        console.error("Gagal mengambil transaksi deposito:", error.message);
         return { transactions: [] };
     }
 };

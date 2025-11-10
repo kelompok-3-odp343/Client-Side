@@ -5,9 +5,6 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-/**
- * Fetch all cards (real API or dummy fallback)
- */
 export async function fetchAllCards() {
   try {
     const res = await api.post("/api/v1/account", {
@@ -47,8 +44,8 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
       },
     });
 
-    if (resp.data?.transaction?.length) return resp.data;
-    if (resp.data?.transactions?.length) return resp.data;
+    if (respTrxHistory.data?.transaction?.length) return respTrxHistory.data;
+    if (respTrxHistory.data?.transactions?.length) return respTrxHistory.data;
   } catch (error) {
     console.warn("API unavailable, using dummy", error?.message);
   }
