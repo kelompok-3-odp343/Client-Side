@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Users, LogOut } from "lucide-react";
+import { Home, Users, Activity, LogOut } from "lucide-react";
 import logo from "../../../assets/images/wandoor-logo-2.png";
 import "../styles/admin-sidebar.css";
 
@@ -12,6 +12,7 @@ export default function AdminSideBar({ isOpen, onClose }) {
 	const menuItems = [
 		{ name: "Home", path: "/admin/home", icon: Home },
 		{ name: "Users", path: "/admin/users", icon: Users },
+		{ name: "Activity", path: "/admin/activity", icon: Activity },
 	];
 
 	const handleLogout = () => {
@@ -63,9 +64,7 @@ export default function AdminSideBar({ isOpen, onClose }) {
 						return (
 							<button
 								key={item.name}
-								className={`sidebar-item ${
-									location.pathname === item.path ? "active" : ""
-								}`}
+								className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
 								onClick={() => handleMenuClick(item.path)}
 								type="button"
 							>

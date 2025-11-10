@@ -146,6 +146,7 @@ export default function AdminHome() {
 												className="view-btn"
 												onClick={() => handleViewTransactions(transaction)}
 												type="button"
+												title="View transaction history"
 											>
 												<Clock size={30} />
 											</button>
