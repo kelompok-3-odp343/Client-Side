@@ -165,6 +165,10 @@
 	animation: slideUp 0.3s ease;
 }
 
+.modal-unblock {
+	max-width: 600px;
+}
+
 @keyframes fadeIn {
 	from {
 		opacity: 0;
@@ -194,10 +198,76 @@
 	line-height: 1.5;
 }
 
+.modal-subtitle {
+	font-size: 0.95rem;
+	color: var(--text-muted);
+	margin: -1rem 0 1.5rem 0;
+	text-align: center;
+	line-height: 1.4;
+}
+
+.modal-field {
+	margin-bottom: 1.5rem;
+}
+
+.modal-field:last-of-type {
+	margin-bottom: 0;
+}
+
+.modal-label {
+	display: block;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: var(--text-dark);
+	margin-bottom: 0.5rem;
+}
+
+.modal-select {
+	width: 100%;
+	padding: 0.625rem 1rem;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	font-size: 0.9rem;
+	color: var(--text-dark);
+	outline: none;
+	transition: border-color 0.2s;
+	background: var(--white);
+}
+
+.modal-select:focus {
+	border-color: #6dddd0;
+}
+
+.modal-textarea {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	font-size: 0.9rem;
+	color: var(--text-dark);
+	outline: none;
+	transition: border-color 0.2s;
+	resize: vertical;
+	font-family: inherit;
+}
+
+.modal-textarea:focus {
+	border-color: #6dddd0;
+}
+
+.modal-required {
+	display: block;
+	font-size: 0.8rem;
+	color: #f94449;
+	margin-top: 0.25rem;
+	text-align: right;
+}
+
 .modal-actions {
 	display: flex;
 	gap: 1rem;
 	justify-content: center;
+	margin-top: 1.5rem;
 }
 
 .modal-btn {
@@ -211,27 +281,39 @@
 	min-width: 100px;
 }
 
-.modal-btn-no {
+.modal-btn-cancel {
 	background: var(--white);
 	color: #6b7280;
 	border-color: #d1d5db;
 }
 
-.modal-btn-no:hover {
+.modal-btn-cancel:hover {
 	background: #f3f4f6;
 	border-color: #9ca3af;
 	color: #4b5563;
 }
 
-.modal-btn-yes {
-	background: #10b981;
+.modal-btn-submit {
+	background: #6dddd0;
 	color: var(--white);
-	border-color: #10b981;
+	border-color: #6dddd0;
 }
 
-.modal-btn-yes:hover {
-	background: #059669;
-	border-color: #059669;
+.modal-btn-submit:hover {
+	background: #5bc9bc;
+	border-color: #5bc9bc;
+}
+
+.modal-btn-close {
+	background: #6dddd0;
+	color: var(--white);
+	border-color: #6dddd0;
+	width: 100%;
+}
+
+.modal-btn-close:hover {
+	background: #5bc9bc;
+	border-color: #5bc9bc;
 }
 
 /* RESPONSIVE */

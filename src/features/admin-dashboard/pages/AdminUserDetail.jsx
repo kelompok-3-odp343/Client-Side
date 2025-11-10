@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import "../styles/admin-user-detail.css";
@@ -7,10 +7,14 @@ import "../styles/admin-user-detail.css";
 export default function AdminUserDetail() {
 	const location = useLocation();
 	const { id } = useParams();
+	const navigate = useNavigate();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const [showUnblockModal, setShowUnblockModal] = useState(false);
+	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
+	const [selectedChecker, setSelectedChecker] = useState("");
+	const [reason, setReason] = useState("");
 	
 	// Local state for user data
 	const [userData, setUserData] = useState(null);
@@ -18,29 +22,26 @@ export default function AdminUserDetail() {
 
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-	// Fetch user details from API
+	// Sample checkers
+	const checkers = [
+		{ id: "ADM002", name: "Khairuddin Nasty" },
+		{ id: "ADM004", name: "Checker 2" },
+		{ id: "ADM005", name: "Checker 3" },
+	];
+
+	// Fetch user details (mock) and load saved status
 	useEffect(() => {
 		const fetchUserDetails = async () => {
 			setLoading(true);
 			setError(null);
 			
 			try {
-				// TODO: Replace with actual API call
-				// const response = await fetch(`/api/admin/users/${id}`);
-				// const data = await response.json();
-				
-				// For now, use state data or defaults
 				const stateUser = location.state?.user;
 				
 				if (stateUser) {
 					setUserData(stateUser);
 					setAccounts(stateUser.accounts || []);
 				} else {
-					// Fallback: fetch from API
-					// const data = await getUserById(id);
-					// setUserData(data.user);
-					// setAccounts(data.accounts);
-					
 					// Temporary default data
 					setUserData({
 						customerName: "Ulion Pardede",
@@ -123,7 +124,7 @@ export default function AdminUserDetail() {
 		fetchUserDetails();
 	}, [id, location.state]);
 
-	const colors = ["#FFBC8E", "#FFE8B0", "#6DDDD0"];
+	const colors = ["#6DDDD0", "#FFBC8E", "#CABEE3"];
 
 	// Get color based on diagonal pattern
 	const getCardColor = (index) => {
@@ -137,50 +138,87 @@ export default function AdminUserDetail() {
 		setShowUnblockModal(true);
 	};
 
+	const handleSubmitUnblock = () => {
+		if (!selectedChecker) {
+			alert("Please select a checker");
+			return;
+		}
+		if (!reason.trim()) {
+			alert("Please provide a reason");
+			return;
+		}
+
+		setShowUnblockModal(false);
+		setShowConfirmationModal(true);
+	};
+
 	const confirmUnblock = async () => {
 		try {
-			// TODO: Replace with actual API call
-			// await fetch(`/api/admin/users/${userData.cif}/unblock`, {
-			//   method: 'POST',
-			//   headers: { 'Content-Type': 'application/json' }
-			// });
-			
-			// Update local user status
-			const updatedUser = {
-				...userData,
-				status: "Active",
-			};
-			setUserData(updatedUser);
-			
-			// Update accounts status
-			const updatedAccounts = accounts.map(acc => ({ ...acc, status: "Active" }));
-			setAccounts(updatedAccounts);
-			
-			// Save to sessionStorage for persistence
-			const savedStatuses = sessionStorage.getItem('userStatuses');
-			let statuses = {};
-			if (savedStatuses) {
+			// create activity in sessionStorage
+			const activities = sessionStorage.getItem('activities');
+			let activitiesList = [];
+			if (activities) {
 				try {
-					statuses = JSON.parse(savedStatuses);
+					activitiesList = JSON.parse(activities);
 				} catch (e) {
-					console.error('Error parsing user statuses:', e);
+					console.error('Error parsing activities:', e);
 				}
 			}
-			statuses[userData.cif] = "Active";
-			sessionStorage.setItem('userStatuses', JSON.stringify(statuses));
 			
-			// Trigger event for AdminUsers to refresh
-			window.dispatchEvent(new Event('userStatusChanged'));
+			// Get current date and admin info
+			const now = new Date();
+			const dateStr = now.toISOString().replace('T', ' ').substring(0, 19);
+			const adminName = sessionStorage.getItem('adminName') || 'Della Puspita';
+			const adminId = sessionStorage.getItem('adminId') || 'ADM001';
 			
-			setShowUnblockModal(false);
+			const newActivity = {
+				id: activitiesList.length + 1,
+				activityId: `ACK00000${activitiesList.length + 1}`,
+				actionFlow: "Check & Approval",
+				data: `P00${activitiesList.length + 1}`,
+				createdTime: dateStr,
+				createdBy: adminId,
+				checkerId: selectedChecker,
+				approverId: "",
+				status: "Pending Check",
+				customerName: userData.customerName,
+				cif: userData.cif,
+				reason: reason,
+				createdAt: `${dateStr} by ${adminName} (${adminId})`,
+				checkedBy: "",
+				checkedAt: "",
+				approvedBy: "",
+				approvedAt: "",
+				rejectionNotes: "-",
+			};
+			
+			activitiesList.push(newActivity);
+			sessionStorage.setItem('activities', JSON.stringify(activitiesList));
+			
+			// Trigger event for Activity page to refresh
+			window.dispatchEvent(new Event('activityStatusChanged'));
+			
+			setShowConfirmationModal(false);
+			setSelectedChecker("");
+			setReason("");
+			
+			// Navigate to activity page
+			alert("Unblock request has been submitted successfully. Waiting for checker approval.");
+			navigate("/admin/activity");
 		} catch (err) {
-			console.error("Error unblocking user:", err);
-			setError("Failed to unblock user. Please try again.");
+			console.error("Error creating unblock request:", err);
+			setError("Failed to create unblock request. Please try again.");
 		}
 	};
 
 	const cancelUnblock = () => {
 		setShowUnblockModal(false);
+		setSelectedChecker("");
+		setReason("");
+	};
+
+	const cancelConfirmation = () => {
+		setShowConfirmationModal(false);
 	};
 
 	const isBlocked = userData?.status === "Blocked";
@@ -264,17 +302,60 @@ export default function AdminUserDetail() {
 				</div>
 			</main>
 
-			{/* Unblock Confirmation Modal */}
+			{/* Unblock Modal - Maker fills checker and reason */}
 			{showUnblockModal && (
 				<div className="modal-overlay">
-					<div className="modal-content">
-						<h3 className="modal-title">Are you sure you want to unblock this account?</h3>
+					<div className="modal-content modal-unblock">
+						<div className="modal-field">
+							<label className="modal-label">Checker*</label>
+							<select
+								className="modal-select"
+								value={selectedChecker}
+								onChange={(e) => setSelectedChecker(e.target.value)}
+							>
+								<option value="">Choose a checker</option>
+								{checkers.map((checker) => (
+									<option key={checker.id} value={checker.id}>
+										{checker.name} ({checker.id})
+									</option>
+								))}
+							</select>
+							<span className="modal-required">*required</span>
+						</div>
+						
+						<div className="modal-field">
+							<label className="modal-label">Reason*</label>
+							<textarea
+								className="modal-textarea"
+								placeholder="Type here ..."
+								value={reason}
+								onChange={(e) => setReason(e.target.value)}
+								rows={5}
+							/>
+							<span className="modal-required">*required</span>
+						</div>
+						
 						<div className="modal-actions">
-							<button className="modal-btn modal-btn-no" onClick={cancelUnblock}>
-								No
+							<button className="modal-btn modal-btn-cancel" onClick={cancelUnblock}>
+								Cancel
 							</button>
-							<button className="modal-btn modal-btn-yes" onClick={confirmUnblock}>
-								Yes
+							<button className="modal-btn modal-btn-submit" onClick={handleSubmitUnblock}>
+								Submit
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Confirmation Modal */}
+			{showConfirmationModal && (
+				<div className="modal-overlay">
+					<div className="modal-content">
+						<h3 className="modal-title">Unblock request has been submitted successfully</h3>
+						<p className="modal-subtitle">The request is now pending checker approval.</p>
+						<div className="modal-actions">
+							<button className="modal-btn modal-btn-close" onClick={confirmUnblock}>
+								Close
 							</button>
 						</div>
 					</div>
