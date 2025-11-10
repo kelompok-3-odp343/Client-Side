@@ -4,9 +4,6 @@ import LIFE_GOALS_TX_DUMMY from "../data/life-goals-tx.dummy";
 import LIFE_GOALS_REVAMP_DUMMY from "../data/life-goals.revamp.dummy";
 import LIFE_GOALS_DUMMY from "../data/life-goals.dummy";
 
-/* ============================================================
-   HELPER: Mapping accountNumber → dummy key
-   ============================================================ */
 const mapAccountToKey = (accountNumber) => {
   if (!accountNumber) return "education";
   const num = String(accountNumber).toLowerCase();
@@ -24,9 +21,7 @@ const mapAccountToKey = (accountNumber) => {
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
-/* ============================================================
-   MAIN API FUNCTIONS
-   ============================================================ */
+
 export async function fetchLifeGoals(userId = "USER001") {
   try {
     const res = await api.get(`/api/life-goals/${userId}`);
@@ -95,6 +90,6 @@ export async function fetchLifeGoalsRevamp() {
     });
     return res;
   } catch {
-    return { data: LIFE_GOALS_REVAMP_DUMMY };
+    return { data: null };
   }
 }

@@ -36,11 +36,11 @@ export default function DetailMyCard() {
     const groups = {};
     flat.forEach((trx) => {
       const iso = toISOFromDMY(trx.transactionDate);
-      const d = iso ? new Date(iso) : new Date(trx.transactionDate); // fallback just in case
+      const d = iso ? new Date(iso) : new Date(trx.transactionDate);
       const key = d.toLocaleDateString("id-ID", {
         day: "2-digit",
         month: "short",
-      }); // ex: "25 Sep"
+      });
 
       if (!groups[key]) {
         groups[key] = { date: key, sortKey: d.getTime(), items: [] };
@@ -56,7 +56,6 @@ export default function DetailMyCard() {
       });
     });
 
-    // sort by date (newest first) and return without sortKey
     return Object.values(groups)
       .sort((a, b) => b.sortKey - a.sortKey)
       .map(({ sortKey, ...rest }) => rest);

@@ -14,8 +14,12 @@ export default function LifeGoals() {
 
   useEffect(() => {
     const loadData = async () => {
-      const res = await fetchLifeGoalsRevamp();
-      setGoals(res?.data || {});
+      try {
+        const res = await fetchLifeGoalsRevamp();
+        setGoals(res?.data || {});
+      } catch {
+        setGoals({});
+      }
       setLoading(false);
     };
     loadData();
@@ -24,7 +28,32 @@ export default function LifeGoals() {
   const format = (v) => `Rp${(v || 0).toLocaleString("id-ID")}`;
   const percent = (cur, tar) => (tar ? Math.round((cur / tar) * 100) : 0);
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="life-goals-page">
+        <Navbar />
+        <div className="content-wrap">
+          <div className="loading">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!goals || Object.keys(goals).length === 0) {
+    return (
+      <div className="life-goals-page">
+        <Navbar />
+        <div className="content-wrap">
+          <h2 className="section-title">Life Goals Information</h2>
+          <p className="section-subtitle">Small saves fuel big dreams</p>
+
+          <p className="no-life-goals" style={{ fontSize: "24px", fontWeight: "600" }}>
+            No life goals available.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const colorByIndex = (idx) => COLORS[idx % COLORS.length];
 
@@ -32,6 +61,7 @@ export default function LifeGoals() {
     <div className="life-goals-page">
       <Navbar />
       <div className="content-wrap">
+
         <h2 className="section-title">Life Goals Information</h2>
         <p className="section-subtitle">Small saves fuel big dreams</p>
 
@@ -48,6 +78,7 @@ export default function LifeGoals() {
                     Invest in your brightest future
                   </p>
                 </div>
+
                 <div className="category-total">
                   {format(data.currentBalance)} / {format(data.totalTarget)}
                 </div>
@@ -59,11 +90,13 @@ export default function LifeGoals() {
                   style={{ width: `${prog}%`, background: color }}
                 />
               </div>
+
               <p className="big-progress-meta">{prog}% achieved</p>
 
               <div className="subcards-grid">
                 {data.lifeGoalsList.map((g) => {
                   const p = percent(g.currentBalance, g.targetBalance);
+
                   return (
                     <div
                       key={g.accountNumber}
@@ -80,10 +113,7 @@ export default function LifeGoals() {
                               desc: g.lifegoalsSubtitle,
                               current: g.currentBalance,
                               target: g.targetBalance,
-                              progress: percent(
-                                g.currentBalance,
-                                g.targetBalance
-                              ),
+                              progress: p,
                               color,
                             },
                           },
@@ -101,10 +131,7 @@ export default function LifeGoals() {
                                 desc: g.lifegoalsSubtitle,
                                 current: g.currentBalance,
                                 target: g.targetBalance,
-                                progress: percent(
-                                  g.currentBalance,
-                                  g.targetBalance
-                                ),
+                                progress: p,
                                 color,
                               },
                             },
@@ -114,12 +141,8 @@ export default function LifeGoals() {
                       aria-label={`Open details for ${g.lifegoalsTitle}`}
                     >
                       <div className="lg-subcard-body">
-                        <h4 className="lg-subcard-title">
-                          {g.lifegoalsTitle}
-                        </h4>
-                        <p className="lg-subcard-subtitle">
-                          {g.lifegoalsSubtitle}
-                        </p>
+                        <h4 className="lg-subcard-title">{g.lifegoalsTitle}</h4>
+                        <p className="lg-subcard-subtitle">{g.lifegoalsSubtitle}</p>
 
                         <div className="lg-progress-wrap">
                           <div className="lg-mini-progress">
@@ -135,6 +158,7 @@ export default function LifeGoals() {
                             <span>Current Savings</span>
                             <span>Target</span>
                           </div>
+
                           <div className="lg-progress-values">
                             <span>{format(g.currentBalance)}</span>
                             <span>{format(g.targetBalance)}</span>
