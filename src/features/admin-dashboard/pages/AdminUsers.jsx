@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Filter, X, List } from "lucide-react";
+import { Filter, X, Eye } from "lucide-react";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
@@ -401,7 +401,7 @@ export default function AdminUsers() {
 					onClick={() => handleViewDetails(row)}
 					type="button"
 				>
-					<List size={30} />
+					<Eye size={30} />
 				</button>
 			);
 		}
