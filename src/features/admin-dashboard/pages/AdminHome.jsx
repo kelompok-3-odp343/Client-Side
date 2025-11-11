@@ -12,14 +12,50 @@ import iconSaving from "../../../assets/images/dashboard-savings-icon.png";
 import iconLifeGoals from "../../../assets/images/dashboard-life-goals-icon.png";
 import iconPension from "../../../assets/images/dashboard-dplk-icon.png";
 
+const getSortIcon = (sortConfig, columnKey, onSort) => {
+    const isActive = sortConfig?.key === columnKey;
+    const ascActive = isActive && sortConfig.direction === "asc";
+    const descActive = isActive && sortConfig.direction === "desc";
+
+    return (
+        <span
+            className={`sort-icons ${isActive ? "active" : ""}`}
+            onClick={(e) => {
+                e.stopPropagation();
+                onSort(columnKey);
+            }}
+            role="button"
+            title="Sort"
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") onSort(columnKey);
+            }}
+        >
+            <span className={`arrow up ${ascActive ? "active" : ""}`}>↑</span>
+            <span className={`arrow down ${descActive ? "active" : ""}`}>↓</span>
+        </span>
+    );
+};
+
 export default function AdminHome() {
 	const navigate = useNavigate();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const [sortAsc, setSortAsc] = useState(true);
 	const [searchQuery, setSearchQuery] = useState("");
+	const [sortConfig, setSortConfig] = useState(null);
 
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-	const toggleSort = () => setSortAsc(!sortAsc);
+
+	const handleSort = (columnKey) => {
+        setSortConfig((prev) => {
+            if (!prev || prev.key !== columnKey) {
+                return { key: columnKey, direction: "asc" };
+            }
+            if (prev.direction === "asc") {
+                return { key: columnKey, direction: "desc" };
+            }
+            return null;
+        });
+    };
 
 	const transactions = [
 		{ id: "T1", cif: "9285711832", nik: "3277017005000007", name: "Della Puspita" },
@@ -43,10 +79,21 @@ export default function AdminHome() {
 			t.nik.includes(searchQuery)
 	);
 
-	const sortedTransactions = [...filteredTransactions].sort((a, b) => {
-		if (sortAsc) return a.name.localeCompare(b.name);
-		return b.name.localeCompare(a.name);
-	});
+	const sortedTransactions = sortConfig
+        ? [...filteredTransactions].sort((a, b) => {
+              const { key, direction } = sortConfig;
+              const dir = direction === "asc" ? 1 : -1;
+              const va = a[key];
+              const vb = b[key];
+
+              if (typeof va === "string" && typeof vb === "string") {
+                  return va.localeCompare(vb) * dir;
+              }
+              if (va > vb) return 1 * dir;
+              if (va < vb) return -1 * dir;
+              return 0;
+          })
+        : filteredTransactions;
 
 	const handleViewTransactions = (transaction) => {
 		navigate("/admin/transactions", { state: { transaction } });
@@ -127,10 +174,17 @@ export default function AdminHome() {
 									<th className="col-no">No</th>
 									<th>CIF</th>
 									<th>NIK</th>
-									<th onClick={toggleSort} className="sortable">
-										Customer Name{" "}
-										<span className="sort-icon">{sortAsc ? "▲" : "▼"}</span>
-									</th>
+									<th
+                                        className="sortable name-col"
+                                        onClick={() => handleSort("name")}
+                                    >
+                                        <div className="th-content">
+                                            <span className="th-label">Customer Name</span>
+                                            <div className="th-icons">
+                                                {getSortIcon(sortConfig, "name", handleSort)}
+                                            </div>
+                                        </div>
+                                    </th>
 									<th className="col-action">Action</th>
 								</tr>
 							</thead>

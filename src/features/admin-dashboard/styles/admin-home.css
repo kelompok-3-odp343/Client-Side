@@ -191,20 +191,48 @@ body {
 	white-space: nowrap;
 }
 
-.transaction-table th.sortable {
+/* .transaction-table th.sortable {
 	cursor: pointer;
 	user-select: none;
 	transition: background 0.2s;
-}
+} */
 
-.transaction-table th.sortable:hover {
+/* .transaction-table th.sortable:hover {
 	background: rgba(255, 255, 255, 0.1);
+} */
+
+/* Sort Icon Style */
+.sort-icons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 0.8rem;
+  user-select: none;
+  margin-top: -0.3rem;
+  margin-left: 0.2rem;
 }
 
-.sort-icon {
+.sort-icons .arrow {
+  color: #767676;
+  -webkit-text-stroke: 0.08rem currentColor;
+  paint-order: stroke fill;
+  transition: color 0.2s ease;
+}
+
+.sort-icons:hover .arrow {
+	color: #9e9e9e;
+}
+
+.sort-icons .arrow.active {
+  color: #000;
+  -webkit-text-stroke: 0.08rem currentColor;
+  paint-order: stroke fill;
+}
+
+/* .sort-icon {
 	margin-left: 0.5rem;
 	font-size: 0.9rem;
-}
+} */
 
 .transaction-table tbody tr {
 	border-bottom: 2px solid #d9d9d9;
