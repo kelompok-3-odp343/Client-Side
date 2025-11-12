@@ -9,12 +9,13 @@ export default function AdminUserDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const [showUnblockModal, setShowUnblockModal] = useState(false);
-	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+	const [showActionModal, setShowActionModal] = useState(false);
+	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [selectedChecker, setSelectedChecker] = useState("");
 	const [reason, setReason] = useState("");
+	const [actionType, setActionType] = useState(""); // "block" or "unblock"
 	
 	// Local state for user data
 	const [userData, setUserData] = useState(null);
@@ -135,10 +136,16 @@ export default function AdminUserDetail() {
 	};
 
 	const handleUnblock = () => {
-		setShowUnblockModal(true);
+		setActionType("unblock");
+		setShowActionModal(true);
 	};
 
-	const handleSubmitUnblock = () => {
+	const handleBlock = () => {
+		setActionType("block");
+		setShowActionModal(true);
+	};
+
+	const handleSubmitAction = async () => {
 		if (!selectedChecker) {
 			alert("Please select a checker");
 			return;
@@ -148,20 +155,17 @@ export default function AdminUserDetail() {
 			return;
 		}
 
-		setShowUnblockModal(false);
-		setShowConfirmationModal(true);
-	};
-
-	const confirmUnblock = async () => {
 		try {
-			// create activity in sessionStorage
-			const activities = sessionStorage.getItem('activities');
+			// Load existing activities or create new array
 			let activitiesList = [];
-			if (activities) {
+			const storedActivities = sessionStorage.getItem('activities');
+			
+			if (storedActivities) {
 				try {
-					activitiesList = JSON.parse(activities);
+					activitiesList = JSON.parse(storedActivities);
 				} catch (e) {
 					console.error('Error parsing activities:', e);
+					activitiesList = [];
 				}
 			}
 			
@@ -171,10 +175,12 @@ export default function AdminUserDetail() {
 			const adminName = sessionStorage.getItem('adminName') || 'Della Puspita';
 			const adminId = sessionStorage.getItem('adminId') || 'ADM001';
 			
+			// Create new activity
 			const newActivity = {
 				id: activitiesList.length + 1,
 				activityId: `ACK00000${activitiesList.length + 1}`,
 				actionFlow: "Check & Approval",
+				actionType: actionType, // "block" or "unblock"
 				data: `P00${activitiesList.length + 1}`,
 				createdTime: dateStr,
 				createdBy: adminId,
@@ -185,43 +191,49 @@ export default function AdminUserDetail() {
 				cif: userData.cif,
 				reason: reason,
 				createdAt: `${dateStr} by ${adminName} (${adminId})`,
-				checkedBy: "",
+				checkedBy: selectedChecker,
 				checkedAt: "",
 				approvedBy: "",
 				approvedAt: "",
 				rejectionNotes: "-",
 			};
 			
+			// Add to activities list
 			activitiesList.push(newActivity);
 			sessionStorage.setItem('activities', JSON.stringify(activitiesList));
 			
+			// Close modal and show success
+			setShowActionModal(false);
+			setShowSuccessModal(true);
+			
 			// Trigger event for Activity page to refresh
 			window.dispatchEvent(new Event('activityStatusChanged'));
-			
-			setShowConfirmationModal(false);
-			setSelectedChecker("");
-			setReason("");
-			
-			// Navigate to activity page
-			alert("Unblock request has been submitted successfully. Waiting for checker approval.");
-			navigate("/admin/activity");
 		} catch (err) {
-			console.error("Error creating unblock request:", err);
-			setError("Failed to create unblock request. Please try again.");
+			console.error("Error creating request:", err);
+			setError("Failed to create request. Please try again.");
 		}
 	};
 
-	const cancelUnblock = () => {
-		setShowUnblockModal(false);
-		setSelectedChecker("");
-		setReason("");
+	const handleSuccessViewActivity = () => {
+		navigate("/admin/activity");
 	};
 
-	const cancelConfirmation = () => {
-		setShowConfirmationModal(false);
+	const handleSuccessClose = () => {
+		setShowSuccessModal(false);
+		setSelectedChecker("");
+		setReason("");
+		setActionType("");
+	};
+
+	const cancelAction = () => {
+		setShowActionModal(false);
+		setSelectedChecker("");
+		setReason("");
+		setActionType("");
 	};
 
 	const isBlocked = userData?.status === "Blocked";
+	const isFormValid = selectedChecker && reason.trim();
 
 	if (loading) {
 		return (
@@ -263,13 +275,22 @@ export default function AdminUserDetail() {
 							</span>
 						</div>
 					</div>
-					<button 
-						className={`unblock-btn ${!isBlocked ? "disabled" : ""}`}
-						onClick={handleUnblock}
-						disabled={!isBlocked}
-					>
-						Unblock
-					</button>
+					<div className="action-buttons">
+						<button 
+							className={`unblock-btn ${!isBlocked ? "disabled" : ""}`}
+							onClick={handleUnblock}
+							disabled={!isBlocked}
+						>
+							Unblock
+						</button>
+						<button 
+							className={`block-btn ${isBlocked ? "disabled" : ""}`}
+							onClick={handleBlock}
+							disabled={isBlocked}
+						>
+							Block
+						</button>
+					</div>
 				</div>
 
 				<div className="accounts-grid">
@@ -302,10 +323,11 @@ export default function AdminUserDetail() {
 				</div>
 			</main>
 
-			{/* Unblock Modal - Maker fills checker and reason */}
-			{showUnblockModal && (
+			{/* Action Modal - Block/Unblock */}
+			{showActionModal && (
 				<div className="modal-overlay">
-					<div className="modal-content modal-unblock">
+					<div className="modal-content modal-action">
+						<h3 className="modal-title">{actionType === "block" ? "Block" : "Unblock"} User Request</h3>
 						<div className="modal-field">
 							<label className="modal-label">Checker*</label>
 							<select
@@ -320,7 +342,6 @@ export default function AdminUserDetail() {
 									</option>
 								))}
 							</select>
-							<span className="modal-required">*required</span>
 						</div>
 						
 						<div className="modal-field">
@@ -332,14 +353,19 @@ export default function AdminUserDetail() {
 								onChange={(e) => setReason(e.target.value)}
 								rows={5}
 							/>
-							<span className="modal-required">*required</span>
 						</div>
 						
+						<span className="modal-required">*required</span>
+						
 						<div className="modal-actions">
-							<button className="modal-btn modal-btn-cancel" onClick={cancelUnblock}>
+							<button className="modal-btn modal-btn-cancel" onClick={cancelAction}>
 								Cancel
 							</button>
-							<button className="modal-btn modal-btn-submit" onClick={handleSubmitUnblock}>
+							<button 
+								className={`modal-btn modal-btn-submit ${!isFormValid ? 'disabled' : ''}`}
+								onClick={handleSubmitAction}
+								disabled={!isFormValid}
+							>
 								Submit
 							</button>
 						</div>
@@ -347,15 +373,20 @@ export default function AdminUserDetail() {
 				</div>
 			)}
 
-			{/* Confirmation Modal */}
-			{showConfirmationModal && (
+			{/* Success Modal with Navigation Options */}
+			{showSuccessModal && (
 				<div className="modal-overlay">
-					<div className="modal-content">
-						<h3 className="modal-title">Unblock request has been submitted successfully</h3>
+					<div className="modal-content modal-success">
+						<h3 className="modal-title">
+							{actionType === "block" ? "Block" : "Unblock"} request submitted successfully!
+						</h3>
 						<p className="modal-subtitle">The request is now pending checker approval.</p>
-						<div className="modal-actions">
-							<button className="modal-btn modal-btn-close" onClick={confirmUnblock}>
-								Close
+						<div className="modal-actions modal-actions-vertical">
+							<button className="modal-btn modal-btn-primary" onClick={handleSuccessViewActivity}>
+								View Activity List
+							</button>
+							<button className="modal-btn modal-btn-secondary" onClick={handleSuccessClose}>
+								Stay on This Page
 							</button>
 						</div>
 					</div>

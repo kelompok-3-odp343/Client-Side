@@ -12,13 +12,16 @@ export default function AdminActivityDetail() {
 	// Modals and form state
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showApproveModal, setShowApproveModal] = useState(false);
+	const [showSuccessModal, setShowSuccessModal] = useState(false);
+	const [successMessage, setSuccessMessage] = useState("");
 	const [rejectNotes, setRejectNotes] = useState("");
 	const [selectedApprover, setSelectedApprover] = useState("");
 
 	// Activity data state
 	const [activityData, setActivityData] = useState(null);
 
-	// Get current user role from sessionStorage (fallback to 'maker')
+	// Get current user role from sessionStorage - for demo, allow all roles
+	// In production, this should be strictly from backend authentication
 	const currentUserRole = sessionStorage.getItem("userRole") || "maker"; // maker, checker, approver
 
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -52,13 +55,14 @@ export default function AdminActivityDetail() {
 			// Fallback inline dummy if not found
 			const fallback = {
 				activityId: id || "ACK000001",
+				actionType: "unblock",
 				data: "P001",
 				customerName: "Ulion Pardede",
 				cif: "1234567890",
 				status: "Pending Check",
 				createdBy: "ADM001",
 				createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
-				checkedBy: "",
+				checkedBy: "ADM002",
 				checkedAt: "",
 				approvedBy: "",
 				approvedAt: "",
@@ -73,7 +77,6 @@ export default function AdminActivityDetail() {
 		return () => {
 			mounted = false;
 		};
-		// We intentionally include location.state and id
 	}, [id, location.state]);
 
 	// Approvers used in checker's approve modal
@@ -88,15 +91,15 @@ export default function AdminActivityDetail() {
 	};
 
 	const handleApprove = () => {
-		// If checker, they choose approver then submit
-		if (currentUserRole === "checker") {
+		// Check current status to determine role
+		if (activityData.status === "Pending Check") {
+			// Checker stage - need to choose approver
 			setShowApproveModal(true);
 			return;
 		}
-		// If approver, confirm final approval
-		if (currentUserRole === "approver") {
-			const confirmed = window.confirm("Are you sure you want to approve this request?");
-			if (confirmed) confirmApproval();
+		if (activityData.status === "Pending Approval") {
+			// Approver stage - direct approval
+			confirmApproval();
 		}
 	};
 
@@ -137,26 +140,17 @@ export default function AdminActivityDetail() {
 			} catch (e) {
 				console.error('Error updating activity:', e);
 			}
-		} else {
-			// If no stored activities, create one with Rejected status (edge case)
-			const newActivity = {
-				...activityData,
-				status: "Rejected",
-				rejectionNotes: rejectNotes,
-				checkedAt: currentUserRole === 'checker' ? `${dateStr} by ${adminName} (${adminId})` : "",
-				approvedAt: currentUserRole === 'approver' ? `${dateStr} by ${adminName} (${adminId})` : "",
-			};
-			sessionStorage.setItem('activities', JSON.stringify([newActivity]));
-			setActivityData(newActivity);
 		}
 
 		setShowRejectModal(false);
 		setRejectNotes("");
 
+		// Show success modal
+		setSuccessMessage("Activity has been rejected successfully.");
+		setShowSuccessModal(true);
+
 		// Trigger refresh event
 		window.dispatchEvent(new Event("activityStatusChanged"));
-		
-		alert("Activity has been rejected");
 	};
 
 	const confirmCheckerApproval = () => {
@@ -192,24 +186,17 @@ export default function AdminActivityDetail() {
 			} catch (e) {
 				console.error('Error updating activity:', e);
 			}
-		} else {
-			const newActivity = {
-				...activityData,
-				status: "Pending Approval",
-				approverId: selectedApprover,
-				checkedAt: `${dateStr} by ${adminName} (${adminId})`,
-			};
-			sessionStorage.setItem('activities', JSON.stringify([newActivity]));
-			setActivityData(newActivity);
 		}
 
 		setShowApproveModal(false);
 		setSelectedApprover("");
 
+		// Show success modal
+		setSuccessMessage("Activity has been checked and sent to approver successfully.");
+		setShowSuccessModal(true);
+
 		// Trigger refresh event
 		window.dispatchEvent(new Event("activityStatusChanged"));
-		
-		alert("Activity has been approved and sent to approver");
 	};
 
 	const confirmApproval = () => {
@@ -237,7 +224,7 @@ export default function AdminActivityDetail() {
 					// Update local state
 					setActivityData(activities[index]);
 					
-					// Unblock user in userStatuses
+					// Update user status based on action type
 					const savedStatuses = sessionStorage.getItem("userStatuses");
 					let statuses = {};
 					if (savedStatuses) {
@@ -247,8 +234,11 @@ export default function AdminActivityDetail() {
 							console.error("Error parsing user statuses:", e);
 						}
 					}
+					
 					if (activityData && activityData.cif) {
-						statuses[activityData.cif] = "Active";
+						// If action was "unblock", set to Active; if "block", set to Blocked
+						const actionType = activities[index].actionType || "unblock";
+						statuses[activityData.cif] = actionType === "unblock" ? "Active" : "Blocked";
 						sessionStorage.setItem("userStatuses", JSON.stringify(statuses));
 					}
 
@@ -256,42 +246,15 @@ export default function AdminActivityDetail() {
 					window.dispatchEvent(new Event("userStatusChanged"));
 					window.dispatchEvent(new Event("activityStatusChanged"));
 
-					// Show success message
-					alert("Activity has been approved. Account has been unblocked successfully!");
+					// Show success modal
+					const actionType = activities[index].actionType || "unblock";
+					const actionText = actionType === "unblock" ? "unblocked" : "blocked";
+					setSuccessMessage(`Activity has been approved. Account has been ${actionText} successfully!`);
+					setShowSuccessModal(true);
 				}
 			} catch (e) {
 				console.error('Error updating activity:', e);
 			}
-		} else {
-			// Edge case: no activities array present
-			const newActivity = {
-				...activityData,
-				status: "Approved",
-				approvedAt: `${dateStr} by ${adminName} (${adminId})`,
-				approvedBy: adminId,
-			};
-			sessionStorage.setItem('activities', JSON.stringify([newActivity]));
-			setActivityData(newActivity);
-
-			// update userStatuses
-			const savedStatuses = sessionStorage.getItem("userStatuses");
-			let statuses = {};
-			if (savedStatuses) {
-				try {
-					statuses = JSON.parse(savedStatuses);
-				} catch (e) {
-					console.error("Error parsing user statuses:", e);
-				}
-			}
-			if (activityData && activityData.cif) {
-				statuses[activityData.cif] = "Active";
-				sessionStorage.setItem("userStatuses", JSON.stringify(statuses));
-			}
-
-			window.dispatchEvent(new Event("userStatusChanged"));
-			window.dispatchEvent(new Event("activityStatusChanged"));
-
-			alert("Activity has been approved. Account has been unblocked successfully!");
 		}
 	};
 
@@ -305,7 +268,12 @@ export default function AdminActivityDetail() {
 		setSelectedApprover("");
 	};
 
-	// Determine workflow step based on status - safe guards
+	const closeSuccess = () => {
+		setShowSuccessModal(false);
+		setSuccessMessage("");
+	};
+
+	// Determine workflow step based on status
 	const getWorkflowStep = () => {
 		if (!activityData || !activityData.status) return 0;
 		switch (String(activityData.status)) {
@@ -340,31 +308,32 @@ export default function AdminActivityDetail() {
 	// Determine if current user can take action
 	const canReject = () => {
 		if (!activityData || !activityData.status) return false;
-		if (activityData.status === "Approved" || activityData.status === "Rejected") {
+		const status = activityData.status;
+		
+		// Can't change if already final state
+		if (status === "Approved" || status === "Rejected") {
 			return false;
 		}
-		if (currentUserRole === "checker" && activityData.status === "Pending Check") {
-			return true;
-		}
-		if (currentUserRole === "approver" && activityData.status === "Pending Approval") {
-			return true;
-		}
-		return false;
+		
+		// Can reject at any pending stage
+		return status === "Pending Check" || status === "Pending Approval";
 	};
 
 	const canApprove = () => {
 		if (!activityData || !activityData.status) return false;
-		if (activityData.status === "Approved" || activityData.status === "Rejected") {
+		const status = activityData.status;
+		
+		// Can't change if already final state
+		if (status === "Approved" || status === "Rejected") {
 			return false;
 		}
-		if (currentUserRole === "checker" && activityData.status === "Pending Check") {
-			return true;
-		}
-		if (currentUserRole === "approver" && activityData.status === "Pending Approval") {
-			return true;
-		}
-		return false;
+		
+		// Can approve at any pending stage
+		return status === "Pending Check" || status === "Pending Approval";
 	};
+
+	const isRejectFormValid = rejectNotes.trim();
+	const isApproveFormValid = selectedApprover;
 
 	return (
 		<div className="admin-container">
@@ -374,7 +343,9 @@ export default function AdminActivityDetail() {
 			<main className="admin-activity-detail-main">
 				<div className="activity-detail-header">
 					<h2>User Management</h2>
-					<p className="activity-action">Action: Unblock User</p>
+					<p className="activity-action">
+						Action: {activityData.actionType === "block" ? "Block" : "Unblock"} User
+					</p>
 				</div>
 
 				<div className="activity-detail-card">
@@ -396,60 +367,34 @@ export default function AdminActivityDetail() {
 							<span className="activity-value">: {activityData.cif}</span>
 						</div>
 						<div className="activity-detail-row">
-							<span className="activity-label">Status</span>
-							<span className="activity-value">: {activityData.status}</span>
-						</div>
-						<div className="activity-detail-row">
-							<span className="activity-label">Created by</span>
-							<span className="activity-value">: {activityData.createdBy}</span>
-						</div>
-						<div className="activity-detail-row">
-							<span className="activity-label">Created At</span>
-							<span className="activity-value">: {activityData.createdAt}</span>
-						</div>
-						<div className="activity-detail-row">
-							<span className="activity-label">Checked by</span>
-							<span className="activity-value">: {activityData.checkedBy || "-"}</span>
-						</div>
-						<div className="activity-detail-row">
-							<span className="activity-label">Checked At</span>
-							<span className="activity-value">: {activityData.checkedAt || "-"}</span>
-						</div>
-						<div className="activity-detail-row">
-							<span className="activity-label">Approved by</span>
-							<span className="activity-value">: {activityData.approvedBy || "-"}</span>
-						</div>
-						<div className="activity-detail-row">
-							<span className="activity-label">Approved At</span>
-							<span className="activity-value">: {activityData.approvedAt || "-"}</span>
-						</div>
-						<div className="activity-detail-row activity-detail-row-full">
 							<span className="activity-label">Reason</span>
 							<span className="activity-value">: {activityData.reason}</span>
+						</div>
+						<div className="activity-detail-row">
+							<span className="activity-label">Rejection Notes</span>
+							<span className="activity-value">: {activityData.rejectionNotes}</span>
 						</div>
 					</div>
 
 					{/* Workflow Timeline */}
 					<div className="workflow-timeline">
-						<div className={`workflow-step ${workflowStep >= 1 ? "completed" : ""} ${workflowStep === 1 ? "current" : ""}`}>
+						<div className={`workflow-step ${workflowStep >= 1 || activityData.status === "Rejected" ? "completed" : ""}`}>
 							<div className="workflow-circle"></div>
 							<div className="workflow-info">
-								<div className="workflow-title">
-									{activityData.status === "Rejected" ? "Rejected" : workflowStep === 1 && activityData.status === "Pending Check" ? "Pending Check" : "Created at " + (activityData.createdAt ? activityData.createdAt.split(" by ")[0] : "")}
-								</div>
+								<div className="workflow-title">Created</div>
 								<div className="workflow-subtitle">
 									{activityData.createdAt}
 								</div>
 							</div>
 						</div>
 
-						{activityData.status !== "Rejected" && (
+						{activityData.status !== "Rejected" ? (
 							<>
-								<div className={`workflow-step ${workflowStep >= 2 ? "completed" : ""} ${workflowStep === 2 ? "current" : ""}`}>
+								<div className={`workflow-step ${workflowStep >= 2 ? "completed" : ""} ${workflowStep === 1 ? "current" : ""}`}>
 									<div className="workflow-circle"></div>
 									<div className="workflow-info">
 										<div className="workflow-title">
-											{workflowStep === 2 && activityData.status === "Pending Approval" ? "Pending approval" : workflowStep >= 2 ? "Checked at " + (activityData.checkedAt ? activityData.checkedAt.split(" by ")[0] : "") : "Pending Check"}
+											{workflowStep === 1 ? "Pending Check" : workflowStep >= 2 ? "Checked" : "Pending Check"}
 										</div>
 										{workflowStep >= 2 && (
 											<div className="workflow-subtitle">
@@ -459,11 +404,11 @@ export default function AdminActivityDetail() {
 									</div>
 								</div>
 
-								<div className={`workflow-step ${workflowStep >= 3 ? "completed" : ""}`}>
+								<div className={`workflow-step ${workflowStep >= 3 ? "completed" : ""} ${workflowStep === 2 ? "current" : ""}`}>
 									<div className="workflow-circle"></div>
 									<div className="workflow-info">
 										<div className="workflow-title">
-											{workflowStep >= 3 ? "Approved at " + (activityData.approvedAt ? activityData.approvedAt.split(" by ")[0] : "") : "Pending approval"}
+											{workflowStep === 2 ? "Pending Approval" : workflowStep >= 3 ? "Approved" : "Pending Approval"}
 										</div>
 										{workflowStep >= 3 && (
 											<div className="workflow-subtitle">
@@ -473,6 +418,16 @@ export default function AdminActivityDetail() {
 									</div>
 								</div>
 							</>
+						) : (
+							<div className="workflow-step completed">
+								<div className="workflow-circle"></div>
+								<div className="workflow-info">
+									<div className="workflow-title">Rejected</div>
+									<div className="workflow-subtitle">
+										{activityData.checkedAt || activityData.approvedAt || "-"}
+									</div>
+								</div>
+							</div>
 						)}
 					</div>
 				</div>
@@ -513,7 +468,11 @@ export default function AdminActivityDetail() {
 							<button className="modal-btn modal-btn-cancel" onClick={cancelReject}>
 								Cancel
 							</button>
-							<button className="modal-btn modal-btn-submit" onClick={confirmRejection}>
+							<button 
+								className={`modal-btn modal-btn-submit ${!isRejectFormValid ? 'disabled' : ''}`}
+								onClick={confirmRejection}
+								disabled={!isRejectFormValid}
+							>
 								Submit
 							</button>
 						</div>
@@ -543,8 +502,26 @@ export default function AdminActivityDetail() {
 							<button className="modal-btn modal-btn-cancel" onClick={cancelApprove}>
 								Cancel
 							</button>
-							<button className="modal-btn modal-btn-submit" onClick={confirmCheckerApproval}>
+							<button 
+								className={`modal-btn modal-btn-submit ${!isApproveFormValid ? 'disabled' : ''}`}
+								onClick={confirmCheckerApproval}
+								disabled={!isApproveFormValid}
+							>
 								Submit
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Success Modal */}
+			{showSuccessModal && (
+				<div className="modal-overlay">
+					<div className="modal-content modal-success">
+						<h3 className="modal-title">{successMessage}</h3>
+						<div className="modal-actions">
+							<button className="modal-btn modal-btn-close" onClick={closeSuccess}>
+								Close
 							</button>
 						</div>
 					</div>

@@ -41,6 +41,12 @@
 	gap: 0.5rem;
 }
 
+.action-buttons {
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+}
+
 .user-name {
 	font-size: 1.5rem;
 	font-weight: 700;
@@ -92,6 +98,33 @@
 }
 
 .unblock-btn.disabled {
+	background: #f3f4f6;
+	color: #9ca3af;
+	border-color: #d1d5db;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.block-btn {
+	background: #fffbeb;
+	color: #f59e0b;
+	border: 2px solid #f59e0b;
+	padding: 0.625rem 1.75rem;
+	border-radius: 8px;
+	font-size: 0.9rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition: all 0.2s;
+	white-space: nowrap;
+}
+
+.block-btn:hover:not(.disabled) {
+	background: #fef3c7;
+	border-color: #d97706;
+	color: #d97706;
+}
+
+.block-btn.disabled {
 	background: #f3f4f6;
 	color: #9ca3af;
 	border-color: #d1d5db;
@@ -165,7 +198,8 @@
 	animation: slideUp 0.3s ease;
 }
 
-.modal-unblock {
+.modal-unblock,
+.modal-success {
 	max-width: 600px;
 }
 
@@ -270,6 +304,10 @@
 	margin-top: 1.5rem;
 }
 
+.modal-actions-vertical {
+	flex-direction: column;
+}
+
 .modal-btn {
 	padding: 0.625rem 2rem;
 	border-radius: 8px;
@@ -299,21 +337,40 @@
 	border-color: #6dddd0;
 }
 
-.modal-btn-submit:hover {
+.modal-btn-submit:hover:not(.disabled) {
 	background: #5bc9bc;
 	border-color: #5bc9bc;
 }
 
-.modal-btn-close {
+.modal-btn-submit.disabled {
+	background: #f3f4f6;
+	color: #9ca3af;
+	border-color: #d1d5db;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.modal-btn-primary {
 	background: #6dddd0;
 	color: var(--white);
 	border-color: #6dddd0;
 	width: 100%;
 }
 
-.modal-btn-close:hover {
+.modal-btn-primary:hover {
 	background: #5bc9bc;
 	border-color: #5bc9bc;
+}
+
+.modal-btn-secondary {
+	background: var(--white);
+	color: #6dddd0;
+	border-color: #6dddd0;
+	width: 100%;
+}
+
+.modal-btn-secondary:hover {
+	background: #f3f4f6;
 }
 
 /* RESPONSIVE */
@@ -333,13 +390,13 @@
 		align-items: flex-start;
 	}
 
-	.user-meta {
+	.action-buttons {
+		width: 100%;
 		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.5rem;
 	}
 
-	.unblock-btn {
+	.unblock-btn,
+	.block-btn {
 		width: 100%;
 	}
 
