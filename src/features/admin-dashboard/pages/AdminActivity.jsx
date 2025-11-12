@@ -7,6 +7,136 @@ import SearchBar from "../components/SearchBar";
 import DataTable from "../components/DataTable";
 import "../styles/admin-activity.css";
 
+// Default dummy activities - will be used if no activities exist
+const DEFAULT_ACTIVITIES = [
+	{
+		id: 1,
+		activityId: "ACK000001",
+		actionFlow: "Check & Approval",
+		actionType: "unblock",
+		data: "P001",
+		createdTime: "2025-11-01 10:00:00",
+		createdBy: "ADM001",
+		checkerId: "ADM002",
+		approverId: "ADM003",
+		status: "Pending Approval",
+		customerName: "Ulion Pardede",
+		cif: "1234567890",
+		reason: "System automatically blocked the user due to multiple failed login attempts.",
+		rejectionNotes: "-",
+		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
+		checkedBy: "ADM002",
+		checkedAt: "2025-11-01 12:02:32 by Khairuddin Nasty (ADM002)",
+		approvedBy: "",
+		approvedAt: "",
+	},
+	{
+		id: 2,
+		activityId: "ACK000002",
+		actionFlow: "Check & Approval",
+		actionType: "unblock",
+		data: "P002",
+		createdTime: "2025-11-01 10:00:00",
+		createdBy: "ADM001",
+		checkerId: "ADM002",
+		approverId: "ADM003",
+		status: "Pending Check",
+		customerName: "Sample User 2",
+		cif: "1234567891",
+		reason: "User requested account unblock after verification.",
+		rejectionNotes: "-",
+		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
+		checkedBy: "ADM002",
+		checkedAt: "",
+		approvedBy: "",
+		approvedAt: "",
+	},
+	{
+		id: 3,
+		activityId: "ACK000003",
+		actionFlow: "Check & Approval",
+		actionType: "block",
+		data: "P003",
+		createdTime: "2025-11-01 10:00:00",
+		createdBy: "ADM001",
+		checkerId: "ADM002",
+		approverId: "ADM003",
+		status: "Rejected",
+		customerName: "Sample User 3",
+		cif: "1234567892",
+		reason: "Suspicious activity detected, need to block account.",
+		rejectionNotes: "Documentation incomplete",
+		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
+		checkedBy: "ADM002",
+		checkedAt: "2025-11-01 11:15:20 by Khairuddin Nasty (ADM002)",
+		approvedBy: "",
+		approvedAt: "",
+	},
+	{
+		id: 4,
+		activityId: "ACK000004",
+		actionFlow: "Check & Approval",
+		actionType: "unblock",
+		data: "P004",
+		createdTime: "2025-11-01 10:00:00",
+		createdBy: "ADM001",
+		checkerId: "ADM002",
+		approverId: "ADM003",
+		status: "Approved",
+		customerName: "Sample User 4",
+		cif: "1234567893",
+		reason: "Routine unblock after security check.",
+		rejectionNotes: "-",
+		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
+		checkedBy: "ADM002",
+		checkedAt: "2025-11-01 12:05:10 by Khairuddin Nasty (ADM002)",
+		approvedBy: "ADM003",
+		approvedAt: "2025-11-02 08:00:00 by Wira Natanael Uli (ADM003)",
+	},
+	{
+		id: 5,
+		activityId: "ACK000005",
+		actionFlow: "Check & Approval",
+		actionType: "block",
+		data: "P005",
+		createdTime: "2025-11-01 10:00:00",
+		createdBy: "ADM001",
+		checkerId: "ADM002",
+		approverId: "ADM003",
+		status: "Pending Approval",
+		customerName: "Sample User 5",
+		cif: "1234567894",
+		reason: "Multiple violations detected, need to block account.",
+		rejectionNotes: "-",
+		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
+		checkedBy: "ADM002",
+		checkedAt: "2025-11-01 13:20:45 by Khairuddin Nasty (ADM002)",
+		approvedBy: "",
+		approvedAt: "",
+	},
+	{
+		id: 6,
+		activityId: "ACK000006",
+		actionFlow: "Check & Approval",
+		actionType: "unblock",
+		data: "P006",
+		createdTime: "2025-11-01 10:00:00",
+		createdBy: "ADM001",
+		checkerId: "ADM002",
+		approverId: "ADM003",
+		status: "Pending Approval",
+		customerName: "Sample User 6",
+		cif: "1234567895",
+		reason: "User forgot password multiple times, account blocked.",
+		rejectionNotes: "-",
+		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
+		checkedBy: "ADM002",
+		checkedAt: "2025-11-01 14:10:30 by Khairuddin Nasty (ADM002)",
+		approvedBy: "",
+		approvedAt: "",
+	},
+];
+
 export default function AdminActivity() {
 	const navigate = useNavigate();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -17,6 +147,15 @@ export default function AdminActivity() {
 	const [refreshKey, setRefreshKey] = useState(0);
 
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+	// Initialize activities on first load
+	useEffect(() => {
+		const stored = sessionStorage.getItem('activities');
+		if (!stored) {
+			// First time - set default activities
+			sessionStorage.setItem('activities', JSON.stringify(DEFAULT_ACTIVITIES));
+		}
+	}, []);
 
 	// Listen for activity changes
 	useEffect(() => {
@@ -31,92 +170,22 @@ export default function AdminActivity() {
 		};
 	}, []);
 
-	// Load activities from sessionStorage or fallback to inline dummy
+	// Load activities from sessionStorage
 	const activities = useMemo(() => {
 		const stored = sessionStorage.getItem('activities');
 		if (stored) {
 			try {
 				const parsed = JSON.parse(stored);
-				if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+				if (Array.isArray(parsed) && parsed.length > 0) {
+					return parsed;
+				}
 			} catch (e) {
 				console.error('Error parsing activities:', e);
 			}
 		}
 
-		// Default sample data if no activities yet
-		return [
-			{
-				id: 1,
-				activityId: "ACK000001",
-				actionFlow: "Check & Approval",
-				data: "P001",
-				createdTime: "2025-11-01 10:00:00",
-				createdBy: "ADM001",
-				checkerId: "ADM002",
-				approverId: "ADM003",
-				status: "Pending Approval",
-				customerName: "Ulion Pardede",
-				cif: "1234567890",
-				reason: "System automatically blocked the user due to multiple failed login attempts.",
-				rejectionNotes: "-",
-			},
-			{
-				id: 2,
-				activityId: "ACK000002",
-				actionFlow: "Check & Approval",
-				data: "P002",
-				createdTime: "2025-11-01 10:00:00",
-				createdBy: "ADM001",
-				checkerId: "ADM002",
-				approverId: "ADM003",
-				status: "Pending Check",
-			},
-			{
-				id: 3,
-				activityId: "ACK000003",
-				actionFlow: "Check & Approval",
-				data: "P003",
-				createdTime: "2025-11-01 10:00:00",
-				createdBy: "ADM001",
-				checkerId: "ADM002",
-				approverId: "ADM003",
-				status: "Rejected",
-			},
-			{
-				id: 4,
-				activityId: "ACK000004",
-				actionFlow: "Check & Approval",
-				data: "P004",
-				createdTime: "2025-11-01 10:00:00",
-				createdBy: "ADM001",
-				checkerId: "ADM002",
-				approverId: "ADM003",
-				status: "Approved",
-			},
-			{
-				id: 5,
-				activityId: "ACK000005",
-				actionFlow: "Check & Approval",
-				data: "P005",
-				createdTime: "2025-11-01 10:00:00",
-				createdBy: "ADM001",
-				checkerId: "ADM002",
-				approverId: "ADM003",
-				status: "Pending Approval",
-			},
-			{
-				id: 6,
-				activityId: "ACK000006",
-				actionFlow: "Check & Approval",
-				data: "P006",
-				createdTime: "2025-11-01 10:00:00",
-				createdBy: "ADM001",
-				checkerId: "ADM002",
-				approverId: "ADM003",
-				status: "Pending Approval",
-			},
-		];
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// Fallback to default if nothing in storage
+		return DEFAULT_ACTIVITIES;
 	}, [refreshKey]);
 
 	const tableColumns = [
