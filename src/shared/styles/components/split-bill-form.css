@@ -152,6 +152,14 @@
   box-sizing: border-box;
 }
 
+/* disabled input style */
+.col-amount input[disabled],
+.participant-row input[disabled] {
+  background: #f3f3f3;
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
 /* actions */
 .row-actions {
   display: flex;
