@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/Navbar";
+import generateSplitBillPDF from "../modules/generateSplitBillPDF";
 import Swal from "sweetalert2";
 import "../styles/split-bill-detail.css";
 
@@ -8,9 +9,6 @@ import {
   getSplitBillById,
   updateSplitBillStatus,
 } from "../api/split-bill.api";
-
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 export default function SplitBillDetail() {
   const { state } = useLocation();
@@ -223,27 +221,13 @@ export default function SplitBillDetail() {
   /* ----------------------- PDF ----------------------- */
 
   const handleDownloadPDF = () => {
-    const doc = new jsPDF();
+    const preview = window.open("", "_blank");
 
-    doc.setFontSize(16);
-    doc.text(bill.split_bill_title, 14, 16);
+    const doc = generateSplitBillPDF(bill, members, color);
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
 
-    doc.setFontSize(10);
-    doc.text(`Ref ID: ${bill.ref_id}`, 14, 25);
-    doc.text(`Created: ${new Date(bill.created_time).toLocaleString("id-ID")}`, 14, 32);
-
-    autoTable(doc, {
-      head: [["No", "Member", "Amount", "Status"]],
-      body: members.map((m, i) => [
-        i + 1,
-        m.member_name,
-        `Rp ${Number(m.amount).toLocaleString("id-ID")}`,
-        m.status,
-      ]),
-      startY: 42,
-    });
-
-    doc.save(`split-bill-${bill.split_bill_id}.pdf`);
+    preview.location.href = url;
   };
 
   /* ----------------------- RENDER ----------------------- */
