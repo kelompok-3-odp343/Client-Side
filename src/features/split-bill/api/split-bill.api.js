@@ -40,10 +40,8 @@ export async function fetchSplitBills() {
 
     const res = await api.get("/api/split-bill", {
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
         "ngrok-skip-browser-warning": "true",
       },
     });
@@ -64,10 +62,8 @@ export async function getSplitBillById(splitBillId) {
       { splitBillId },
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
-          "User-Id": sessionStorage.getItem("user_id"),
-          "Customer-Id": sessionStorage.getItem("cif"),
           "ngrok-skip-browser-warning": "true",
         },
       }
@@ -129,10 +125,8 @@ export async function createSplitBill(payload) {
     const token = sessionStorage.getItem("token");
     const res = await api.post("/api/split-bill/add", newBill, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
         "ngrok-skip-browser-warning": "true",
       },
       timeout: 4000,

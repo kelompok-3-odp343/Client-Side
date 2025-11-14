@@ -39,9 +39,9 @@ export default function Login() {
 			return;
 		}
 
-		const { role, sessionId, token, message: apiMsg } = respLogin.data;
+		const { role, sessionIdOrToken, token, message: apiMsg } = respLogin.data;
 
-		sessionStorage.setItem("sessionID", sessionId || "NO_SESSION");
+		sessionStorage.setItem("sessionID", sessionIdOrToken || "NO_SESSION");
 		sessionStorage.setItem("token", token || "DUMMY_TOKEN");
 		sessionStorage.setItem("role", role || "user");
 

@@ -7,18 +7,14 @@ const api = axios.create({
 export const getTimeDeposits = async () => {
     try {
         const token = sessionStorage.getItem("token");
-        const userId = sessionStorage.getItem("user_id");
-        const customerId = sessionStorage.getItem("cif");
 
-        if (!token || !userId || !customerId) {
-            throw new Error("Missing token, User-Id, or Customer-Id in sessionStorage");
+        if (!token) {
+            throw new Error("Missing token in sessionStorage");
         }
 
         const response = await api.get(`/api/v1/detail-deposit`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
-                "User-Id": userId,
-                "Customer-Id": customerId,
                 "Content-Type": "application/json",
                 "ngrok-skip-browser-warning": "true",
             },
@@ -38,11 +34,9 @@ export const getTimeDeposits = async () => {
 export const getTimeDepositTransactions = async ({ month, year, accountNumber }) => {
     try {
         const token = sessionStorage.getItem("token");
-        const userId = sessionStorage.getItem("user_id");
-        const customerId = sessionStorage.getItem("cif");
 
-        if (!token || !userId || !customerId) {
-            throw new Error("Missing token, User-Id, or Customer-Id in sessionStorage");
+        if (!token) {
+            throw new Error("Missing token in sessionStorage");
         }
 
         const payload = {
@@ -54,8 +48,6 @@ export const getTimeDepositTransactions = async ({ month, year, accountNumber })
         const response = await api.post(`/api/v1/trx-history`, payload, {
             headers: {
                 "Authorization": `Bearer ${token}`,
-                "User-Id": userId,
-                "Customer-Id": customerId,
                 "Content-Type": "application/json",
                 "ngrok-skip-browser-warning": "true",
             },
