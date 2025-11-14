@@ -4,58 +4,47 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-export const getSavingsData = async (userId) => {
+export const getSavingsOverview = async () => {
+    const token = sessionStorage.getItem("token");
     try {
-        const response = await api.get(`/api/savings/${userId}`);
+        const response = await api.get(`/api/v1/savings`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
+            }
+        });
 
-        if (response.data && response.data.status === true) {
-            console.log("dari api");
-            return response.data;
-        } else {
-            throw new Error("Invalid API response structure");
+        if (!response.data || !response.data.data) {
+            throw new Error("Data tidak ditemukan");
         }
+
+        return response.data;
     } catch (error) {
-        console.warn("pakai dummy dulu", error.message);
+        console.error("Error getSavingsOverview:", error);
+        throw error;
+    }
+};
 
-        const dummyResponse = {
-            status: true,
-            message: "Dummy data sementara",
-            data: [
-                {
-                    account_id: "ACCT_9876543210",
-                    title: "Savings - TAPLUS PEGAWAI BNI",
-                    total_balance: 500000000,
-                    items: [
-                        {
-                            item_id: "ACCT_9876543210",
-                            account_number: "1234567899",
-                            account_name: "TAPLUS PEGAWAI BNI",
-                            effective_balance: 500000000,
-                            is_main_account: false,
-                            account_status: "BUKA",
-                        },
-                    ],
-                },
-                {
-                    account_id: "ACCT_12345678910",
-                    title: "Savings - TAPLUS BISNIS",
-                    total_balance: 12000000000,
-                    items: [
-                        {
-                            item_id: "ACCT_12345678910",
-                            account_number: "12345678910",
-                            account_name: "TAPLUS BISNIS",
-                            effective_balance: 12000000000,
-                            is_main_account: true,
-                            account_status: "BUKA",
-                        },
-                    ],
-                },
-            ],
-        };
+export const getSavingsDetail = async () => {
+    const token = sessionStorage.getItem("token");
+    try {
+        const response = await api.get(`/api/v1/savings/detail`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
+            }
+        });
 
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        if (!response.data || !response.data.summary) {
+            throw new Error("Data tidak ditemukan");
+        }
 
-        return dummyResponse;
+        return response.data;
+    } catch (error) {
+        console.error("Error getSavingsDetail:", error);
+
+        throw error;
     }
 };
