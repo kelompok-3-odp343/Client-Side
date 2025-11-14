@@ -10,8 +10,6 @@ export async function fetchAllCards() {
     const res = await api.post("/api/v1/account", {
       headers: {
         "Authorization": `Bearer ${token}`,
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       }
@@ -37,8 +35,6 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
     const respTrxHistory = await api.post(`/api/v1/trx-history`, payload, {
       headers: {
         "Authorization": `Bearer ${token}`,
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },

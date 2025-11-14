@@ -72,7 +72,6 @@ export default function Dashboard() {
     dataDashboards();
   }, []);
 
-  // === AUTO SLIDE UNTUK CARD ===
   useEffect(() => {
     if (cards.length > 1) {
       const interval = setInterval(() => {
@@ -82,7 +81,6 @@ export default function Dashboard() {
     }
   }, [cards]);
 
-  // === Manual slide controls ===
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
   };
@@ -118,7 +116,6 @@ export default function Dashboard() {
       <main className="dashboard-main">
         <h2 className="page-title">Dashboard</h2>
 
-        {/* ========== TOP GRID ========== */}
         <section className="top-grid">
           <div className="card card-gradient assets-card">
             <div className="card-head">
@@ -219,7 +216,6 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* ========== FUND PILLS ========== */}
         <section className="fund-pills">
           <button
             className="pill"
@@ -290,7 +286,6 @@ export default function Dashboard() {
           </button>
         </section>
 
-        {/* ========== MY CARDS & EARNINGS ========== */}
         <section className="bottom-grid">
           <div className="card cards-panel">
             <div className="cards-layout">

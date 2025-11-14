@@ -4,6 +4,7 @@ import "../styles/auth.css";
 import "../styles/auth-otp.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
 import { postVerifyOtp, postResendOtp } from "../api/authService";
+import { decodeJwtToken } from "../api/jwtHelper";
 
 export default function OtpLogin() {
 	const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -51,11 +52,14 @@ export default function OtpLogin() {
 			return;
 		}
 
-		sessionStorage.setItem("token", resp.data.token);
-		sessionStorage.setItem("user_id", resp.data.user.userId);
-		sessionStorage.setItem("username", resp.data.user.username);
-		sessionStorage.setItem("role", resp.data.user.role);
-		sessionStorage.setItem("cif", resp.data.user.cif);
+		const token = sessionStorage.setItem("token", resp.data.token);
+		const userData = decodeJwtToken(token);
+		if (userData) {
+			sessionStorage.setItem("user_id", userData.userId);
+			sessionStorage.setItem("username", userData.username);
+			sessionStorage.setItem("role", userData.role);
+			sessionStorage.setItem("cif", userData.cif);
+		}
 		sessionStorage.setItem("attempt", resp.data.attemptCount);
 
 		setMessage("✅ OTP Verified (DEV MODE)");

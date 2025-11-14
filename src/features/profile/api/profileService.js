@@ -7,15 +7,11 @@ const api = axios.create({
 export const getUserProfile = async () => {
   try {
     const token = sessionStorage.getItem('token');
-    const userId = sessionStorage.getItem('user_id');
-    const cif = sessionStorage.getItem('cif');
 
     const res = await api.get("/api/v1/profile",
       {
         headers: {
           "Authorization": `Bearer ${token}`,
-          "User-Id": userId,
-          "Customer-Id": cif,
           "Content-Type": "application/json",
           "ngrok-skip-browser-warning": "true",
         },

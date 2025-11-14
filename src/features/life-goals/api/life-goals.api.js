@@ -38,8 +38,6 @@ export async function fetchLifeGoalDetail(accountNumber) {
     const res = await api.get(`/api/v1/lifegoals-detail/${accountNumber}`, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
@@ -59,9 +57,7 @@ export async function fetchLifeGoalTransactions(accountNumber) {
     const token = sessionStorage.getItem("token");
     const res = await api.get(`/api/v1/lifegoals-tx/${accountNumber}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
@@ -81,9 +77,7 @@ export async function fetchLifeGoalsRevamp() {
     const token = sessionStorage.getItem("token");
     const res = await api.get(`/api/v1/lifegoals`, {
       headers: {
-        Authorization: `Bearer ${token}`,
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },

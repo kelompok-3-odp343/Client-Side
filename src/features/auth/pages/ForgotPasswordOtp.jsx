@@ -50,7 +50,7 @@ export default function ForgotPasswordOtp() {
         setLoading(true);
         try {
             const res = await postForgotPasswordVerifyOtp({
-                sessionId: state.sessionId,
+                sessionId: state.sessionIdOrToken,
                 otpCode,
             });
 
@@ -92,7 +92,7 @@ export default function ForgotPasswordOtp() {
             const res = await postForgotPasswordRequestOtp({ username: state?.username });
 
             if (res.ok && res.data.status) {
-                sessionStorage.setItem("fp_session", res.data.sessionId);
+                sessionStorage.setItem("fp_session", res.data.sessionIdOrToken);
                 Swal.fire({
                     icon: "success",
                     title: "OTP Resent",

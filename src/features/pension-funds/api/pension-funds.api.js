@@ -11,8 +11,6 @@ export const getPensionFunds = async () => {
         const resp = await api.get(`/api/v1/dplk`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
-                "User-Id": sessionStorage.getItem("user_id"),
-                "Customer-Id": sessionStorage.getItem("cif"),
                 "Content-Type": "application/json",
                 "ngrok-skip-browser-warning": "true",
             },
@@ -35,17 +33,11 @@ export async function fetchDPLKTransactionHistory({ month, year, accountNumber }
     try {
         const token = sessionStorage.getItem("token");
 
-        const payload = {
-            month,
-            year,
-            accountNumber
-        };
+        const payload = { month, year, accountNumber };
 
         const resp = await api.post("/api/v1/trx-history", payload, {
             headers: {
                 "Authorization": `Bearer ${token}`,
-                "User-Id": sessionStorage.getItem("user_id"),
-                "Customer-Id": sessionStorage.getItem("cif"),
                 "Content-Type": "application/json",
                 "ngrok-skip-browser-warning": "true",
             }
@@ -57,7 +49,7 @@ export async function fetchDPLKTransactionHistory({ month, year, accountNumber }
         return { transactions: [] };
 
     } catch (error) {
-        console.error("DPLK trx error:", error?.message);
+        console.error("trx error:", error?.message);
         return { transactions: [] };
     }
 }
