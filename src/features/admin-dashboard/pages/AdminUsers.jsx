@@ -24,18 +24,18 @@ export default function AdminUsers() {
 		const handleStatusChange = () => {
 			setRefreshKey(prev => prev + 1);
 		};
-		
+
 		window.addEventListener('userStatusChanged', handleStatusChange);
-		
+
 		// Also refresh when component becomes visible again
 		const handleVisibilityChange = () => {
 			if (!document.hidden) {
 				setRefreshKey(prev => prev + 1);
 			}
 		};
-		
+
 		document.addEventListener('visibilitychange', handleVisibilityChange);
-		
+
 		return () => {
 			window.removeEventListener('userStatusChanged', handleStatusChange);
 			document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -226,7 +226,7 @@ export default function AdminUsers() {
 		} catch (e) {
 			console.error('Error parsing user statuses:', e);
 		}
-		
+
 		const groupedByCif = rawAccounts.reduce((acc, account) => {
 			if (!acc[account.cif]) {
 				acc[account.cif] = {
@@ -255,7 +255,7 @@ export default function AdminUsers() {
 
 	const tableColumns = [
 		{ key: "no", label: "No", sortable: false },
-		{ key: "cif", label: "CIF", sortable: false },
+		{ key: "cif", label: "CIF", sortable: true },
 		{ key: "customerName", label: "Customer Name", sortable: true },
 		{ key: "status", label: "Customer Status", sortable: true, filterable: true },
 		{ key: "accountCount", label: "# of Accounts", sortable: true },
@@ -269,7 +269,7 @@ export default function AdminUsers() {
 	const totalUsers = users.length;
 	const activeUsers = users.filter(u => u.status === "Active").length;
 	const blockedUsers = users.filter(u => u.status === "Blocked").length;
-	const avgAccountsPerUser = users.length > 0 
+	const avgAccountsPerUser = users.length > 0
 		? Math.round(users.reduce((sum, u) => sum + u.accountCount, 0) / users.length)
 		: 0;
 
@@ -306,10 +306,10 @@ export default function AdminUsers() {
 	});
 
 	const handleViewDetails = (user) => {
-		navigate(`/admin/users/${user.cif}`, { 
-			state: { 
+		navigate(`/admin/users/${user.cif}`, {
+			state: {
 				user: user
-			} 
+			}
 		});
 	};
 
@@ -396,8 +396,8 @@ export default function AdminUsers() {
 
 		if (column.key === "action") {
 			return (
-				<button 
-					className="view-details-btn" 
+				<button
+					className="view-details-btn"
 					onClick={() => handleViewDetails(row)}
 					type="button"
 				>
