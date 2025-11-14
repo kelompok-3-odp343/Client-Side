@@ -5,7 +5,7 @@
 	--white: #ffffff;
 	--shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	--radius: 12px;
-	--purple: #cabee3;
+	--purple: #9C7EDC;
 }
 
 .admin-activity-detail-main {
@@ -210,9 +210,10 @@
 
 .modal-content {
 	background: var(--white);
+	border: 3px solid #cabee3;
 	border-radius: 12px;
-	padding: 2rem;
-	max-width: 500px;
+	padding: 1.5rem;
+	max-width: 600px;
 	width: 90%;
 	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 	animation: slideUp 0.3s ease;
@@ -280,7 +281,7 @@
 .modal-select {
 	width: 100%;
 	padding: 0.625rem 1rem;
-	border: 1px solid #d1d5db;
+	border: 2px solid #cabee3;
 	border-radius: 8px;
 	font-size: 0.9rem;
 	color: var(--text-dark);
@@ -296,7 +297,7 @@
 .modal-textarea {
 	width: 100%;
 	padding: 0.75rem 1rem;
-	border: 1px solid #d1d5db;
+	border: 2px solid #cabee3;
 	border-radius: 8px;
 	font-size: 0.9rem;
 	color: var(--text-dark);
@@ -320,8 +321,8 @@
 
 .modal-actions {
 	display: flex;
-	gap: 1rem;
-	justify-content: center;
+	/* gap: 1rem; */
+	justify-content: space-between;
 	margin-top: 1.5rem;
 }
 
@@ -330,37 +331,38 @@
 }
 
 .modal-btn {
-	padding: 0.625rem 2rem;
+	padding: 0.5rem 0.8rem;
 	border-radius: 8px;
 	font-size: 0.9rem;
 	font-weight: 600;
 	cursor: pointer;
 	transition: all 0.2s;
 	border: 2px solid;
-	min-width: 120px;
+	/* min-width: 120px; */
 }
 
 .modal-btn-cancel {
 	background: var(--white);
-	color: #6b7280;
-	border-color: #d1d5db;
+	color: #f94449;
+	border-color: #f94449;
 }
 
 .modal-btn-cancel:hover {
-	background: #f3f4f6;
-	border-color: #9ca3af;
-	color: #4b5563;
+	background: #fef5f5;
+	border-color: #f94449;
+	color: #f94449;
 }
 
 .modal-btn-submit {
-	background: var(--purple);
-	color: var(--white);
+	background: none;
+	color: var(--purple);
 	border-color: var(--purple);
 }
 
 .modal-btn-submit:hover:not(.disabled) {
-	background: #b9a8d6;
-	border-color: #b9a8d6;
+	background: #f8f5ff;
+	color: var(--purple);
+	border-color: var(--purple);
 }
 
 .modal-btn-submit.disabled {
