@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { Lock, Unlock } from "lucide-react";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import "../styles/admin-user-detail.css";
@@ -8,6 +9,8 @@ export default function AdminUserDetail() {
 	const location = useLocation();
 	const { id } = useParams();
 	const navigate = useNavigate();
+
+	// State
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const [showActionModal, setShowActionModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -16,6 +19,7 @@ export default function AdminUserDetail() {
 	const [selectedChecker, setSelectedChecker] = useState("");
 	const [reason, setReason] = useState("");
 	const [actionType, setActionType] = useState(""); // "block" or "unblock"
+	const [lastActivity, setLastActivity] = useState(null);
 	
 	// Local state for user data
 	const [userData, setUserData] = useState(null);
@@ -172,6 +176,15 @@ export default function AdminUserDetail() {
 			// Get current date and admin info
 			const now = new Date();
 			const dateStr = now.toISOString().replace('T', ' ').substring(0, 19);
+			const createdTimeDisplay = now.toLocaleString("en-GB", {
+				day: "numeric",
+				month: "short",
+				year: "numeric",
+				hour: "2-digit",
+				minute: "2-digit",
+				second: "2-digit",
+			});
+
 			const adminName = sessionStorage.getItem('adminName') || 'Della Puspita';
 			const adminId = sessionStorage.getItem('adminId') || 'ADM001';
 			
@@ -179,10 +192,13 @@ export default function AdminUserDetail() {
 			const newActivity = {
 				id: activitiesList.length + 1,
 				activityId: `ACK00000${activitiesList.length + 1}`,
+				menu: "User Management",
 				actionFlow: "Check & Approval",
 				actionType: actionType, // "block" or "unblock"
+				actionMenu: actionType === "block" ? "Block User" : "Unblock User",
 				data: `P00${activitiesList.length + 1}`,
 				createdTime: dateStr,
+				createdTimeDisplay,
 				createdBy: adminId,
 				checkerId: selectedChecker,
 				approverId: "",
@@ -202,6 +218,8 @@ export default function AdminUserDetail() {
 			activitiesList.push(newActivity);
 			sessionStorage.setItem('activities', JSON.stringify(activitiesList));
 			
+			setLastActivity(newActivity);
+
 			// Close modal and show success
 			setShowActionModal(false);
 			setShowSuccessModal(true);
@@ -223,6 +241,7 @@ export default function AdminUserDetail() {
 		setSelectedChecker("");
 		setReason("");
 		setActionType("");
+		setLastActivity(null);
 	};
 
 	const cancelAction = () => {
@@ -269,9 +288,13 @@ export default function AdminUserDetail() {
 					<div className="user-info">
 						<h2 className="user-name">{userData.customerName}</h2>
 						<div className="user-meta">
-							<span className="user-cif">CIF: {userData.cif}</span>
+							<span className="user-cif">
+								<span className="label">CIF :</span>
+								<span className="value">{userData.cif}</span>
+							</span>
 							<span className={`user-status ${userData.status === "Blocked" ? "blocked" : "active"}`}>
-								Customer Status: {userData.status}
+								<span className="label">Customer Status :</span>
+								<span className="value">{userData.status}</span>
 							</span>
 						</div>
 					</div>
@@ -281,14 +304,16 @@ export default function AdminUserDetail() {
 							onClick={handleUnblock}
 							disabled={!isBlocked}
 						>
-							Unblock
+							<Unlock size={24} />
+							<span>Unblock</span>
 						</button>
 						<button 
 							className={`block-btn ${isBlocked ? "disabled" : ""}`}
 							onClick={handleBlock}
 							disabled={isBlocked}
 						>
-							Block
+							<Lock size={24} />
+							<span>Block</span>
 						</button>
 					</div>
 				</div>
@@ -326,12 +351,12 @@ export default function AdminUserDetail() {
 			{/* Action Modal - Block/Unblock */}
 			{showActionModal && (
 				<div className="modal-overlay">
-					<div className="modal-content modal-action">
+					<div className="modal-content-user-detail modal-action">
 						<h3 className="modal-title">{actionType === "block" ? "Block" : "Unblock"} User Request</h3>
 						<div className="modal-field">
 							<label className="modal-label">Checker*</label>
 							<select
-								className="modal-select"
+								className="modal-select-user-detail"
 								value={selectedChecker}
 								onChange={(e) => setSelectedChecker(e.target.value)}
 							>
@@ -347,7 +372,7 @@ export default function AdminUserDetail() {
 						<div className="modal-field">
 							<label className="modal-label">Reason*</label>
 							<textarea
-								className="modal-textarea"
+								className="modal-textarea-user-detail"
 								placeholder="Type here ..."
 								value={reason}
 								onChange={(e) => setReason(e.target.value)}
@@ -355,14 +380,14 @@ export default function AdminUserDetail() {
 							/>
 						</div>
 						
-						<span className="modal-required">*required</span>
+						<span className="modal-required-user-detail">*required</span>
 						
 						<div className="modal-actions">
 							<button className="modal-btn modal-btn-cancel" onClick={cancelAction}>
 								Cancel
 							</button>
 							<button 
-								className={`modal-btn modal-btn-submit ${!isFormValid ? 'disabled' : ''}`}
+								className={`modal-btn modal-btn-user-detail-submit ${!isFormValid ? 'disabled' : ''}`}
 								onClick={handleSubmitAction}
 								disabled={!isFormValid}
 							>
@@ -374,19 +399,44 @@ export default function AdminUserDetail() {
 			)}
 
 			{/* Success Modal with Navigation Options */}
-			{showSuccessModal && (
+			{showSuccessModal && lastActivity && (
 				<div className="modal-overlay">
-					<div className="modal-content modal-success">
+					<div className="modal-content-user-detail modal-success">
 						<h3 className="modal-title">
-							{actionType === "block" ? "Block" : "Unblock"} request submitted successfully!
+							Activity Has Been Created
 						</h3>
-						<p className="modal-subtitle">The request is now pending checker approval.</p>
-						<div className="modal-actions modal-actions-vertical">
-							<button className="modal-btn modal-btn-primary" onClick={handleSuccessViewActivity}>
-								View Activity List
+						<p className="modal-subtitle-user-detail">
+							Created at <strong>{lastActivity.createdTimeDisplay}</strong>
+						</p>
+
+						<div className="activity-summary-card">
+							<div className="activity-row">
+								<span className="activity-label">Activity ID</span>
+								<span className="activity-value">
+									: {lastActivity.activityId}
+								</span>
+							</div>
+							<div className="activity-row">
+								<span className="activity-label">Menu</span>
+								<span className="activity-value">
+									: {lastActivity.menu}
+								</span>
+							</div>
+							<div className="activity-row">
+								<span className="activity-label">Action Menu</span>
+								<span className="activity-value">
+									: {lastActivity.actionMenu}
+								</span>
+							</div>
+						</div>
+
+
+						<div className="modal-actions">
+							<button className="modal-btn modal-btn-user-detail-close" onClick={handleSuccessClose}>
+								Close
 							</button>
-							<button className="modal-btn modal-btn-secondary" onClick={handleSuccessClose}>
-								Stay on This Page
+							<button className="modal-btn modal-btn-user-detail-view" onClick={handleSuccessViewActivity}>
+								View Activity List
 							</button>
 						</div>
 					</div>
