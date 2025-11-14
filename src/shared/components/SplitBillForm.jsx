@@ -18,10 +18,11 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
   const lastAddedId = useRef(null);
   const navigate = useNavigate();
 
+  // parse transaction amount (supports formatted strings like "Rp 1.000")
   const totalBill = parseInt(
-    (transaction.amount || "").toString().replace(/[^\d]/g, ""),
+    (transaction?.amount || "").toString().replace(/[^\d]/g, ""),
     10
-  );
+  ) || 0;
 
   const totalParticipantAmount = participants.reduce(
     (sum, p) => sum + parseInt(p.participantAmount || "0", 10),
@@ -30,7 +31,7 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
 
   const remainingAmount = totalBill - totalParticipantAmount;
 
-  // 🔒 Kunci scroll background saat modal aktif
+  // 🔒 lock scroll when modal active
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -38,7 +39,7 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
     };
   }, []);
 
-  // 🎯 Fokus otomatis ke input baru
+  // focus to last added input
   useEffect(() => {
     const last = participants[participants.length - 1];
     if (lastAddedId.current && last && lastAddedId.current === last.id) {
@@ -49,6 +50,9 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
   }, [participants]);
 
   function handleAddRow() {
+    // Prevent adding when amounts are already balanced
+    if (totalParticipantAmount === totalBill) return;
+
     const newId = Date.now() + Math.random();
     lastAddedId.current = newId;
     setParticipants((prev) => [
@@ -131,7 +135,7 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
       await createSplitBill(payload);
       setShowSuccess(true);
 
-      // ✅ Tambahan baru:
+      // callback kalau ada
       if (typeof onSuccess === "function") onSuccess();
     } catch (err) {
       const msg = err?.message || "Unknown error";
@@ -159,6 +163,9 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
     (p) => !p.participantName.trim() || !p.participantAmount.trim()
   );
 
+  // disable Add button when either there are empty fields OR the amounts already match
+  const disableAddButton = hasEmptyFields || totalParticipantAmount === totalBill;
+
   return (
     <div className="splitbill-modal" role="dialog" aria-modal="true">
       <div className="splitbill-container">
@@ -179,7 +186,7 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
         </div>
 
         <div className="bill-info-container">
-          <div className="bill-info">
+          <div className="bill-info" style={{ ["--theme-color"]: "#6dddd0" }}>
             <p><strong>Bill Name :</strong> {transaction.detail}</p>
             <p><strong>Total Bill :</strong> {transaction.amount}</p>
             <p><strong>Split Amount :</strong> {formatRp(totalParticipantAmount.toString())}</p>
@@ -227,7 +234,11 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
                 </div>
                 <div className="row-actions">
                   {participants.length > 1 && (
-                    <button type="button" className="rmv-btn" onClick={() => handleDeleteRow(p.id)}>
+                    <button
+                      type="button"
+                      className="rmv-btn"
+                      onClick={() => handleDeleteRow(p.id)}
+                    >
                       <Minus />
                     </button>
                   )}
@@ -236,11 +247,18 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
                       type="button"
                       className="add-btn"
                       onClick={handleAddRow}
-                      disabled={hasEmptyFields}
+                      disabled={disableAddButton}
                       style={{
-                        opacity: hasEmptyFields ? 0.4 : 1,
-                        cursor: hasEmptyFields ? "not-allowed" : "pointer",
+                        opacity: disableAddButton ? 0.4 : 1,
+                        cursor: disableAddButton ? "not-allowed" : "pointer",
                       }}
+                      title={
+                        disableAddButton
+                          ? totalParticipantAmount === totalBill
+                            ? "Total split already equals total bill"
+                            : "Please fill all fields before adding"
+                          : "Add participant"
+                      }
                     >
                       <Plus />
                     </button>

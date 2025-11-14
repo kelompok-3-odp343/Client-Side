@@ -13,6 +13,7 @@ export default function SplitBill() {
     async function loadData() {
       setLoading(true);
       const data = await fetchSplitBills();
+
       if (!data || !data.data || data.data.length === 0) {
         setBills([]);
         setLoading(false);
@@ -46,7 +47,7 @@ export default function SplitBill() {
             <p className="sb-sub">Track and manage your shared expenses</p>
           </div>
 
-          {/* <div>
+          <div>
             <button
               className="add-split-btn"
               onClick={() => navigate("/detailmycard")}
@@ -54,7 +55,7 @@ export default function SplitBill() {
             >
               + Add Split Bill
             </button>
-          </div> */}
+          </div>
         </div>
 
         {bills.length === 0 ? (
@@ -74,21 +75,28 @@ export default function SplitBill() {
               const row = Math.floor(i / 3);
               const col = i % 3;
               const color = cardColors[(row + col) % cardColors.length];
-              const membersToShow = bill.splitBillMemberDetail?.slice(0, 3);
-              const extraCount = Math.max(0, bill.splitBillMemberDetail?.length - (membersToShow?.length || 0));
+
+              // normalized shape from API
+              const members = bill.members || [];
+              const membersToShow = members.slice(0, 3);
+              const extraCount = Math.max(0, members.length - membersToShow.length);
+
+              // progress: percent of members who have paid
+              const paidCount = members.filter((m) => m.hasPaid || m.status === "Paid").length;
+              const progressPercent = (paidCount / Math.max(1, members.length)) * 100;
 
               return (
                 <div
-                  key={bill.splitBillId || bill.split_bill_id || i}
+                  key={bill.split_bill_id || bill.splitBillId || i}
                   className="sb-card"
                   style={{ "--color": color }}
                 >
                   <div className="sb-card-header">
-                    <h3>{bill.splitBillTitle || bill.split_bill_title}</h3>
+                    <h3>{bill.split_bill_title || bill.splitBillTitle}</h3>
                     <p>
                       <span>Total Bill</span>
                       <span className="amount">
-                        Rp {Number(bill.totalBill || bill.total_bill).toLocaleString("id-ID")}
+                        Rp {Number(bill.total_bill || bill.totalBill).toLocaleString("id-ID")}
                       </span>
                     </p>
                   </div>
@@ -98,21 +106,18 @@ export default function SplitBill() {
                       <div
                         className="progress-fill"
                         style={{
-                          width: `${(bill.splitBillMemberDetail?.filter((m) => m.status === "Paid").length /
-                            Math.max(1, bill.splitBillMemberDetail?.length)) *
-                            100
-                            }%`,
+                          width: `${progressPercent}%`,
                         }}
                       />
                     </div>
                   </div>
 
                   <div className="sb-members">
-                    {membersToShow?.map((m, idx) => (
-                      <div key={m.memberId || idx} className="sb-member-row">
-                        <span>{m.memberName || m.member_name}</span>
+                    {membersToShow.map((m, idx) => (
+                      <div key={m.member_id || idx} className="sb-member-row">
+                        <span>{m.member_name}</span>
                         <span>
-                          Rp{Number(m.totalBillAmount).toLocaleString("id-ID")}{" "}
+                          Rp{Number(m.amount || 0).toLocaleString("id-ID")}{" "}
                           <span
                             className={`status ${m.hasPaid || m.status === "Paid" ? "paid" : "unpaid"}`}
                           >
@@ -130,7 +135,7 @@ export default function SplitBill() {
                       onClick={() =>
                         navigate("/splitbill/detail", {
                           state: {
-                            splitBillId: bill.splitBillId,
+                            splitBillId: bill.split_bill_id || bill.splitBillId,
                             color,
                           },
                         })

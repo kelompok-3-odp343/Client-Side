@@ -12,19 +12,33 @@ function normalizeBill(b) {
   if (!b) return null;
 
   const bill = {
-    split_bill_id: b.split_bill_id || b.id || null,
-    split_bill_title: b.split_bill_title || b.title || b.splitBillTitle || "Untitled Bill",
-    total_bill: b.total_bill || b.totalAmount || b.total_bill || 0,
-    ref_id: b.ref_id || b.transactionId || b.refId || null,
-    created_time: b.created_time || b.created_at || new Date().toISOString(),
-    members: (b.members || b.billMembers || []).map((m) => ({
-      member_name: m.member_name || m.memberName || "Unknown",
-      amount:
-        typeof m.amount === "string"
-          ? Number(m.amount.replace(/[^\d.-]/g, "")) || 0
-          : Number(m.amount || m.amountShare || 0),
-      status: m.status || "Unpaid",
-    })),
+    split_bill_id: b.split_bill_id || b.splitBillId || b.id || null,
+    split_bill_title:
+      b.split_bill_title ||
+      b.splitBillTitle ||
+      b.title ||
+      b.splitBillTitle ||
+      "Untitled Bill",
+    total_bill:
+      Number(b.total_bill || b.totalBill || b.totalAmount || 0) || 0,
+    ref_id: b.ref_id || b.refId || b.transactionId || null,
+    created_time: b.created_time || b.createdTime || b.created_at || new Date().toISOString(),
+    // normalize members to { member_id?, member_name, amount, status, hasPaid? }
+    members: (b.members || b.billMembers || b.splitBillMemberDetail || []).map((m) => {
+      const amountRaw = m.amount ?? m.amountShare ?? m.totalBillAmount ?? 0;
+      const amount = typeof amountRaw === "string"
+        ? Number(amountRaw.replace(/[^\d.-]/g, "")) || 0
+        : Number(amountRaw || 0);
+
+      const status = (m.status || (m.hasPaid ? (m.hasPaid ? "Paid" : "Unpaid") : m.paymentStatus) || "Unpaid");
+      return {
+        member_id: m.member_id || m.memberId || m.id || null,
+        member_name: m.member_name || m.memberName || m.participantName || "Unknown",
+        amount,
+        status,
+        hasPaid: m.hasPaid === undefined ? (status === "Paid") : Boolean(m.hasPaid),
+      };
+    }),
   };
 
   bill.remaining_bill = bill.members
@@ -40,16 +54,32 @@ export async function fetchSplitBills() {
 
     const res = await api.get("/api/split-bill", {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
+      timeout: 5000,
     });
 
-    return res.data;
+    if (res?.data?.data && Array.isArray(res.data.data) && res.data.data.length > 0) {
+      // ensure normalized structure
+      return {
+        status: true,
+        data: res.data.data.map(normalizeBill),
+      };
+    }
+
+    console.warn("⚠️ API split bills tidak valid atau kosong, menggunakan dummy");
+    return {
+      status: true,
+      data: DUMMY_STORAGE.map(normalizeBill),
+    };
   } catch (error) {
-    console.error("Gagal memuat Split Bill:", error.message);
-    return null;
+    console.error("Gagal memuat Split Bill:", error?.message || error);
+    return {
+      status: true,
+      data: DUMMY_STORAGE.map(normalizeBill),
+    };
   }
 }
 
@@ -62,46 +92,74 @@ export async function getSplitBillById(splitBillId) {
       { splitBillId },
       {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
           "ngrok-skip-browser-warning": "true",
         },
+        timeout: 5000,
       }
     );
 
-    const data = res.data?.data;
-    if (!data) return null;
+    const data = res?.data?.data;
+    if (!data) {
+      console.warn("⚠️ API split bill detail tidak valid, menggunakan dummy");
+      const dummyBill = DUMMY_STORAGE.find((b) => b.split_bill_id === splitBillId || b.splitBillId === splitBillId);
+      return dummyBill ? normalizeBill(dummyBill) : null;
+    }
 
-    return {
-      split_bill_id: data.splitBillId,
-      split_bill_title: data.splitBillTitle,
-      total_bill: data.totalBill,
-      ref_id: data.refId,
-      created_time: data.createdTime,
-      members: (data.members || []).map((m) => ({
-        member_id: m.memberId,
-        member_name: m.memberName,
-        amount: m.amount,
-        hasPaid: m.hasPaid,
-        status: m.hasPaid ? "Paid" : "Unpaid",
-      })),
-    };
+    // normalize API response object to our shape
+    return normalizeBill(data);
   } catch (error) {
-    console.error("Gagal memuat detail Split Bill:", error.message);
-    return null;
+    console.warn("⚠️ API split bill detail gagal, menggunakan dummy:", error?.message || error);
+    const dummyBill = DUMMY_STORAGE.find((b) => b.split_bill_id === splitBillId || b.splitBillId === splitBillId);
+    return dummyBill ? normalizeBill(dummyBill) : null;
   }
 }
 
 export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
-  const idx = DUMMY_STORAGE.findIndex((b) => b.split_bill_id === split_bill_id);
+  // Attempt API call first (best-effort), fallback to dummy behavior
+  try {
+    const token = sessionStorage.getItem("token");
+    const payload = {
+      splitBillId: split_bill_id,
+      members: updatedMembers.map((m) => ({
+        memberId: m.member_id,
+        memberName: m.member_name,
+        amount: Number(m.amount) || 0,
+        hasPaid: m.status === "Paid" || m.hasPaid === true,
+        status: m.status,
+      })),
+    };
+
+    const res = await api.post("/api/split-bill/update", payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+      timeout: 5000,
+    });
+
+    if (res.status >= 200 && res.status < 300) {
+      API_WORKED_BEFORE = true;
+      return normalizeBill(res.data?.data || res.data);
+    }
+  } catch (err) {
+    console.warn("⚠️ Gagal memanggil API update split bill:", err?.message || err);
+  }
+
+  // Dummy update
+  const idx = DUMMY_STORAGE.findIndex((b) => b.split_bill_id === split_bill_id || b.splitBillId === split_bill_id);
   if (idx !== -1) {
     DUMMY_STORAGE[idx].members = updatedMembers.map((m) => ({
-      ...m,
+      member_id: m.member_id,
+      member_name: m.member_name,
       amount: Number(m.amount) || 0,
-      status: m.status || "Unpaid",
+      status: m.status || (m.hasPaid ? "Paid" : "Unpaid"),
+      hasPaid: m.status === "Paid" || m.hasPaid === true,
     }));
 
-    DUMMY_STORAGE[idx].remaining_bill = updatedMembers
+    DUMMY_STORAGE[idx].remaining_bill = DUMMY_STORAGE[idx].members
       .filter((m) => m.status !== "Paid")
       .reduce((s, m) => s + (Number(m.amount) || 0), 0);
 
@@ -116,7 +174,7 @@ export async function createSplitBill(payload) {
     accountNumber: payload.accountNumber,
     transactionId: payload.transactionId,
     splitBillTitle: payload.splitBillTitle,
-    currency: "IDR",
+    currency: payload.currency || "IDR",
     totalAmount: payload.totalAmount,
     billMembers: payload.billMembers,
   };
@@ -125,11 +183,11 @@ export async function createSplitBill(payload) {
     const token = sessionStorage.getItem("token");
     const res = await api.post("/api/split-bill/add", newBill, {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
-      timeout: 4000,
+      timeout: 5000,
     });
 
     if (res.status >= 200 && res.status < 300) {
@@ -138,7 +196,7 @@ export async function createSplitBill(payload) {
       return normalizeBill(res.data?.data || res.data);
     }
   } catch (err) {
-    console.warn("⚠️ Gagal API, fallback dummy:", err.message);
+    console.warn("⚠️ Gagal API, fallback dummy:", err?.message || err);
   }
 
   if (API_WORKED_BEFORE) {
@@ -151,10 +209,12 @@ export async function createSplitBill(payload) {
     total_bill: newBill.totalAmount,
     created_time: new Date().toISOString(),
     ref_id: newBill.transactionId,
-    members: newBill.billMembers.map((m) => ({
+    members: (newBill.billMembers || []).map((m) => ({
+      member_id: null,
       member_name: m.memberName,
-      amount: m.amountShare,
+      amount: m.amountShare ?? m.amount ?? 0,
       status: "Unpaid",
+      hasPaid: false,
     })),
   };
 
