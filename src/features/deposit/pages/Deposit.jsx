@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
+import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
 import "../styles/deposit.css";
 import { Download } from "lucide-react";
 import depositIcon from "../../../assets/images/deposit-icon.png";
@@ -10,6 +11,8 @@ export default function Deposits() {
   const [transactions, setTransactions] = useState([]);
   const [chartData, setChartData] = useState({ income: 0, expense: 0 });
   const [showBalance, setShowBalance] = useState(true);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const getLastMonths = () => {
     const now = new Date();
@@ -114,10 +117,14 @@ export default function Deposits() {
 
       groups[key].items.push({
         transactionId: trx.transactionId,
+        transactionDate: trx.transactionDate,
         type: trx.transactionType,
         detail: trx.partyName,
         amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
         jenisTransaksi: trx.debit_credit === "D" ? "Pengeluaran" : "Pemasukan",
+        debit_credit: trx.debit_credit,
+        partyName: trx.partyName,
+        partyDetail: trx.partyDetail,
       });
     });
 
@@ -224,6 +231,11 @@ export default function Deposits() {
                         `${group.date}-${item.detail}-${item.amount}`
                       }
                       className="transaction-modern-item"
+                      onClick={() => {
+                        setSelectedTransaction(item);
+                        setShowDetailModal(true);
+                      }}
+                      style={{ cursor: "pointer" }}
                     >
                       <div className="transaction-text">
                         <p className="transaction-type">{item.type}</p>
@@ -250,6 +262,17 @@ export default function Deposits() {
           </div>
         </section>
       </main>
+
+      {showDetailModal && selectedTransaction && (
+        <TransactionDetailModal
+          transaction={selectedTransaction}
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedTransaction(null);
+          }}
+          productType="DEP"
+        />
+      )}
     </div>
   );
 }

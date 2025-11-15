@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/Navbar";
 import LifeGoalsCard from "../components/LifeGoalsCard";
+import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
 import "../styles/life-goals-detail.css";
 import {
   fetchLifeGoalTransactions,
@@ -18,6 +19,8 @@ export default function LifeGoalDetail() {
   const [goalDetail, setGoalDetail] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("May");
   const [loading, setLoading] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const months = [
     "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov",
@@ -121,14 +124,29 @@ export default function LifeGoalDetail() {
               <div className="tx-list">
                 {Array.isArray(transactions[selectedMonth]) &&
                 transactions[selectedMonth].length > 0 ? (
-                  // 🔽 reverse the array to show newest first
                   [...transactions[selectedMonth]]
                     .reverse()
                     .map((group, gi) => (
                       <div key={gi} className="tx-group">
                         <div className="tx-date">{group.date}</div>
                         {group.items.map((tx, i) => (
-                          <div key={i} className="tx-row">
+                          <div 
+                            key={i} 
+                            className="tx-row"
+                            onClick={() => {
+                              setSelectedTransaction({
+                                transactionId: `LFG-${selectedMonth}-${gi}-${i}`,
+                                transactionDate: group.date,
+                                transactionType: tx.type,
+                                partyName: tx.type,
+                                partyDetail: tx.desc,
+                                amount: tx.amount,
+                                debit_credit: String(tx.amount).startsWith("-") ? "D" : "C",
+                              });
+                              setShowDetailModal(true);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
                             <div className="tx-left">
                               <div className="tx-dot" />
                               <div className="tx-text">
@@ -220,6 +238,17 @@ export default function LifeGoalDetail() {
           </aside>
         </div>
       </main>
+
+      {showDetailModal && selectedTransaction && (
+        <TransactionDetailModal
+          transaction={selectedTransaction}
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedTransaction(null);
+          }}
+          productType="LFG"
+        />
+      )}
     </div>
   );
 }

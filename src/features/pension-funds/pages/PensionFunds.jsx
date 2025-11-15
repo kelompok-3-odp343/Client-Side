@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
+import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
 import "../styles/pension-funds.css";
 import { Download } from "lucide-react";
 import pensionfunds from "../../../assets/images/pension.png";
@@ -26,6 +27,8 @@ export default function PensionFunds() {
   const [pensionFundsData, setPensionFundsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const pension = async () => {
     try {
@@ -81,9 +84,14 @@ export default function PensionFunds() {
       const prefix = tx.debit_credit === "C" ? "+" : "-";
 
       groups[key].items.push({
+        transactionId: tx.transactionId,
+        transactionDate: tx.transactionDate,
         type: tx.transactionType || "-",
         detail: tx.description || tx.partyName || "-",
         amount: prefix + tx.amount,
+        debit_credit: tx.debit_credit,
+        partyName: tx.transactionType || tx.partyName,
+        partyDetail: tx.description || tx.partyName,
       });
     });
 
@@ -192,7 +200,15 @@ export default function PensionFunds() {
                   <p className="transaction-date"><strong>{group.date}</strong></p>
                   <hr />
                   {group.items.map((tx, i) => (
-                    <div key={i} className="transaction-item">
+                    <div 
+                      key={i} 
+                      className="transaction-item"
+                      onClick={() => {
+                        setSelectedTransaction(tx);
+                        setShowDetailModal(true);
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
                       <div className="tx-left">
                         <div className="tx-icon">★</div>
                         <div className="tx-text">
@@ -213,6 +229,17 @@ export default function PensionFunds() {
           </div>
         </section>
       </main>
+
+      {showDetailModal && selectedTransaction && (
+        <TransactionDetailModal
+          transaction={selectedTransaction}
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedTransaction(null);
+          }}
+          productType="DPLK"
+        />
+      )}
     </div>
   );
 }
