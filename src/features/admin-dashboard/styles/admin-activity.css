@@ -7,12 +7,12 @@
 }
 
 .activity-list-table {
-	min-width: 1800px;
+	min-width: 2000px;
 }
 
 /* Purple header variant */
 .data-table.header-purple thead {
-	background: linear-gradient(180deg, #cabee3 0%, #fff 100%);
+	background: linear-gradient(180deg, #AD96DE 0%, #fff 100%);
 }
 
 /* Status Badge Styles */
@@ -31,10 +31,11 @@
 
 .view-details-btn-activity {
 	background: none;
-	color: #cabee3;
-	border: 2px solid #cabee3;
-	padding: 0.25rem 0.5rem;
-	border-radius: 10px;
+	box-shadow: none;
+	color: #AD96DE;
+	border: none;
+	padding: 0;
+	/* border-radius: 10px; */
 	font-size: 0.9rem;
 	font-weight: 700;
 	margin-top: 0.25rem;
@@ -45,8 +46,8 @@
 }
 
 .view-details-btn-activity:hover {
-	background: #cabee3;
-	color: #000;
+	background: none;
+	color: #cabee3;
 }
 
 @media (max-width: 768px) {

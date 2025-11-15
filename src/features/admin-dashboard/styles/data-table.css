@@ -123,6 +123,10 @@
 	background: linear-gradient(180deg, #ffbc8e 0%, #fff 100%);
 }
 
+.data-table.header-purple thead {
+	background: linear-gradient(180deg, #AD96DE 0%, #fff 100%);
+}
+
 .data-table th {
 	padding: 0.5rem 0.25rem;
 	text-align: center;
@@ -191,6 +195,7 @@
 	/* opacity: 0.6; */
 	transition: color 0.2s ease;
 	/* border-radius: 4px; */
+	margin-bottom: 0.2rem;
 }
 
 .filter-icon-btn:hover {
@@ -316,6 +321,13 @@
 	width: 16px;
 	height: 16px;
 	accent-color: #ffbc8e;
+}
+
+.data-table.header-purple .filter-checkbox-label input[type="checkbox"] {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+	accent-color: #AD96DE;
 }
 
 .filter-checkbox-label span {
