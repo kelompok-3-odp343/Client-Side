@@ -305,6 +305,37 @@ export default function AdminActivityDetail() {
 
 	const workflowStep = getWorkflowStep();
 
+	const parseTimelineInfo = (raw) => {
+		if (!raw) return { dateTime: "-", actor: "" };
+
+		const [datePartRaw, actor] = raw.split(" by ");
+		let dateTime = datePartRaw;
+
+		if (/^\d{4}-\d{2}-\d{2}/.test(datePartRaw)) {
+			const [date, time] = datePartRaw.split(" ");
+			const [year, month, day] = date.split("-").map(Number);
+			const [hour = 0, minute = 0] = (time || "").split(":").map(Number);
+
+			const d = new Date(year, month - 1, day, hour, minute);
+
+			dateTime = d.toLocaleString("en-GB", {
+				day: "numeric",
+				month: "short",
+				year: "numeric",
+				hour: "2-digit",
+				minute: "2-digit",
+				hour12: false,
+			});
+		}
+
+		return { dateTime, actor };
+	};
+
+	const createdInfo = parseTimelineInfo(activityData.createdAt);
+	const checkedInfo = parseTimelineInfo(activityData.checkedAt);
+	const approvedInfo = parseTimelineInfo(activityData.approvedAt);
+	const rejectedInfo = parseTimelineInfo(activityData.checkedAt || activityData.approvedAt);
+
 	// Determine if current user can take action
 	const canReject = () => {
 		if (!activityData || !activityData.status) return false;
@@ -383,7 +414,13 @@ export default function AdminActivityDetail() {
 							<div className="workflow-info">
 								<div className="workflow-title">Created</div>
 								<div className="workflow-subtitle">
-									{activityData.createdAt}
+									{createdInfo.dateTime}
+									{createdInfo.actor && (
+										<>
+											<br />
+											{createdInfo.actor}
+										</>
+									)}
 								</div>
 							</div>
 						</div>
@@ -398,7 +435,13 @@ export default function AdminActivityDetail() {
 										</div>
 										{workflowStep >= 2 && (
 											<div className="workflow-subtitle">
-												{activityData.checkedAt || "-"}
+												{checkedInfo.dateTime}
+												{checkedInfo.actor && (
+													<>
+														<br />
+														{checkedInfo.actor}
+													</>
+												)}
 											</div>
 										)}
 									</div>
@@ -412,7 +455,13 @@ export default function AdminActivityDetail() {
 										</div>
 										{workflowStep >= 3 && (
 											<div className="workflow-subtitle">
-												{activityData.approvedAt || "-"}
+												{approvedInfo.dateTime}
+												{approvedInfo.actor && (
+													<>
+														<br />
+														{approvedInfo.actor}
+													</>
+												)}
 											</div>
 										)}
 									</div>
@@ -424,7 +473,13 @@ export default function AdminActivityDetail() {
 								<div className="workflow-info">
 									<div className="workflow-title">Rejected</div>
 									<div className="workflow-subtitle">
-										{activityData.checkedAt || activityData.approvedAt || "-"}
+										{rejectedInfo.dateTime}
+										{rejectedInfo.actor && (
+											<>
+												<br />
+												{rejectedInfo.actor}
+											</>
+										)}
 									</div>
 								</div>
 							</div>
