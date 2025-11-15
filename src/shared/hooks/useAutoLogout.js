@@ -14,7 +14,7 @@ export default function useAutoLogout(timeoutMinutes = 5, warningSeconds = 30) {
     const warningTimer = useRef(null);
 
     useEffect(() => {
-        if (location.pathname === "/login") return;
+        if (location.pathname === "/") return;
 
         const totalTimeout = timeoutMinutes * 60 * 1000;
         const warningTimeout = totalTimeout - warningSeconds * 1000;
@@ -22,22 +22,22 @@ export default function useAutoLogout(timeoutMinutes = 5, warningSeconds = 30) {
         const handleLogout = async () => {
             await Swal.fire({
                 icon: "warning",
-                title: "Kamu telah logout",
-                text: "Kamu tidak aktif selama 5 menit.",
+                title: "You have been logged out",
+                text: "You have been inactive for 5 minutes.",
                 confirmButtonText: "OK",
             });
             sessionStorage.clear();
-            navigate("/login");
+            navigate("/");
         };
 
         const showWarning = async () => {
             const result = await Swal.fire({
                 icon: "info",
-                title: "Tidak ada aktivitas",
-                text: `Kamu akan logout otomatis dalam ${warningSeconds} detik.`,
+                title: "No activity",
+                text: `You will be automatically logged out in ${warningSeconds} seconds.`,
                 showCancelButton: true,
-                confirmButtonText: "Tetap login",
-                cancelButtonText: "Logout sekarang",
+                confirmButtonText: "Stay logged in",
+                cancelButtonText: "Log out now",
                 reverseButtons: true,
                 timer: warningSeconds * 1000,
                 timerProgressBar: true,

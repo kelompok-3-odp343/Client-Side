@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://api-dev.wandoor.my.id",
+        target: "http://34.87.139.149:30080",
         changeOrigin: true,
         secure: false,
       },

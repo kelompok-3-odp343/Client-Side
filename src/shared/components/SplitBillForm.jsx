@@ -3,25 +3,22 @@ import "../styles/components/split-bill-form.css";
 import SplitBillFormCancel from "./SplitBillFormCancel";
 import { Plus, Minus } from "lucide-react";
 import { createSplitBill } from "../../features/split-bill/api/split-bill.api";
-import { useNavigate } from "react-router-dom";
 
 export default function SplitBillForm({ onClose, onSuccess, transaction }) {
   const [participants, setParticipants] = useState([
     { id: Date.now(), participantName: "", participantAmount: "" },
   ]);
+
   const [showCancelPopup, setShowCancelPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [localSuccessId, setLocalSuccessId] = useState(null);
 
   const inputRefs = useRef({});
   const lastAddedId = useRef(null);
-  const navigate = useNavigate();
 
-  const totalBill = parseInt(
-    (transaction.amount || "").toString().replace(/[^\d]/g, ""),
-    10
-  );
+  const totalBill =
+    parseInt(String(transaction?.amount || "").replace(/[^\d]/g, ""), 10) || 0;
 
   const totalParticipantAmount = participants.reduce(
     (sum, p) => sum + parseInt(p.participantAmount || "0", 10),
@@ -30,7 +27,6 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
 
   const remainingAmount = totalBill - totalParticipantAmount;
 
-  // 🔒 Kunci scroll background saat modal aktif
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -38,7 +34,6 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
     };
   }, []);
 
-  // 🎯 Fokus otomatis ke input baru
   useEffect(() => {
     const last = participants[participants.length - 1];
     if (lastAddedId.current && last && lastAddedId.current === last.id) {
@@ -48,35 +43,40 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
     }
   }, [participants]);
 
-  function handleAddRow() {
+  const handleAddRow = () => {
+    if (totalParticipantAmount === totalBill) return;
     const newId = Date.now() + Math.random();
     lastAddedId.current = newId;
     setParticipants((prev) => [
       ...prev,
       { id: newId, participantName: "", participantAmount: "" },
     ]);
-  }
+  };
 
-  function handleDeleteRow(id) {
+  const handleDeleteRow = (id) => {
     setErrorMessage("");
     setParticipants((prev) => {
       if (prev.length === 1) return prev;
       return prev.filter((p) => p.id !== id);
     });
-  }
+  };
 
-  function handleChangeName(id, value) {
+  const handleChangeName = (id, value) => {
     setErrorMessage("");
     setParticipants((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, participantName: value } : p))
+      prev.map((p) =>
+        p.id === id ? { ...p, participantName: value } : p
+      )
     );
-  }
+  };
 
-  function handleChangeAmount(id, value) {
+  const handleChangeAmount = (id, value) => {
     const sanitized = value.replace(/[^\d]/g, "");
     setParticipants((prev) => {
       const updated = prev.map((p) =>
-        p.id === id ? { ...p, participantAmount: sanitized } : p
+        p.id === id
+          ? { ...p, participantAmount: sanitized }
+          : p
       );
 
       const newTotal = updated.reduce(
@@ -86,7 +86,7 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
 
       if (newTotal > totalBill) {
         setErrorMessage(
-          `Unsplit amount exceeds the total bill (${formatRp(totalBill.toString())}).`
+          `Unsplit amount exceeds the total bill (Rp ${totalBill.toLocaleString("id-ID")}).`
         );
         return prev;
       }
@@ -94,23 +94,22 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
       setErrorMessage("");
       return updated;
     });
-  }
+  };
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
-    const emptyName = participants.find(
+    const emptyField = participants.find(
       (p) => !p.participantName.trim() || !p.participantAmount.trim()
     );
-
-    if (emptyName) {
-      setErrorMessage("Please fill in name and amount fields before saving.");
+    if (emptyField) {
+      setErrorMessage("Please fill in name and amount fields.");
       return;
     }
 
     if (totalParticipantAmount !== totalBill) {
-      setErrorMessage("Split amount doesn't match the total bill.");
+      setErrorMessage("Split amount doesn't match total bill.");
       return;
     }
 
@@ -128,36 +127,37 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
     };
 
     try {
-      await createSplitBill(payload);
-      setShowSuccess(true);
+      const resp = await createSplitBill(payload);
 
-      // ✅ Tambahan baru:
-      if (typeof onSuccess === "function") onSuccess();
+      let newSplitBillId =
+        resp?.split_bill_id ||
+        resp?.id ||
+        resp?.data?.id ||
+        `sb_${Date.now()}`;
+
+      setLocalSuccessId(newSplitBillId);
     } catch (err) {
-      const msg = err?.message || "Unknown error";
-      if (msg.includes("Server sedang maintance")) {
-        setErrorMessage("Server sedang maintance, silahkan coba beberapa saat lagi");
-      } else {
-        setErrorMessage("Failed saving data, please try again.");
-      }
+      setErrorMessage(
+        err?.message?.includes("maintance")
+          ? "Server sedang maintenance, coba lagi."
+          : "Failed saving data."
+      );
     } finally {
       setIsSaving(false);
     }
-  }
-
-  const formatRp = (val) => {
-    if (!val) return "Rp 0";
-    return "Rp " + val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  const formatAmount = (val) => {
-    if (!val) return "";
-    return val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
+  const formatAmount = (val) =>
+    !val ? "" : val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-  const hasEmptyFields = participants.some(
+  const formatRp = (val) =>
+    !val ? "Rp 0" : "Rp " + val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+  const hasEmpty = participants.some(
     (p) => !p.participantName.trim() || !p.participantAmount.trim()
   );
+
+  const disableAdd = hasEmpty || totalParticipantAmount === totalBill;
 
   return (
     <div className="splitbill-modal" role="dialog" aria-modal="true">
@@ -166,31 +166,18 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
         <hr />
 
         <div className="transaction-info">
-          <div className="transaction-info-left-panel">
-            <p>
-              <strong>Transaction ID :</strong> {transaction.id}
-            </p>
-          </div>
-          <div className="transaction-info-right-panel">
-            <p>
-              <strong>Transaction Date :</strong> {transaction.date}
-            </p>
-          </div>
+          <p><strong>Transaction ID: </strong>{transaction.transactionId}</p>
+          <p><strong>Date: </strong>{transaction.transactionDate}</p>
         </div>
 
         <div className="bill-info-container">
-          <div className="bill-info">
+          <div className="bill-info" style={{ ["--theme-color"]: "#6dddd0" }}>
             <p><strong>Bill Name :</strong> {transaction.detail}</p>
             <p><strong>Total Bill :</strong> {transaction.amount}</p>
             <p><strong>Split Amount :</strong> {formatRp(totalParticipantAmount.toString())}</p>
             {remainingAmount > 0 && (
-              <p style={{ color: "#c00f0c", fontWeight: "600" }}>
-                Unsplit Amount : {formatRp(remainingAmount.toString())}
-              </p>
-            )}
-            {remainingAmount === 0 && (
-              <p style={{ color: "#00a05a", fontWeight: "600" }}>
-                All amounts match the total bill.
+              <p style={{ color: "#c00f0c", fontWeight: 600 }}>
+                Unsplit Amount: {formatRp(remainingAmount.toString())}
               </p>
             )}
           </div>
@@ -208,13 +195,18 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
             {participants.map((p, i) => (
               <div key={p.id} className="participant-row">
                 <span className="member-index">{i + 1}</span>
-                <input
-                  type="text"
-                  placeholder="Enter name"
-                  ref={(el) => (inputRefs.current[p.id] = el)}
-                  value={p.participantName}
-                  onChange={(e) => handleChangeName(p.id, e.target.value)}
-                />
+
+                <div className="col-name">
+                  <input
+                    type="text"
+                    placeholder="Enter name"
+                    value={p.participantName}
+                    onChange={(e) => handleChangeName(p.id, e.target.value)}
+                    ref={(el) => (inputRefs.current[p.id] = el)}
+                    disabled={isSaving}
+                  />
+                </div>
+
                 <div className="col-amount">
                   <span className="rp-prefix">Rp</span>
                   <input
@@ -223,24 +215,28 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
                     placeholder="0"
                     value={formatAmount(p.participantAmount)}
                     onChange={(e) => handleChangeAmount(p.id, e.target.value)}
+                    disabled={isSaving}
                   />
                 </div>
+
                 <div className="row-actions">
                   {participants.length > 1 && (
-                    <button type="button" className="rmv-btn" onClick={() => handleDeleteRow(p.id)}>
+                    <button
+                      type="button"
+                      className="rmv-btn"
+                      onClick={() => handleDeleteRow(p.id)}
+                      disabled={isSaving}
+                    >
                       <Minus />
                     </button>
                   )}
+
                   {i === participants.length - 1 && (
                     <button
                       type="button"
                       className="add-btn"
                       onClick={handleAddRow}
-                      disabled={hasEmptyFields}
-                      style={{
-                        opacity: hasEmptyFields ? 0.4 : 1,
-                        cursor: hasEmptyFields ? "not-allowed" : "pointer",
-                      }}
+                      disabled={disableAdd || isSaving}
                     >
                       <Plus />
                     </button>
@@ -257,17 +253,15 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
           <button
             className="cancel-add-participant"
             onClick={() => setShowCancelPopup(true)}
+            disabled={isSaving}
           >
             Cancel
           </button>
+
           <button
             className="add-participant-btn"
             onClick={handleSubmit}
             disabled={isSaving}
-            style={{
-              opacity: isSaving ? 0.6 : 1,
-              cursor: isSaving ? "not-allowed" : "pointer",
-            }}
           >
             {isSaving ? "Saving..." : "Save"}
           </button>
@@ -281,17 +275,31 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
         />
       )}
 
-      {showSuccess && (
+      {localSuccessId && (
         <div className="splitbill-success-overlay">
           <div className="splitbill-success-modal">
             <h3>Split bill saved successfully!</h3>
-            <p>Split bill data has been added to split bill list.</p>
+            <p>Your split bill has been created.</p>
+
             <div className="success-btn-group">
-              <button className="go-splitbill" onClick={() => navigate("/splitbill")}>
-                View Split Bill List
+              <button
+                className="go-splitbill"
+                onClick={() => {
+                  onSuccess?.(localSuccessId, "view");
+                }}
+              >
+                View Split Bill Detail
               </button>
-              <button className="close-success" onClick={() => onClose()}>
-                Close
+
+              <button
+                className="close-success"
+                onClick={() => {
+                  onSuccess?.(localSuccessId, "stay");
+                  setLocalSuccessId(null);
+                  onClose?.();
+                }}
+              >
+                Stay Here
               </button>
             </div>
           </div>

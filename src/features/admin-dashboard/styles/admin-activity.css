@@ -1,0 +1,57 @@
+.admin-activity-main {
+	padding: 1.5rem;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.activity-list-table {
+	min-width: 2000px;
+}
+
+/* Purple header variant */
+.data-table.header-purple thead {
+	background: linear-gradient(180deg, #AD96DE 0%, #fff 100%);
+}
+
+/* Status Badge Styles */
+.status-approved {
+	color: #3dbf4a;
+}
+
+.status-rejected {
+	color: #f94449;
+}
+
+.status-pending-check,
+.status-pending-approval {
+	color: #ff954c;
+}
+
+.view-details-btn-activity {
+	background: none;
+	box-shadow: none;
+	color: #AD96DE;
+	border: none;
+	padding: 0;
+	/* border-radius: 10px; */
+	font-size: 0.9rem;
+	font-weight: 700;
+	margin-top: 0.25rem;
+	margin-bottom: 0.25rem;
+	cursor: pointer;
+	transition: all 0.2s;
+	white-space: nowrap;
+}
+
+.view-details-btn-activity:hover {
+	background: none;
+	color: #cabee3;
+}
+
+@media (max-width: 768px) {
+	.admin-activity-main {
+		padding: 1rem;
+	}
+}

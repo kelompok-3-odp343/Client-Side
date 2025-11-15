@@ -28,6 +28,10 @@ import AdminHome from "../features/admin-dashboard/pages/AdminHome";
 import AdminTransactions from "../features/admin-dashboard/pages/AdminTransactions";
 import AdminUsers from "../features/admin-dashboard/pages/AdminUsers";
 import AdminUserDetail from "../features/admin-dashboard/pages/AdminUserDetail";
+import AdminActivity from "../features/admin-dashboard/pages/AdminActivity";
+import AdminActivityDetail from "../features/admin-dashboard/pages/AdminActivityDetail";
+
+// === Hooks ===
 import useAutoLogout from "../shared/hooks/useAutoLogout";
 
 // === Routes ===
@@ -67,7 +71,9 @@ export default function AppRoutes() {
           <Route path="/admin/home" element={<AdminHome />} />
           <Route path="/admin/transactions" element={<AdminTransactions />} />
           <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/users/:id" element={<AdminUserDetail />} />
+          <Route path="/admin/users/detail" element={<AdminUserDetail />} />
+          <Route path="/admin/activity" element={<AdminActivity />} />
+          <Route path="/admin/activity/:id" element={<AdminActivityDetail />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" />} />

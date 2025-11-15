@@ -75,6 +75,12 @@
   align-items: center;
 }
 
+.status-placeholder {
+  color: #ccc;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
 .edit-btn {
   background: var(--theme);
   color: #fff;
@@ -87,6 +93,26 @@
 }
 .edit-btn:hover {
   filter: brightness(1.1);
+}
+
+.pdf-btn {
+  background: transparent;
+  border: 1.5px solid var(--theme);
+  color: var(--theme);
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pdf-btn:hover {
+  background: var(--theme);
+  color: #fff;
+}
+
+.pdf-btn:active {
+  transform: scale(0.97);
 }
 
 /* Cancel button */
@@ -232,6 +258,13 @@ td input[type="text"] {
   background: #fff;
 }
 
+/* Disabled input variant */
+.disabled-input {
+  background: #f3f3f3 !important;
+  cursor: not-allowed !important;
+  color: #6b7280 !important;
+}
+
 /* Amount Input Layout */
 .amount-input-wrap {
   display: flex;
@@ -259,15 +292,24 @@ td input[type="text"] {
 ================================ */
 .action-cell {
   vertical-align: middle !important;
-  padding-right: 1rem;
+  text-align: center;
+  padding: 0.5rem 0.5rem;
 }
 .action-flex {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;  
   gap: 0.5rem;
-  height: 100%;
 }
+
+.action-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  gap: 0.5rem;
+  min-height: 38px; 
+}
+
 .mark-btn {
   font-size: 0.85rem;
   border-radius: 8px;
@@ -293,6 +335,12 @@ td input[type="text"] {
   border: 1.5px solid var(--border);
 }
 
+.status-edit-combo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* ================================
    ADD / REMOVE PARTICIPANT BUTTONS
 ================================ */
@@ -315,6 +363,13 @@ td input[type="text"] {
   background: rgba(109, 221, 208, 0.18);
   color: var(--text-main); 
   border-color: var(--theme);
+}
+
+/* disabled add-member */
+.add-member[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-style: dashed;
 }
 
 /* REMOVE BUTTON */

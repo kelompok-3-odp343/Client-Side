@@ -4,9 +4,6 @@ import LIFE_GOALS_TX_DUMMY from "../data/life-goals-tx.dummy";
 import LIFE_GOALS_REVAMP_DUMMY from "../data/life-goals.revamp.dummy";
 import LIFE_GOALS_DUMMY from "../data/life-goals.dummy";
 
-/* ============================================================
-   HELPER: Mapping accountNumber → dummy key
-   ============================================================ */
 const mapAccountToKey = (accountNumber) => {
   if (!accountNumber) return "education";
   const num = String(accountNumber).toLowerCase();
@@ -21,18 +18,20 @@ const mapAccountToKey = (accountNumber) => {
   // fallback default
   return "education";
 };
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
-/* ============================================================
-   MAIN API FUNCTIONS
-   ============================================================ */
+
 export async function fetchLifeGoals(userId = "USER001") {
   try {
     const res = await api.get(`/api/life-goals/${userId}`);
     if (res?.data?.status && res.data.data?.goals) return res.data.data;
+    
+    console.warn("⚠️ API returned invalid data, using dummy");
     return LIFE_GOALS_DUMMY.data;
-  } catch {
+  } catch (error) {
+    console.warn("⚠️ Life goals API failed, using dummy:", error?.message);
     return LIFE_GOALS_DUMMY.data;
   }
 }
@@ -43,17 +42,18 @@ export async function fetchLifeGoalDetail(accountNumber) {
     const res = await api.get(`/api/v1/lifegoals-detail/${accountNumber}`, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
     });
 
     if (res?.data) return res;
+    
+    console.warn("⚠️ API returned invalid data, using dummy");
     const key = mapAccountToKey(accountNumber);
     return { data: LIFE_GOALS_DETAILS_DUMMY[key] };
-  } catch {
+  } catch (error) {
+    console.warn("⚠️ Life goal detail API failed, using dummy:", error?.message);
     const key = mapAccountToKey(accountNumber);
     return { data: LIFE_GOALS_DETAILS_DUMMY[key] };
   }
@@ -64,18 +64,19 @@ export async function fetchLifeGoalTransactions(accountNumber) {
     const token = sessionStorage.getItem("token");
     const res = await api.get(`/api/v1/lifegoals-tx/${accountNumber}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
     });
 
     if (res?.data) return res.data;
+    
+    console.warn("⚠️ API returned invalid data, using dummy");
     const key = mapAccountToKey(accountNumber);
     return LIFE_GOALS_TX_DUMMY[key] || LIFE_GOALS_TX_DUMMY.EDU001;
-  } catch {
+  } catch (error) {
+    console.warn("⚠️ Life goal transactions API failed, using dummy:", error?.message);
     const key = mapAccountToKey(accountNumber);
     return LIFE_GOALS_TX_DUMMY[key] || LIFE_GOALS_TX_DUMMY.EDU001;
   }
@@ -86,15 +87,18 @@ export async function fetchLifeGoalsRevamp() {
     const token = sessionStorage.getItem("token");
     const res = await api.get(`/api/v1/lifegoals`, {
       headers: {
-        Authorization: `Bearer ${token}`,
-        "User-Id": sessionStorage.getItem("user_id"),
-        "Customer-Id": sessionStorage.getItem("cif"),
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
     });
-    return res;
-  } catch {
+    
+    if (res?.data) return res;
+    
+    console.warn("⚠️ API returned invalid data, using dummy");
+    return { data: LIFE_GOALS_REVAMP_DUMMY };
+  } catch (error) {
+    console.warn("⚠️ Life goals revamp API failed, using dummy:", error?.message);
     return { data: LIFE_GOALS_REVAMP_DUMMY };
   }
 }

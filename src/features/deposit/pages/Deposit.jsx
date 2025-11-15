@@ -1,22 +1,39 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
+import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
 import "../styles/deposit.css";
 import { Download } from "lucide-react";
 import depositIcon from "../../../assets/images/deposit-icon.png";
-import { getTimeDeposits } from "../api/time-deposits.api";
+import { getTimeDeposits, getTimeDepositTransactions } from "../api/time-deposits.api";
 
 export default function Deposits() {
-  const months = [
-    "May", "June", "July", "Aug", "Sept", "Oct",
-    "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"
-  ];
-
-  const [selectedMonth, setSelectedMonth] = useState("May");
   const [depositsData, setDepositsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [chartData, setChartData] = useState({ income: 0, expense: 0 });
+  const [showBalance, setShowBalance] = useState(true);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
+  const getLastMonths = () => {
+    const now = new Date();
+    const arr = [];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      arr.push({
+        label: d.toLocaleString("en-US", { month: "short" }),
+        month: d.getMonth() + 1,
+        year: d.getFullYear(),
+      });
+    }
+    return arr.reverse();
+  };
 
-  const dataDeposit = async () => {
+  const [months] = useState(getLastMonths());
+  const [selectedMonth, setSelectedMonth] = useState(
+    getLastMonths()[getLastMonths().length - 1]
+  );
+
+  const fetchDeposits = async () => {
     try {
       const responseData = await getTimeDeposits();
       const resApi = responseData.data;
@@ -41,6 +58,7 @@ export default function Deposits() {
             year: "numeric",
           }),
           status: item.status,
+          account_number: item.deposit_account_number,
         })),
       };
 
@@ -50,37 +68,91 @@ export default function Deposits() {
     }
   };
 
-  const dummyTransactions = [
-    { date: "31 May 2025", month: "May", type: "Long Term", detail: "Admin fee", amount: "-Rp1.000" },
-    { date: "31 May 2025", month: "May", type: "Short Term", detail: "Management fee", amount: "-Rp7" },
-    { date: "30 May 2025", month: "May", type: "Short Term", detail: "Deposits", amount: "-Rp3.500" },
-  ];
+  const handleSelectedMonth = async (m) => {
+    setSelectedMonth(m);
 
-  const fetchTransactions = async (month) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/transactions?month=${month}`);
-      if (!res.ok) throw new Error("Failed to fetch transactions");
-      const data = await res.json();
-      setTransactions(data);
-      console.log("✅ Data transactions diambil dari backend");
-    } catch (error) {
-      console.warn("⚠️ Backend tidak aktif, gunakan dummyTransactions");
-      const filtered = dummyTransactions.filter((tx) => tx.month === month);
-      setTransactions(filtered);
+      const accountNumber = depositsData?.deposits?.[0]?.account_number;
+      if (!accountNumber) return;
+
+      const data = await getTimeDepositTransactions({
+        month: m.month,
+        year: m.year,
+        accountNumber,
+      });
+
+      if (!data?.transactions) {
+        setTransactions([]);
+        return;
+      }
+
+      const grouped = mapTransactionsToGroups(data.transactions);
+      setTransactions(grouped);
+    } catch (err) {
+      console.error("Gagal fetch transaksi deposit:", err);
     }
   };
 
-  // gunakan use effect
-  useEffect(() => {
-    dataDeposit();
-    fetchTransactions(selectedMonth);
-  }, [selectedMonth]);
+  const toISOFromDMY = (dateTimeStr) => {
+    if (!dateTimeStr) return null;
+    const [dPart, tPart = "00:00:00"] = dateTimeStr.split("T");
+    const [dd, mm, yyyy] = dPart.split("-");
+    if (!dd || !mm || !yyyy) return null;
+    return `${yyyy}-${mm}-${dd}T${tPart}`;
+  };
 
-  // Group transaksi by date
-  const groupedTransactions = transactions.reduce((acc, tx) => {
-    acc[tx.date] = acc[tx.date] ? [...acc[tx.date], tx] : [tx];
-    return acc;
-  }, {});
+  const mapTransactionsToGroups = (flat) => {
+    const groups = {};
+    flat.forEach((trx) => {
+      const iso = toISOFromDMY(trx.transactionDate);
+      const d = iso ? new Date(iso) : new Date(trx.transactionDate);
+      const key = d.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+      });
+
+      if (!groups[key]) {
+        groups[key] = { date: key, sortKey: d.getTime(), items: [] };
+      }
+
+      groups[key].items.push({
+        transactionId: trx.transactionId,
+        transactionDate: trx.transactionDate,
+        type: trx.transactionType,
+        detail: trx.partyName,
+        amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
+        jenisTransaksi: trx.debit_credit === "D" ? "Pengeluaran" : "Pemasukan",
+        debit_credit: trx.debit_credit,
+        partyName: trx.partyName,
+        partyDetail: trx.partyDetail,
+      });
+    });
+
+    return Object.values(groups)
+      .sort((a, b) => b.sortKey - a.sortKey)
+      .map(({ sortKey, ...rest }) => rest);
+  };
+
+  useEffect(() => {
+    const flatItems = transactions.flatMap((g) => g.items || []);
+    const income = flatItems
+      .filter((i) => typeof i.amount === "string" && i.amount.startsWith("+"))
+      .reduce((s, i) => s + Number((i.amount || "").replace(/[^\d]/g, "")), 0);
+    const expense = flatItems
+      .filter((i) => typeof i.amount === "string" && i.amount.startsWith("-"))
+      .reduce((s, i) => s + Number((i.amount || "").replace(/[^\d]/g, "")), 0);
+    setChartData({ income, expense });
+  }, [transactions]);
+
+  useEffect(() => {
+    fetchDeposits();
+  }, []);
+
+  useEffect(() => {
+    if (depositsData?.deposits?.length) {
+      handleSelectedMonth(selectedMonth);
+    }
+  }, [depositsData]);
 
   return (
     <div className="deposit-page">
@@ -125,49 +197,82 @@ export default function Deposits() {
         <section className="deposit-right">
           <div className="transaction-header">
             <h2 className="lg-title">Transaction History</h2>
-            <Download className="download-icon" />
           </div>
 
           <div className="months">
             {months.map((m) => (
               <button
-                key={m}
-                className={`month-btn-dep ${selectedMonth === m ? "active" : ""}`}
-                onClick={() => setSelectedMonth(m)}
+                key={m.month + "-" + m.year}
+                className={
+                  m.month === selectedMonth?.month &&
+                    m.year === selectedMonth?.year
+                    ? "active"
+                    : ""
+                }
+                onClick={() => handleSelectedMonth(m)}
               >
-                {m}
+                {m.label}
               </button>
             ))}
           </div>
 
-          <div className="transaction-list">
-            {transactions.length > 0 ? (
-              Object.keys(groupedTransactions).map((date) => (
-                <div key={date} className="transaction-group">
-                  <p className="transaction-date"><strong>{date}</strong></p>
+          <div className="transaction-list-modern">
+            {transactions.length ? (
+              transactions.map((group) => (
+                <div key={group.date} className="transaction-group">
+                  <p className="transaction-date">
+                    <strong>{group.date}</strong>
+                  </p>
                   <hr />
-                  {groupedTransactions[date].map((tx, i) => (
-                    <div key={i} className="transaction-item">
-                      <div className="tx-left">
-                        <div className="tx-icon">★</div>
-                        <div className="tx-text">
-                          <p className="tx-type">{tx.type}</p>
-                          <p className="tx-detail">{tx.detail}</p>
-                        </div>
+                  {group.items.map((item) => (
+                    <div
+                      key={
+                        item.transactionId ||
+                        `${group.date}-${item.detail}-${item.amount}`
+                      }
+                      className="transaction-modern-item"
+                      onClick={() => {
+                        setSelectedTransaction(item);
+                        setShowDetailModal(true);
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <div className="transaction-text">
+                        <p className="transaction-type">{item.type}</p>
+                        <p className="transaction-detail">{item.detail}</p>
                       </div>
-                      <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
-                        {tx.amount}
+                      <div className="transaction-amount-modern">
+                        <span
+                          className={`amount ${item.amount.startsWith("+") ? "credit" : "debit"
+                            }`}
+                        >
+                          {item.amount}
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
               ))
             ) : (
-              <p className="no-tx">No transactions available for {selectedMonth}</p>
+              <p className="no-data">
+                No transactions available for {selectedMonth?.label}{" "}
+                {selectedMonth?.year}
+              </p>
             )}
           </div>
         </section>
       </main>
+
+      {showDetailModal && selectedTransaction && (
+        <TransactionDetailModal
+          transaction={selectedTransaction}
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedTransaction(null);
+          }}
+          productType="DEP"
+        />
+      )}
     </div>
   );
 }

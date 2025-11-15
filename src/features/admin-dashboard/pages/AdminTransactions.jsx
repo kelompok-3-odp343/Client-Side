@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Filter, X } from "lucide-react";
+
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
@@ -8,266 +9,233 @@ import CategoryChart from "../components/CategoryChart";
 import InfoCard from "../components/InfoCard";
 import DataTable from "../components/DataTable";
 import StatusBadge from "../components/StatusBadge";
+
 import "../styles/admin-transactions.css";
+import { fetchAdminTransactionList } from "../service/adminTransactionService";
 
 export default function AdminTransactions() {
 	const location = useLocation();
+	const tableRef = useRef(null);
+
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+	const [sortConfig, setSortConfig] = useState(null);
+
 	const [filterProductType, setFilterProductType] = useState([]);
 	const [filterCategory, setFilterCategory] = useState([]);
 	const [showProductTypeFilter, setShowProductTypeFilter] = useState(false);
 	const [showCategoryFilter, setShowCategoryFilter] = useState(false);
 
+	const [transactionData, setTransactionData] = useState(null);
+
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-	// Data dari route state atau default
-	const customerData = location.state?.transaction || {
-		name: "Erlangga Wahyu Utomo",
-		cif: "9285711834",
-		nik: "3277017005000004",
-	};
+	useEffect(() => {
+		const loadData = async () => {
+			const userId = location.state?.cif || "DEFAULT_USER";
+			const resp = await fetchAdminTransactionList(userId);
+			setTransactionData(resp.data);
+		};
+		loadData();
+	}, []);
 
-	// Static category data - tidak akan berubah saat sorting
-	const categoryData = useMemo(
-		() => [
-			{ name: "QRIS", value: 40, amount: "Rp2.000.000", color: "#FFBC8E" },
-			{ name: "Top Up", value: 35, amount: "Rp1.750.000", color: "#FFE8B0" },
-			{ name: "Others", value: 25, amount: "Rp1.250.000", color: "#FFDDB7" },
-		],
-		[]
+	const transactions = useMemo(() => {
+		if (!transactionData) return [];
+		return transactionData.transactionHistories.map((t, index) => ({
+			id: index + 1,
+			productType: t.productTypeLabel,
+			accountNumber: t.accountNumber,
+			transactionId: t.transactionId,
+			dateTime: new Date(t.paymentTime).toLocaleString("id-ID"),
+			category: t.transactionCategory,
+			amount: `Rp${t.transactionAmount.toLocaleString("id-ID")}`,
+			status: t.status,
+			rawAmount: t.transactionAmount,
+		}));
+	}, [transactionData]);
+
+	const customerData = useMemo(() => {
+		if (!transactionData) return { name: "-", cif: "-", nik: "-" };
+		return {
+			name: transactionData.customerName,
+			cif: transactionData.customerId,
+			nik: transactionData.nik,
+		};
+	}, [transactionData]);
+
+	const productTypes = useMemo(
+		() => [...new Set(transactions.map((t) => t.productType))],
+		[transactions]
 	);
 
-	const accountDetailsData = [
-		{ label: "Customer Name", value: customerData.name },
-		{ label: "CIF", value: customerData.cif },
-		{ label: "NIK", value: customerData.nik },
-	];
+	const categories = useMemo(
+		() => [...new Set(transactions.map((t) => t.category))],
+		[transactions]
+	);
 
-	const transactions = [
-		{
-			id: 1,
-			productType: "Saving",
-			accountNumber: "1234567890",
-			transactionId: "20251023054245000290",
-			dateTime: "23 Oct 2025 10:42:32",
-			category: "QRIS",
-			amount: "Rp500.000",
-			status: "Pending",
-		},
-		{
-			id: 2,
-			productType: "Time Deposit",
-			accountNumber: "1234567890",
-			transactionId: "20251023054245000290",
-			dateTime: "23 Oct 2025 10:42:32",
-			category: "Transfer",
-			amount: "Rp2.000.000",
-			status: "Failed",
-		},
-		{
-			id: 3,
-			productType: "Saving",
-			accountNumber: "1234567890",
-			transactionId: "20251023054245000290",
-			dateTime: "23 Oct 2025 10:42:32",
-			category: "E-wallet",
-			amount: "Rp100.000",
-			status: "Success",
-		},
-		{
-			id: 4,
-			productType: "Saving",
-			accountNumber: "1234567890",
-			transactionId: "20251023054245000290",
-			dateTime: "23 Oct 2025 10:42:32",
-			category: "Bill Payment",
-			amount: "Rp200.000",
-			status: "Pending",
-		},
-		{
-			id: 5,
-			productType: "Pension Fund",
-			accountNumber: "1234567890",
-			transactionId: "20251023054245000290",
-			dateTime: "23 Oct 2025 10:42:32",
-			category: "QRIS",
-			amount: "Rp70.000",
-			status: "Failed",
-		},
-		{
-			id: 6,
-			productType: "Life Goals",
-			accountNumber: "1234567890",
-			transactionId: "20251023054245000290",
-			dateTime: "23 Oct 2025 10:42:32",
-			category: "Transfer",
-			amount: "Rp50.000",
-			status: "Success",
-		},
-	];
+	const parseAmount = (str) => parseInt(str.replace(/[^0-9]/g, ""), 10);
 
-	// Get unique values for filters
-	const productTypes = [...new Set(transactions.map((t) => t.productType))];
-	const categories = [...new Set(transactions.map((t) => t.category))];
+	const filteredTransactions = useMemo(() => {
+		return transactions.filter((t) => {
+			const matchesSearch = Object.values(t).some((v) =>
+				v.toString().toLowerCase().includes(searchQuery.toLowerCase())
+			);
 
-	const tableColumns = [
-		{ key: "no", label: "No", sortable: false },
-		{ key: "productType", label: "Product Type", sortable: true, filterable: true },
-		{ key: "accountNumber", label: "Account Number", sortable: false },
-		{ key: "transactionId", label: "Transaction ID", sortable: false },
-		{ key: "dateTime", label: "Date & Time", sortable: true },
-		{ key: "category", label: "Category", sortable: true, filterable: true },
-		{ key: "amount", label: "Amount", sortable: true },
-		{ key: "status", label: "Status", sortable: true },
-	];
+			const matchesProduct =
+				filterProductType.length === 0 ||
+				filterProductType.includes(t.productType);
 
-	// Helper function to parse amount string to number
-	const parseAmount = (amountStr) => {
-		return parseInt(amountStr.replace(/[^0-9]/g, ""), 10);
+			const matchesCategory =
+				filterCategory.length === 0 ||
+				filterCategory.includes(t.category);
+
+			return matchesSearch && matchesProduct && matchesCategory;
+		});
+	}, [transactions, searchQuery, filterProductType, filterCategory]);
+
+	const sortedTransactions = useMemo(() => {
+		if (!sortConfig) return filteredTransactions;
+
+		const sorted = [...filteredTransactions].sort((a, b) => {
+			let aVal = a[sortConfig.key];
+			let bVal = b[sortConfig.key];
+
+			if (sortConfig.key === "amount") {
+				aVal = parseAmount(aVal);
+				bVal = parseAmount(bVal);
+			}
+
+			if (sortConfig.key === "dateTime") {
+				aVal = new Date(aVal).getTime();
+				bVal = new Date(bVal).getTime();
+			}
+
+			if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+			if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+			return 0;
+		});
+
+		return sorted;
+	}, [filteredTransactions, sortConfig]);
+
+	const [rowsPerPage, setRowsPerPage] = useState(10);
+	const [currentPage, setCurrentPage] = useState(1);
+
+	const totalPages = Math.ceil(sortedTransactions.length / rowsPerPage);
+
+	const paginatedData = useMemo(() => {
+		const start = (currentPage - 1) * rowsPerPage;
+		return sortedTransactions.slice(start, start + rowsPerPage);
+	}, [sortedTransactions, currentPage, rowsPerPage]);
+
+	const goToPage = (page) => {
+		if (page >= 1 && page <= totalPages) {
+			setCurrentPage(page);
+			if (tableRef.current) tableRef.current.scrollIntoView({ behavior: "smooth" });
+		}
 	};
 
-	// Filter and search
-	const filteredTransactions = transactions.filter((t) => {
-		// Search filter
-		const matchesSearch = Object.values(t).some((val) =>
-			val.toString().toLowerCase().includes(searchQuery.toLowerCase())
-		);
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [searchQuery, filterProductType, filterCategory, rowsPerPage]);
 
-		// Product type filter
-		const matchesProductType =
-			filterProductType.length === 0 || filterProductType.includes(t.productType);
+	const top3CategoryData = useMemo(() => {
+		if (!transactionData) return [];
 
-		// Category filter
-		const matchesCategory =
-			filterCategory.length === 0 || filterCategory.includes(t.category);
+		const totals = {};
 
-		return matchesSearch && matchesProductType && matchesCategory;
-	});
+		transactionData.transactionHistories.forEach((t) => {
+			if (!totals[t.transactionCategory]) totals[t.transactionCategory] = 0;
+			totals[t.transactionCategory] += t.transactionAmount;
+		});
 
-	const handleSort = (key) => {
-		let direction = "asc";
-		if (sortConfig.key === key && sortConfig.direction === "asc") {
-			direction = "desc";
-		}
-		setSortConfig({ key, direction });
-	};
+		const sorted = Object.entries(totals)
+			.map(([name, total]) => ({ name, total }))
+			.sort((a, b) => b.total - a.total)
+			.slice(0, 3);
 
-	const sortedTransactions = [...filteredTransactions].sort((a, b) => {
-		if (!sortConfig.key) return 0;
+		const totalOfTop3 = sorted.reduce((a, b) => a + b.total, 0);
+		const colors = ["#FF9F40", "#4BC0C0", "#FF6384"];
 
-		let aVal = a[sortConfig.key];
-		let bVal = b[sortConfig.key];
-
-		// Special handling for amount - parse to number
-		if (sortConfig.key === "amount") {
-			aVal = parseAmount(aVal);
-			bVal = parseAmount(bVal);
-		}
-
-		// Special handling for date
-		if (sortConfig.key === "dateTime") {
-			aVal = new Date(aVal).getTime();
-			bVal = new Date(bVal).getTime();
-		}
-
-		if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-		if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-		return 0;
-	});
-
-	const renderCell = (row, column, index) => {
-		if (column.key === "no") return index + 1;
-		if (column.key === "status") {
-			return <StatusBadge status={row.status} type="transaction" />;
-		}
-		return row[column.key];
-	};
+		return sorted.map((item, idx) => ({
+			name: item.name,
+			color: colors[idx],
+			amount: `Rp${item.total.toLocaleString("id-ID")}`,
+			value: Math.round((item.total / totalOfTop3) * 100),
+		}));
+	}, [transactionData]);
 
 	const toggleProductTypeFilter = (type) => {
 		setFilterProductType((prev) =>
-			prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+			prev.includes(type)
+				? prev.filter((t) => t !== type)
+				: [...prev, type]
 		);
 	};
 
 	const toggleCategoryFilter = (cat) => {
 		setFilterCategory((prev) =>
-			prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+			prev.includes(cat)
+				? prev.filter((c) => c !== cat)
+				: [...prev, cat]
 		);
 	};
-
-	const clearProductTypeFilter = () => {
-		setFilterProductType([]);
-	};
-
-	const clearCategoryFilter = () => {
-		setFilterCategory([]);
-	};
-
-	const clearAllFilters = () => {
-		setFilterProductType([]);
-		setFilterCategory([]);
-	};
-
-	const hasActiveFilters = filterProductType.length > 0 || filterCategory.length > 0;
 
 	const renderColumnHeader = (column) => {
 		if (!column.filterable) return null;
 
-		const isProductType = column.key === "productType";
-		const showFilter = isProductType ? showProductTypeFilter : showCategoryFilter;
-		const filterList = isProductType ? productTypes : categories;
-		const selectedFilters = isProductType ? filterProductType : filterCategory;
-		const toggleFilter = isProductType ? toggleProductTypeFilter : toggleCategoryFilter;
-		const clearFilter = isProductType ? clearProductTypeFilter : clearCategoryFilter;
-		const setShowFilter = isProductType
-			? setShowProductTypeFilter
-			: setShowCategoryFilter;
+		const isProduct = column.key === "productType";
+		const list = isProduct ? productTypes : categories;
+		const selected = isProduct ? filterProductType : filterCategory;
+		const toggle = isProduct ? toggleProductTypeFilter : toggleCategoryFilter;
+		const clear = isProduct
+			? () => setFilterProductType([])
+			: () => setFilterCategory([]);
 
-		const hasFilter = selectedFilters.length > 0;
+		const show = isProduct ? showProductTypeFilter : showCategoryFilter;
+		const setShow =
+			isProduct ? setShowProductTypeFilter : setShowCategoryFilter;
 
 		return (
 			<div className="filter-dropdown-container">
 				<button
-					className={`filter-icon-btn ${hasFilter ? "active" : ""}`}
+					className={`filter-icon-btn ${selected.length ? "active" : ""}`}
 					onClick={(e) => {
 						e.stopPropagation();
-						setShowFilter(!showFilter);
+						setShow(!show);
 					}}
-					title="Filter"
 				>
 					<Filter size={16} />
-					{hasFilter && <span className="filter-badge">{selectedFilters.length}</span>}
+					{selected.length > 0 && (
+						<span className="filter-badge">{selected.length}</span>
+					)}
 				</button>
 
-				{showFilter && (
+				{show && (
 					<>
 						<div
 							className="filter-dropdown-overlay"
-							onClick={() => setShowFilter(false)}
+							onClick={() => setShow(false)}
 						/>
+
 						<div className="filter-dropdown">
 							<div className="filter-dropdown-header">
-								<span className="filter-dropdown-title">Filter {column.label}</span>
-								{hasFilter && (
-									<button
-										className="clear-filter-btn"
-										onClick={clearFilter}
-										title="Clear filter"
-									>
-										<X size={14} />
-										Clear
+								<span>{column.label}</span>
+
+								{selected.length > 0 && (
+									<button className="clear-filter-btn" onClick={clear}>
+										<X size={14} /> Clear
 									</button>
 								)}
 							</div>
+
 							<div className="filter-options">
-								{filterList.map((item) => (
+								{list.map((item) => (
 									<label key={item} className="filter-checkbox-label">
 										<input
 											type="checkbox"
-											checked={selectedFilters.includes(item)}
-											onChange={() => toggleFilter(item)}
+											checked={selected.includes(item)}
+											onChange={() => toggle(item)}
 										/>
 										<span>{item}</span>
 									</label>
@@ -280,44 +248,125 @@ export default function AdminTransactions() {
 		);
 	};
 
+	const tableColumns = [
+		{ key: "no", label: "No", sortable: false },
+		{ key: "productType", label: "Product Type", sortable: true, filterable: true },
+		{ key: "accountNumber", label: "Account Number", sortable: false },
+		{ key: "transactionId", label: "Transaction ID", sortable: false },
+		{ key: "dateTime", label: "Date & Time", sortable: true },
+		{ key: "category", label: "Category", sortable: true, filterable: true },
+		{ key: "amount", label: "Amount", sortable: true },
+		{ key: "status", label: "Status", sortable: true },
+	];
+
 	return (
 		<div className="admin-container">
 			<AdminNavBar onMenuToggle={toggleSidebar} />
-			<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+			<AdminSideBar
+				isOpen={isSidebarOpen}
+				onClose={() => setIsSidebarOpen(false)}
+			/>
 
 			<main className="admin-transactions-main">
-				{/* TOP ROW */}
+
 				<div className="top-row">
-					<InfoCard title="Account Details" data={accountDetailsData} />
-					<CategoryChart data={categoryData} />
+					<InfoCard
+						title="Account Details"
+						data={[
+							{ label: "Customer Name", value: customerData.name },
+							{ label: "CIF", value: customerData.cif },
+							{ label: "NIK", value: customerData.nik },
+						]}
+					/>
+
+					<CategoryChart data={top3CategoryData} />
 				</div>
 
-				{/* TRANSACTION DETAILS TABLE */}
-				<DataTable
-					title="Transaction Details"
-					columns={tableColumns}
-					data={sortedTransactions}
-					sortConfig={sortConfig}
-					onSort={handleSort}
-					renderCell={renderCell}
-					renderColumnHeader={renderColumnHeader}
-					searchBar={
-						<div className="search-and-filter">
-							<SearchBar
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-							/>
-							{hasActiveFilters && (
-								<button className="clear-all-filters-btn" onClick={clearAllFilters}>
-									<X size={16} />
-									Clear All Filters
-								</button>
-							)}
-						</div>
-					}
-					tableClassName="transaction-details-table"
-					headerColor="teal"
-				/>
+				<div ref={tableRef}>
+					<DataTable
+						title="Transaction Details"
+						columns={tableColumns}
+						data={paginatedData}
+						sortConfig={sortConfig}
+						onSort={setSortConfig}
+						renderCell={(row, col, idx) =>
+							col.key === "no"
+								? (currentPage - 1) * rowsPerPage + (idx + 1)
+								: col.key === "status"
+									? <StatusBadge status={row.status} type="transaction" />
+									: row[col.key]
+						}
+						renderColumnHeader={renderColumnHeader}
+						searchBar={
+							<div className="search-and-filter">
+								<SearchBar
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+								/>
+								{(filterProductType.length > 0 ||
+									filterCategory.length > 0) && (
+										<button
+											className="clear-all-filters-btn"
+											onClick={() => {
+												setFilterProductType([]);
+												setFilterCategory([]);
+											}}
+										>
+											<X size={16} /> Clear All Filters
+										</button>
+									)}
+							</div>
+						}
+						tableClassName="transaction-details-table"
+						headerColor="teal"
+					/>
+				</div>
+
+				<div className="pagination-wrapper">
+					<div className="rows-per-page">
+						Show:
+						<select
+							value={rowsPerPage}
+							onChange={(e) => setRowsPerPage(Number(e.target.value))}
+						>
+							<option value={10}>10</option>
+							<option value={25}>25</option>
+							<option value={50}>50</option>
+							<option value={100}>100</option>
+						</select>
+						rows
+					</div>
+
+					<div className="pagination-container">
+						<button
+							className="pagination-btn"
+							onClick={() => goToPage(currentPage - 1)}
+							disabled={currentPage === 1}
+						>
+							Prev
+						</button>
+
+						{[...Array(totalPages)].map((_, i) => (
+							<button
+								key={i}
+								className={`pagination-number ${currentPage === i + 1 ? "active" : ""}`}
+								onClick={() => goToPage(i + 1)}
+							>
+								{i + 1}
+							</button>
+						))}
+
+						<button
+							className="pagination-btn"
+							onClick={() => goToPage(currentPage + 1)}
+							disabled={currentPage === totalPages}
+						>
+							Next
+						</button>
+					</div>
+
+				</div>
+
 			</main>
 		</div>
 	);
