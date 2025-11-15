@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Filter, X } from "lucide-react";
+import { Filter, X, Eye } from "lucide-react";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
@@ -12,8 +12,10 @@ const DEFAULT_ACTIVITIES = [
 	{
 		id: 1,
 		activityId: "ACK000001",
+		menu: "User Management",
 		actionFlow: "Check & Approval",
 		actionType: "unblock",
+		actionMenu: "Unblock User",
 		data: "P001",
 		createdTime: "2025-11-01 10:00:00",
 		createdBy: "ADM001",
@@ -33,8 +35,10 @@ const DEFAULT_ACTIVITIES = [
 	{
 		id: 2,
 		activityId: "ACK000002",
+		menu: "User Management",
 		actionFlow: "Check & Approval",
 		actionType: "unblock",
+		actionMenu: "Unblock User",
 		data: "P002",
 		createdTime: "2025-11-01 10:00:00",
 		createdBy: "ADM001",
@@ -54,8 +58,10 @@ const DEFAULT_ACTIVITIES = [
 	{
 		id: 3,
 		activityId: "ACK000003",
+		menu: "User Management",
 		actionFlow: "Check & Approval",
 		actionType: "block",
+		actionMenu: "Block User",
 		data: "P003",
 		createdTime: "2025-11-01 10:00:00",
 		createdBy: "ADM001",
@@ -75,8 +81,10 @@ const DEFAULT_ACTIVITIES = [
 	{
 		id: 4,
 		activityId: "ACK000004",
+		menu: "User Management",
 		actionFlow: "Check & Approval",
 		actionType: "unblock",
+		actionMenu: "Unblock User",
 		data: "P004",
 		createdTime: "2025-11-01 10:00:00",
 		createdBy: "ADM001",
@@ -96,8 +104,10 @@ const DEFAULT_ACTIVITIES = [
 	{
 		id: 5,
 		activityId: "ACK000005",
+		menu: "User Management",
 		actionFlow: "Check & Approval",
 		actionType: "block",
+		actionMenu: "Block User",
 		data: "P005",
 		createdTime: "2025-11-01 10:00:00",
 		createdBy: "ADM001",
@@ -117,8 +127,10 @@ const DEFAULT_ACTIVITIES = [
 	{
 		id: 6,
 		activityId: "ACK000006",
+		menu: "User Management",
 		actionFlow: "Check & Approval",
 		actionType: "unblock",
+		actionMenu: "Unblock User",
 		data: "P006",
 		createdTime: "2025-11-01 10:00:00",
 		createdBy: "ADM001",
@@ -141,10 +153,20 @@ export default function AdminActivity() {
 	const navigate = useNavigate();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-	const [filterStatus, setFilterStatus] = useState([]);
-	const [showStatusFilter, setShowStatusFilter] = useState(false);
+	const [sortConfig, setSortConfig] = useState(null);
+	// const [filterStatus, setFilterStatus] = useState([]);
+	// const [showStatusFilter, setShowStatusFilter] = useState(false);
 	const [refreshKey, setRefreshKey] = useState(0);
+	const [openFilterFor, setOpenFilterFor] = useState(null);
+	const [columnFilters, setColumnFilters] = useState({
+		status: [],
+		menu: [],
+		actionMenu: [],
+		actionFlow: [],
+		createdBy: [],
+		checkerId: [],
+		approverId: [],
+	});
 
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -188,21 +210,31 @@ export default function AdminActivity() {
 		return DEFAULT_ACTIVITIES;
 	}, [refreshKey]);
 
+	const getUniqueValuesForColumn = (key) => {
+		const values = activities
+			.map((a) => a[key])
+			.filter((v) => v !== undefined && v !== null && v !== "");
+
+		return [...new Set(values)];
+	};
+
 	const tableColumns = [
 		{ key: "no", label: "No", sortable: false },
 		{ key: "activityId", label: "Activity ID", sortable: false },
-		{ key: "actionFlow", label: "Action Flow", sortable: false },
-		{ key: "data", label: "Data", sortable: false },
+		{ key: "menu", label: "Menu", sortable: true, filterable: true },
+		{ key : "actionMenu", label: "Action Menu", sortable: true, filterable: true },
+		{ key: "actionFlow", label: "Action Flow", sortable: true, filterable: true },
+		// { key: "data", label: "Data", sortable: false },
 		{ key: "createdTime", label: "Created Time", sortable: true },
-		{ key: "createdBy", label: "Created by", sortable: false },
-		{ key: "checkerId", label: "Checker ID", sortable: false },
-		{ key: "approverId", label: "Approver ID", sortable: false },
+		{ key: "createdBy", label: "Created by", sortable: false, filterable: true },
+		{ key: "checkerId", label: "Checker ID", sortable: false, filterable: true },
+		{ key: "approverId", label: "Approver ID", sortable: false, filterable: true },
 		{ key: "status", label: "Status", sortable: true, filterable: true },
 		{ key: "action", label: "Action", sortable: false },
 	];
 
 	// Get unique statuses
-	const statuses = ["Pending Check", "Pending Approval", "Rejected", "Approved"];
+	// const statuses = ["Pending Check", "Pending Approval", "Rejected", "Approved"];
 
 	// Filter and search
 	const filteredActivities = activities.filter((activity) => {
@@ -211,38 +243,46 @@ export default function AdminActivity() {
 			String(val).toLowerCase().includes(searchQuery.toLowerCase())
 		);
 
-		// Status filter
-		const matchesStatus =
-			filterStatus.length === 0 || filterStatus.includes(activity.status);
+		// Filter generic
+		const matchesColumnFilters = Object.entries(columnFilters).every(
+			([key, selectedValues]) => {
+				if (!selectedValues || selectedValues.length === 0) return true;
+				return selectedValues.includes(activity[key]);
+			}
+		);
 
-		return matchesSearch && matchesStatus;
+		return matchesSearch && matchesColumnFilters;
 	});
 
 	const handleSort = (key) => {
-		let direction = "asc";
-		if (sortConfig.key === key && sortConfig.direction === "asc") {
-			direction = "desc";
-		}
-		setSortConfig({ key, direction });
-	};
+        setSortConfig((prev) => {
+            if (!prev || prev.key !== key) {
+                return { key, direction: "asc" };
+            }
+            if (prev.direction === "asc") {
+                return { key, direction: "desc" };
+            }
+            return null;
+        });
+    };
 
-	const sortedActivities = [...filteredActivities].sort((a, b) => {
-		if (!sortConfig.key) return 0;
+	const sortedActivities = sortConfig
+        ? [...filteredActivities].sort((a, b) => {
+            const aVal = a[sortConfig.key];
+            const bVal = b[sortConfig.key];
 
-		const aVal = a[sortConfig.key];
-		const bVal = b[sortConfig.key];
+            // Special handling for date
+            if (sortConfig.key === "createdTime") {
+                const aTime = new Date(aVal).getTime();
+                const bTime = new Date(bVal).getTime();
+                return sortConfig.direction === "asc" ? aTime - bTime : bTime - aTime;
+            }
 
-		// Special handling for date
-		if (sortConfig.key === "createdTime") {
-			const aTime = new Date(aVal).getTime();
-			const bTime = new Date(bVal).getTime();
-			return sortConfig.direction === "asc" ? aTime - bTime : bTime - aTime;
-		}
-
-		if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-		if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-		return 0;
-	});
+            if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+            if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+            return 0;
+          })
+        : filteredActivities;
 
 	const handleViewDetails = (activity) => {
 		navigate(`/admin/activity/${activity.activityId}`, {
@@ -250,21 +290,31 @@ export default function AdminActivity() {
 		});
 	};
 
-	const toggleStatusFilter = (status) => {
-		setFilterStatus((prev) =>
-			prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
-		);
-	};
+	// const toggleStatusFilter = (status) => {
+	// 	setFilterStatus((prev) =>
+	// 		prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
+	// 	);
+	// };
 
-	const clearStatusFilter = () => {
-		setFilterStatus([]);
-	};
+	// const clearStatusFilter = () => {
+	// 	setFilterStatus([]);
+	// };
 
 	const clearAllFilters = () => {
-		setFilterStatus([]);
+		setColumnFilters({
+			status: [],
+			menu: [],
+			actionMenu: [],
+			actionFlow: [],
+			createdBy: [],
+			checkerId: [],
+			approverId: [],
+		});
 	};
 
-	const hasActiveFilters = filterStatus.length > 0;
+	const hasActiveFilters = Object.values(columnFilters).some(
+		(arr) => arr && arr.length > 0
+	);
 
 	const getStatusClass = (status) => {
 		switch (String(status || "").toLowerCase()) {
@@ -282,9 +332,15 @@ export default function AdminActivity() {
 	};
 
 	const renderColumnHeader = (column) => {
-		if (!column.filterable || column.key !== "status") return null;
+		if (!column.filterable) return null;
 
-		const hasFilter = filterStatus.length > 0;
+		const key = column.key;
+		const options = getUniqueValuesForColumn(key);
+		const selectedValues = columnFilters[key] || [];
+		const hasFilter = selectedValues.length > 0;
+		const isOpen = openFilterFor === key;
+
+		if (options.length === 0) return null;
 
 		return (
 			<div className="filter-dropdown-container">
@@ -292,28 +348,40 @@ export default function AdminActivity() {
 					className={`filter-icon-btn ${hasFilter ? "active" : ""}`}
 					onClick={(e) => {
 						e.stopPropagation();
-						setShowStatusFilter(!showStatusFilter);
+						setOpenFilterFor((prev) => (prev === key ? null : key));
 					}}
-					title="Filter"
+					title={`Filter ${column.label}`}
+					type="button"
 				>
 					<Filter size={16} />
-					{hasFilter && <span className="filter-badge">{filterStatus.length}</span>}
+					{hasFilter && (
+						<span className="filter-badge">{selectedValues.length}</span>
+					)}
 				</button>
 
-				{showStatusFilter && (
+				{isOpen && (
 					<>
 						<div
 							className="filter-dropdown-overlay"
-							onClick={() => setShowStatusFilter(false)}
+							onClick={() => setOpenFilterFor(null)}
 						/>
 						<div className="filter-dropdown">
 							<div className="filter-dropdown-header">
-								<span className="filter-dropdown-title">Filter {column.label}</span>
+								<span className="filter-dropdown-title">
+									{column.label}
+								</span>
 								{hasFilter && (
 									<button
 										className="clear-filter-btn"
-										onClick={clearStatusFilter}
+										onClick={(e) => {
+											e.stopPropagation();
+											setColumnFilters((prev) => ({
+												...prev,
+												[key]: [],
+											}));
+										}}
 										title="Clear filter"
+										type="button"
 									>
 										<X size={14} />
 										Clear
@@ -321,14 +389,29 @@ export default function AdminActivity() {
 								)}
 							</div>
 							<div className="filter-options">
-								{statuses.map((status) => (
-									<label key={status} className="filter-checkbox-label">
+								{options.map((opt) => (
+									<label key={opt} className="filter-checkbox-label">
 										<input
 											type="checkbox"
-											checked={filterStatus.includes(status)}
-											onChange={() => toggleStatusFilter(status)}
+											checked={selectedValues.includes(opt)}
+											onChange={(e) => {
+												const checked = e.target.checked;
+												setColumnFilters((prev) => {
+													const current = prev[key] || [];
+													let next;
+													if (checked) {
+														next = [...current, opt];
+													} else {
+														next = current.filter((v) => v !== opt);
+													}
+													return {
+														...prev,
+														[key]: next,
+													};
+												});
+											}}
 										/>
-										<span>{status}</span>
+										<span>{opt}</span>
 									</label>
 								))}
 							</div>
@@ -354,7 +437,7 @@ export default function AdminActivity() {
 					type="button"
 					title="View details"
 				>
-					View details
+					<Eye size={30} />
 				</button>
 			);
 		}
