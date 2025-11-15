@@ -47,8 +47,6 @@ export default function AdminHome() {
 	const [dashboard, setDashboard] = useState(null);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [sortConfig, setSortConfig] = useState(null);
-
-	// PAGINATION
 	const [page, setPage] = useState(1);
 	const rowsPerPage = 10;
 
@@ -114,7 +112,7 @@ export default function AdminHome() {
 	);
 
 	const handleViewTransactions = (transaction) => {
-		navigate("/admin/transactions", { state: { transaction } });
+		navigate("/admin/transactions", { state: { cif: transaction.cif } });
 	};
 
 	return (
