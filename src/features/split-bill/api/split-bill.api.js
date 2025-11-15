@@ -54,7 +54,7 @@ export async function fetchSplitBills() {
 
     const res = await api.get("/api/split-bill", {
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
@@ -62,14 +62,13 @@ export async function fetchSplitBills() {
     });
 
     if (res?.data?.data && Array.isArray(res.data.data) && res.data.data.length > 0) {
-      // ensure normalized structure
       return {
         status: true,
         data: res.data.data.map(normalizeBill),
       };
     }
 
-    console.warn("⚠️ API split bills tidak valid atau kosong, menggunakan dummy");
+    console.warn("API split bills tidak valid atau kosong, menggunakan dummy");
     return {
       status: true,
       data: DUMMY_STORAGE.map(normalizeBill),
@@ -92,7 +91,7 @@ export async function getSplitBillById(splitBillId) {
       { splitBillId },
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
           "ngrok-skip-browser-warning": "true",
         },
@@ -102,22 +101,20 @@ export async function getSplitBillById(splitBillId) {
 
     const data = res?.data?.data;
     if (!data) {
-      console.warn("⚠️ API split bill detail tidak valid, menggunakan dummy");
+      console.warn("API split bill detail tidak valid, menggunakan dummy");
       const dummyBill = DUMMY_STORAGE.find((b) => b.split_bill_id === splitBillId || b.splitBillId === splitBillId);
       return dummyBill ? normalizeBill(dummyBill) : null;
     }
 
-    // normalize API response object to our shape
     return normalizeBill(data);
   } catch (error) {
-    console.warn("⚠️ API split bill detail gagal, menggunakan dummy:", error?.message || error);
+    console.warn("API split bill detail gagal, menggunakan dummy:", error?.message || error);
     const dummyBill = DUMMY_STORAGE.find((b) => b.split_bill_id === splitBillId || b.splitBillId === splitBillId);
     return dummyBill ? normalizeBill(dummyBill) : null;
   }
 }
 
 export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
-  // Attempt API call first (best-effort), fallback to dummy behavior
   try {
     const token = sessionStorage.getItem("token");
     const payload = {
@@ -148,7 +145,6 @@ export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
     console.warn("⚠️ Gagal memanggil API update split bill:", err?.message || err);
   }
 
-  // Dummy update
   const idx = DUMMY_STORAGE.findIndex((b) => b.split_bill_id === split_bill_id || b.splitBillId === split_bill_id);
   if (idx !== -1) {
     DUMMY_STORAGE[idx].members = updatedMembers.map((m) => ({
@@ -181,9 +177,10 @@ export async function createSplitBill(payload) {
 
   try {
     const token = sessionStorage.getItem("token");
+
     const res = await api.post("/api/split-bill/add", newBill, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
@@ -192,11 +189,11 @@ export async function createSplitBill(payload) {
 
     if (res.status >= 200 && res.status < 300) {
       API_WORKED_BEFORE = true;
-      console.info("✅ Split bill berhasil disimpan via API");
+      console.info("Split bill berhasil disimpan via API");
       return normalizeBill(res.data?.data || res.data);
     }
   } catch (err) {
-    console.warn("⚠️ Gagal API, fallback dummy:", err?.message || err);
+    console.warn("Gagal API, fallback dummy:", err?.message || err);
   }
 
   if (API_WORKED_BEFORE) {

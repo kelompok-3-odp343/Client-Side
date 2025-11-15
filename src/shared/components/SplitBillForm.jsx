@@ -18,7 +18,6 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
   const lastAddedId = useRef(null);
   const navigate = useNavigate();
 
-  // parse transaction amount (supports formatted strings like "Rp 1.000")
   const totalBill = parseInt(
     (transaction?.amount || "").toString().replace(/[^\d]/g, ""),
     10
@@ -31,7 +30,6 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
 
   const remainingAmount = totalBill - totalParticipantAmount;
 
-  // 🔒 lock scroll when modal active
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -39,7 +37,6 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
     };
   }, []);
 
-  // focus to last added input
   useEffect(() => {
     const last = participants[participants.length - 1];
     if (lastAddedId.current && last && lastAddedId.current === last.id) {
@@ -50,7 +47,6 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
   }, [participants]);
 
   function handleAddRow() {
-    // Prevent adding when amounts are already balanced
     if (totalParticipantAmount === totalBill) return;
 
     const newId = Date.now() + Math.random();
@@ -134,8 +130,6 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
     try {
       await createSplitBill(payload);
       setShowSuccess(true);
-
-      // callback kalau ada
       if (typeof onSuccess === "function") onSuccess();
     } catch (err) {
       const msg = err?.message || "Unknown error";
