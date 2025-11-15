@@ -157,7 +157,6 @@ export default function SplitBillForm({ onClose, onSuccess, transaction }) {
     (p) => !p.participantName.trim() || !p.participantAmount.trim()
   );
 
-  // disable Add button when either there are empty fields OR the amounts already match
   const disableAddButton = hasEmptyFields || totalParticipantAmount === totalBill;
 
   return (
