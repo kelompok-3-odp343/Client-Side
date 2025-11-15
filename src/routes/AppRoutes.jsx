@@ -71,7 +71,7 @@ export default function AppRoutes() {
           <Route path="/admin/home" element={<AdminHome />} />
           <Route path="/admin/transactions" element={<AdminTransactions />} />
           <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/users/:id" element={<AdminUserDetail />} />
+          <Route path="/admin/users/detail" element={<AdminUserDetail />} />
           <Route path="/admin/activity" element={<AdminActivity />} />
           <Route path="/admin/activity/:id" element={<AdminActivityDetail />} />
         </Route>

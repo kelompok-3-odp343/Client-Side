@@ -1,142 +1,69 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Lock, Unlock } from "lucide-react";
+
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
+
+import { fetchAdminUserDetail } from "../service/adminUserDetailService";
 import "../styles/admin-user-detail.css";
 
 export default function AdminUserDetail() {
 	const location = useLocation();
-	const { id } = useParams();
 	const navigate = useNavigate();
+	const userId = location.state?.userId || null;
 
-	// State
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const [showActionModal, setShowActionModal] = useState(false);
-	const [showSuccessModal, setShowSuccessModal] = useState(false);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(null);
-	const [selectedChecker, setSelectedChecker] = useState("");
-	const [reason, setReason] = useState("");
-	const [actionType, setActionType] = useState(""); // "block" or "unblock"
-	const [lastActivity, setLastActivity] = useState(null);
-	
-	// Local state for user data
+	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 	const [userData, setUserData] = useState(null);
 	const [accounts, setAccounts] = useState([]);
 
-	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
-	// Sample checkers
+	const [showActionModal, setShowActionModal] = useState(false);
+	const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+	const [selectedChecker, setSelectedChecker] = useState("");
+	const [reason, setReason] = useState("");
+	const [actionType, setActionType] = useState("");
+	const [lastActivity, setLastActivity] = useState(null);
+
 	const checkers = [
 		{ id: "ADM002", name: "Khairuddin Nasty" },
 		{ id: "ADM004", name: "Checker 2" },
-		{ id: "ADM005", name: "Checker 3" },
+		{ id: "ADM005", name: "Checker 3" }
 	];
 
-	// Fetch user details (mock) and load saved status
 	useEffect(() => {
-		const fetchUserDetails = async () => {
-			setLoading(true);
-			setError(null);
-			
+		const load = async () => {
+			if (!userId) {
+				setError("User not found");
+				setLoading(false);
+				return;
+			}
+
 			try {
-				const stateUser = location.state?.user;
-				
-				if (stateUser) {
-					setUserData(stateUser);
-					setAccounts(stateUser.accounts || []);
-				} else {
-					// Temporary default data
-					setUserData({
-						customerName: "Ulion Pardede",
-						cif: id || "9285711830",
-						status: "Blocked",
-					});
-					setAccounts([
-						{
-							id: 1,
-							accountNumber: "1234567890",
-							accountType: "Time Deposit",
-							effectiveBalance: "Rp5.000.000",
-							status: "Active",
-						},
-						{
-							id: 2,
-							accountNumber: "1234567891",
-							accountType: "Savings",
-							effectiveBalance: "Rp12.500.000",
-							status: "Blocked",
-						},
-						{
-							id: 3,
-							accountNumber: "1234567892",
-							accountType: "Time Deposit",
-							effectiveBalance: "Rp8.750.000",
-							status: "Active",
-						},
-						{
-							id: 4,
-							accountNumber: "1234567893",
-							accountType: "Pension Fund",
-							effectiveBalance: "Rp15.000.000",
-							status: "Active",
-						},
-						{
-							id: 5,
-							accountNumber: "1234567894",
-							accountType: "Life Goals",
-							effectiveBalance: "Rp3.200.000",
-							status: "Active",
-						},
-						{
-							id: 6,
-							accountNumber: "1234567895",
-							accountType: "Savings",
-							effectiveBalance: "Rp20.000.000",
-							status: "Blocked",
-						},
-						{
-							id: 7,
-							accountNumber: "1234567896",
-							accountType: "Time Deposit",
-							effectiveBalance: "Rp6.500.000",
-							status: "Active",
-						},
-					]);
-				}
+				const resp = await fetchAdminUserDetail(userId);
+
+				setUserData(resp.data);
+				setAccounts(resp.data.accounts || []);
 			} catch (err) {
-				setError(err.message || "Failed to fetch user details");
-				console.error("Error fetching user details:", err);
+				setError("Failed to fetch user detail");
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		// Load status from sessionStorage
-		const savedStatuses = sessionStorage.getItem('userStatuses');
-		if (savedStatuses) {
-			try {
-				const statuses = JSON.parse(savedStatuses);
-				if (statuses[id]) {
-					setUserData(prev => prev ? { ...prev, status: statuses[id] } : null);
-				}
-			} catch (e) {
-				console.error('Error parsing user statuses:', e);
-			}
-		}
+		load();
+	}, [userId]);
 
-		fetchUserDetails();
-	}, [id, location.state]);
+	const isBlocked = userData?.isBlocked;
+	const isFormValid = selectedChecker && reason.trim();
 
-	const colors = ["#6DDDD0", "#FFBC8E", "#CABEE3"];
-
-	// Get color based on diagonal pattern
-	const getCardColor = (index) => {
-		const row = Math.floor(index / 3);
-		const col = index % 3;
-		const colorIndex = (row + col) % 3;
-		return colors[colorIndex];
+	const handleBlock = () => {
+		setActionType("block");
+		setShowActionModal(true);
 	};
 
 	const handleUnblock = () => {
@@ -144,121 +71,66 @@ export default function AdminUserDetail() {
 		setShowActionModal(true);
 	};
 
-	const handleBlock = () => {
-		setActionType("block");
-		setShowActionModal(true);
-	};
+	const handleSubmitAction = () => {
+		if (!isFormValid) return;
 
-	const handleSubmitAction = async () => {
-		if (!selectedChecker) {
-			alert("Please select a checker");
-			return;
-		}
-		if (!reason.trim()) {
-			alert("Please provide a reason");
-			return;
-		}
-
+		const now = new Date();
+		const createdTimeDisplay = now.toLocaleString("en-GB");
+		let activities = [];
 		try {
-			// Load existing activities or create new array
-			let activitiesList = [];
-			const storedActivities = sessionStorage.getItem('activities');
-			
-			if (storedActivities) {
-				try {
-					activitiesList = JSON.parse(storedActivities);
-				} catch (e) {
-					console.error('Error parsing activities:', e);
-					activitiesList = [];
-				}
-			}
-			
-			// Get current date and admin info
-			const now = new Date();
-			const dateStr = now.toISOString().replace('T', ' ').substring(0, 19);
-			const createdTimeDisplay = now.toLocaleString("en-GB", {
-				day: "numeric",
-				month: "short",
-				year: "numeric",
-				hour: "2-digit",
-				minute: "2-digit",
-				second: "2-digit",
-			});
+			const stored = sessionStorage.getItem("activities");
+			if (stored) activities = JSON.parse(stored);
+		} catch (_) { }
 
-			const adminName = sessionStorage.getItem('adminName') || 'Della Puspita';
-			const adminId = sessionStorage.getItem('adminId') || 'ADM001';
-			
-			// Create new activity
-			const newActivity = {
-				id: activitiesList.length + 1,
-				activityId: `ACK00000${activitiesList.length + 1}`,
-				menu: "User Management",
-				actionFlow: "Check & Approval",
-				actionType: actionType, // "block" or "unblock"
-				actionMenu: actionType === "block" ? "Block User" : "Unblock User",
-				data: `P00${activitiesList.length + 1}`,
-				createdTime: dateStr,
-				createdTimeDisplay,
-				createdBy: adminId,
-				checkerId: selectedChecker,
-				approverId: "",
-				status: "Pending Check",
-				customerName: userData.customerName,
-				cif: userData.cif,
-				reason: reason,
-				createdAt: `${dateStr} by ${adminName} (${adminId})`,
-				checkedBy: selectedChecker,
-				checkedAt: "",
-				approvedBy: "",
-				approvedAt: "",
-				rejectionNotes: "-",
-			};
-			
-			// Add to activities list
-			activitiesList.push(newActivity);
-			sessionStorage.setItem('activities', JSON.stringify(activitiesList));
-			
-			setLastActivity(newActivity);
+		const newActivity = {
+			id: activities.length + 1,
+			activityId: `ACT${String(activities.length + 1).padStart(5, "0")}`,
+			menu: "User Management",
+			actionFlow: "Check & Approval",
+			actionType,
+			actionMenu: actionType === "block" ? "Block User" : "Unblock User",
+			createdTimeDisplay,
+			customerName: userData.customerName,
+			cif: userData.customerId,
+			reason,
+			status: "Pending Check",
+			checkerId: selectedChecker
+		};
 
-			// Close modal and show success
-			setShowActionModal(false);
-			setShowSuccessModal(true);
-			
-			// Trigger event for Activity page to refresh
-			window.dispatchEvent(new Event('activityStatusChanged'));
-		} catch (err) {
-			console.error("Error creating request:", err);
-			setError("Failed to create request. Please try again.");
-		}
-	};
+		activities.push(newActivity);
+		sessionStorage.setItem("activities", JSON.stringify(activities));
 
-	const handleSuccessViewActivity = () => {
-		navigate("/admin/activity");
+		setLastActivity(newActivity);
+		setShowActionModal(false);
+		setShowSuccessModal(true);
+		window.dispatchEvent(new Event("activityStatusChanged"));
 	};
 
 	const handleSuccessClose = () => {
 		setShowSuccessModal(false);
 		setSelectedChecker("");
 		setReason("");
-		setActionType("");
-		setLastActivity(null);
+	};
+
+	const handleSuccessViewActivity = () => {
+		navigate("/admin/activity");
 	};
 
 	const cancelAction = () => {
 		setShowActionModal(false);
 		setSelectedChecker("");
 		setReason("");
-		setActionType("");
 	};
 
-	const isBlocked = userData?.status === "Blocked";
-	const isFormValid = selectedChecker && reason.trim();
+	const colors = ["#6DDDD0", "#FFBC8E", "#CABEE3"];
+	const getCardColor = (index) => colors[index % 3];
 
 	if (loading) {
 		return (
 			<div className="admin-container">
 				<AdminNavBar onMenuToggle={toggleSidebar} />
 				<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
 				<main className="admin-user-detail-main">
 					<div className="loading-state">Loading user details...</div>
 				</main>
@@ -271,6 +143,7 @@ export default function AdminUserDetail() {
 			<div className="admin-container">
 				<AdminNavBar onMenuToggle={toggleSidebar} />
 				<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
 				<main className="admin-user-detail-main">
 					<div className="error-state">{error || "User not found"}</div>
 				</main>
@@ -287,19 +160,21 @@ export default function AdminUserDetail() {
 				<div className="user-detail-header">
 					<div className="user-info">
 						<h2 className="user-name">{userData.customerName}</h2>
+
 						<div className="user-meta">
 							<span className="user-cif">
-								<span className="label">CIF :</span>
-								<span className="value">{userData.cif}</span>
+								<span className="label">Customer ID :</span>
+								<span className="value">{userData.customerId}</span>
 							</span>
-							<span className={`user-status ${userData.status === "Blocked" ? "blocked" : "active"}`}>
-								<span className="label">Customer Status :</span>
-								<span className="value">{userData.status}</span>
+
+							<span className={`user-status ${isBlocked ? "blocked" : "active"}`}>
+								<span className="label">Status :</span>
+								<span className="value">{isBlocked ? "Blocked" : "Active"}</span>
 							</span>
 						</div>
 					</div>
 					<div className="action-buttons">
-						<button 
+						<button
 							className={`unblock-btn ${!isBlocked ? "disabled" : ""}`}
 							onClick={handleUnblock}
 							disabled={!isBlocked}
@@ -307,7 +182,8 @@ export default function AdminUserDetail() {
 							<Unlock size={24} />
 							<span>Unblock</span>
 						</button>
-						<button 
+
+						<button
 							className={`block-btn ${isBlocked ? "disabled" : ""}`}
 							onClick={handleBlock}
 							disabled={isBlocked}
@@ -319,28 +195,33 @@ export default function AdminUserDetail() {
 				</div>
 
 				<div className="accounts-grid">
-					{accounts.map((account, index) => (
+					{accounts.map((acc, i) => (
 						<div
-							key={account.id || index}
+							key={i}
 							className="account-card"
-							style={{ background: getCardColor(index) }}
+							style={{ background: getCardColor(i) }}
 						>
 							<div className="account-card-content">
 								<div className="account-row">
 									<span className="account-label">Account Number</span>
-									<span className="account-value">: {account.accountNumber}</span>
+									<span className="account-value">: {acc.accountNumber}</span>
 								</div>
+
 								<div className="account-row">
-									<span className="account-label">Account Type</span>
-									<span className="account-value">: {account.accountType}</span>
+									<span className="account-label">Product Type</span>
+									<span className="account-value">: {acc.productName}</span>
 								</div>
-								<div className="account-row">
-									<span className="account-label">Effective Balance</span>
-									<span className="account-value">: {account.effectiveBalance}</span>
-								</div>
+
 								<div className="account-row">
 									<span className="account-label">Account Status</span>
-									<span className="account-value">: {account.status}</span>
+									<span className="account-value">: {acc.accountStatus}</span>
+								</div>
+
+								<div className="account-row">
+									<span className="account-label">Balance</span>
+									<span className="account-value">
+										: Rp{acc.effectiveBalance.toLocaleString("id-ID")}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -348,11 +229,13 @@ export default function AdminUserDetail() {
 				</div>
 			</main>
 
-			{/* Action Modal - Block/Unblock */}
 			{showActionModal && (
 				<div className="modal-overlay">
 					<div className="modal-content-user-detail modal-action">
-						<h3 className="modal-title">{actionType === "block" ? "Block" : "Unblock"} User Request</h3>
+						<h3 className="modal-title">
+							{actionType === "block" ? "Block User" : "Unblock User"} Request
+						</h3>
+
 						<div className="modal-field">
 							<label className="modal-label">Checker*</label>
 							<select
@@ -360,36 +243,38 @@ export default function AdminUserDetail() {
 								value={selectedChecker}
 								onChange={(e) => setSelectedChecker(e.target.value)}
 							>
-								<option value="">Choose a checker</option>
-								{checkers.map((checker) => (
-									<option key={checker.id} value={checker.id}>
-										{checker.name} ({checker.id})
+								<option value="">Select Checker</option>
+								{checkers.map((c) => (
+									<option key={c.id} value={c.id}>
+										{c.name} ({c.id})
 									</option>
 								))}
 							</select>
 						</div>
-						
+
 						<div className="modal-field">
 							<label className="modal-label">Reason*</label>
 							<textarea
 								className="modal-textarea-user-detail"
-								placeholder="Type here ..."
+								rows={5}
 								value={reason}
 								onChange={(e) => setReason(e.target.value)}
-								rows={5}
+								placeholder="Type reason..."
 							/>
 						</div>
-						
+
 						<span className="modal-required-user-detail">*required</span>
-						
+
 						<div className="modal-actions">
 							<button className="modal-btn modal-btn-cancel" onClick={cancelAction}>
 								Cancel
 							</button>
-							<button 
-								className={`modal-btn modal-btn-user-detail-submit ${!isFormValid ? 'disabled' : ''}`}
-								onClick={handleSubmitAction}
+
+							<button
+								className={`modal-btn modal-btn-user-detail-submit ${!isFormValid ? "disabled" : ""
+									}`}
 								disabled={!isFormValid}
+								onClick={handleSubmitAction}
 							>
 								Submit
 							</button>
@@ -398,13 +283,11 @@ export default function AdminUserDetail() {
 				</div>
 			)}
 
-			{/* Success Modal with Navigation Options */}
 			{showSuccessModal && lastActivity && (
 				<div className="modal-overlay">
 					<div className="modal-content-user-detail modal-success">
-						<h3 className="modal-title">
-							Activity Has Been Created
-						</h3>
+						<h3 className="modal-title">Activity Created</h3>
+
 						<p className="modal-subtitle-user-detail">
 							Created at <strong>{lastActivity.createdTimeDisplay}</strong>
 						</p>
@@ -412,30 +295,32 @@ export default function AdminUserDetail() {
 						<div className="activity-summary-card">
 							<div className="activity-row">
 								<span className="activity-label">Activity ID</span>
-								<span className="activity-value">
-									: {lastActivity.activityId}
-								</span>
+								<span className="activity-value">: {lastActivity.activityId}</span>
 							</div>
-							<div className="activity-row">
-								<span className="activity-label">Menu</span>
-								<span className="activity-value">
-									: {lastActivity.menu}
-								</span>
-							</div>
+
 							<div className="activity-row">
 								<span className="activity-label">Action Menu</span>
-								<span className="activity-value">
-									: {lastActivity.actionMenu}
-								</span>
+								<span className="activity-value">: {lastActivity.actionMenu}</span>
+							</div>
+
+							<div className="activity-row">
+								<span className="activity-label">Checker</span>
+								<span className="activity-value">: {lastActivity.checkerId}</span>
 							</div>
 						</div>
 
-
 						<div className="modal-actions">
-							<button className="modal-btn modal-btn-user-detail-close" onClick={handleSuccessClose}>
+							<button
+								className="modal-btn modal-btn-user-detail-close"
+								onClick={handleSuccessClose}
+							>
 								Close
 							</button>
-							<button className="modal-btn modal-btn-user-detail-view" onClick={handleSuccessViewActivity}>
+
+							<button
+								className="modal-btn modal-btn-user-detail-view"
+								onClick={handleSuccessViewActivity}
+							>
 								View Activity List
 							</button>
 						</div>

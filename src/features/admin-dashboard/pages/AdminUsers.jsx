@@ -1,386 +1,177 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Filter, X, Eye } from "lucide-react";
+
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
 import DataTable from "../components/DataTable";
 import StatusBadge from "../components/StatusBadge";
+
 import "../styles/admin-users.css";
+import { fetchAdminUsers } from "../service/adminUsersService";
 
 export default function AdminUsers() {
 	const navigate = useNavigate();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+	const [userData, setUserData] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [loadError, setLoadError] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [sortConfig, setSortConfig] = useState(null);
 	const [filterStatus, setFilterStatus] = useState([]);
 	const [showStatusFilter, setShowStatusFilter] = useState(false);
-	const [refreshKey, setRefreshKey] = useState(0);
+	const [page, setPage] = useState(1);
+	const [rowsPerPage, setRowsPerPage] = useState(10);
+	const toggleSidebar = () => setIsSidebarOpen((v) => !v);
 
-	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+	useEffect(() => {
+		let mounted = true;
 
-	// Listen for status changes from user detail page
-	React.useEffect(() => {
-		const handleStatusChange = () => {
-			setRefreshKey(prev => prev + 1);
-		};
-
-		window.addEventListener('userStatusChanged', handleStatusChange);
-
-		// Also refresh when component becomes visible again
-		const handleVisibilityChange = () => {
-			if (!document.hidden) {
-				setRefreshKey(prev => prev + 1);
+		const load = async () => {
+			setLoading(true);
+			setLoadError(false);
+			try {
+				const resp = await fetchAdminUsers();
+				if (!mounted) return;
+				setUserData(resp.data);
+			} catch (err) {
+				if (!mounted) return;
+				setLoadError(true);
+			} finally {
+				if (mounted) setLoading(false);
 			}
 		};
 
-		document.addEventListener('visibilitychange', handleVisibilityChange);
+		load();
 
 		return () => {
-			window.removeEventListener('userStatusChanged', handleStatusChange);
-			document.removeEventListener('visibilitychange', handleVisibilityChange);
+			mounted = false;
 		};
 	}, []);
 
-	// Raw accounts data
-	const rawAccounts = [
-		{
-			id: 1,
-			cif: "1234567890",
-			customerName: "Oktavia",
-			accountNumber: "1234567890",
-			accountType: "Pension Fund",
-			status: "Active",
-		},
-		{
-			id: 2,
-			cif: "1234567891",
-			customerName: "Ulion Pardede",
-			accountNumber: "1234567890",
-			accountType: "Savings",
-			status: "Blocked",
-		},
-		{
-			id: 3,
-			cif: "1234567891",
-			customerName: "Ulion Pardede",
-			accountNumber: "1234567891",
-			accountType: "Savings",
-			status: "Blocked",
-		},
-		{
-			id: 4,
-			cif: "1234567891",
-			customerName: "Ulion Pardede",
-			accountNumber: "1234567892",
-			accountType: "Time Deposit",
-			status: "Active",
-		},
-		{
-			id: 5,
-			cif: "1234567891",
-			customerName: "Ulion Pardede",
-			accountNumber: "1234567893",
-			accountType: "Pension Fund",
-			status: "Active",
-		},
-		{
-			id: 6,
-			cif: "1234567891",
-			customerName: "Ulion Pardede",
-			accountNumber: "1234567894",
-			accountType: "Life Goals",
-			status: "Active",
-		},
-		{
-			id: 7,
-			cif: "1234567891",
-			customerName: "Ulion Pardede",
-			accountNumber: "1234567895",
-			accountType: "Savings",
-			status: "Active",
-		},
-		{
-			id: 8,
-			cif: "1234567891",
-			customerName: "Ulion Pardede",
-			accountNumber: "1234567896",
-			accountType: "Time Deposit",
-			status: "Active",
-		},
-		{
-			id: 9,
-			cif: "1234567892",
-			customerName: "Erlangga Wahyu",
-			accountNumber: "1234567897",
-			accountType: "Savings",
-			status: "Active",
-		},
-		{
-			id: 10,
-			cif: "1234567892",
-			customerName: "Erlangga Wahyu",
-			accountNumber: "1234567898",
-			accountType: "Life Goals",
-			status: "Active",
-		},
-		{
-			id: 11,
-			cif: "1234567893",
-			customerName: "Della Puspita",
-			accountNumber: "1234567899",
-			accountType: "Time Deposit",
-			status: "Active",
-		},
-		{
-			id: 12,
-			cif: "1234567893",
-			customerName: "Della Puspita",
-			accountNumber: "1234567900",
-			accountType: "Savings",
-			status: "Active",
-		},
-		{
-			id: 13,
-			cif: "1234567893",
-			customerName: "Della Puspita",
-			accountNumber: "1234567901",
-			accountType: "Pension Fund",
-			status: "Active",
-		},
-		{
-			id: 14,
-			cif: "1234567893",
-			customerName: "Della Puspita",
-			accountNumber: "1234567902",
-			accountType: "Life Goals",
-			status: "Active",
-		},
-		{
-			id: 15,
-			cif: "1234567893",
-			customerName: "Della Puspita",
-			accountNumber: "1234567903",
-			accountType: "Time Deposit",
-			status: "Active",
-		},
-		{
-			id: 16,
-			cif: "1234567894",
-			customerName: "Khairuddin Nasty",
-			accountNumber: "1234567904",
-			accountType: "Saving",
-			status: "Blocked",
-		},
-		{
-			id: 17,
-			cif: "1234567894",
-			customerName: "Khairuddin Nasty",
-			accountNumber: "1234567905",
-			accountType: "Life Goals",
-			status: "Active",
-		},
-		{
-			id: 18,
-			cif: "1234567894",
-			customerName: "Khairuddin Nasty",
-			accountNumber: "1234567906",
-			accountType: "Savings",
-			status: "Blocked",
-		},
-		{
-			id: 19,
-			cif: "1234567895",
-			customerName: "Wira Natanael Uli",
-			accountNumber: "1234567907",
-			accountType: "Savings",
-			status: "Active",
-		},
-		{
-			id: 20,
-			cif: "1234567895",
-			customerName: "Wira Natanael Uli",
-			accountNumber: "1234567908",
-			accountType: "Time Deposit",
-			status: "Active",
-		},
-		{
-			id: 21,
-			cif: "1234567895",
-			customerName: "Wira Natanael Uli",
-			accountNumber: "1234567909",
-			accountType: "Pension Fund",
-			status: "Active",
-		},
-	];
-
-	// Group accounts by CIF to get unique users
 	const users = useMemo(() => {
-		// Get saved statuses from sessionStorage
-		let savedStatuses = {};
-		try {
-			const saved = sessionStorage.getItem('userStatuses');
-			if (saved) {
-				savedStatuses = JSON.parse(saved);
-			}
-		} catch (e) {
-			console.error('Error parsing user statuses:', e);
-		}
+		if (!userData?.users) return [];
+		return userData.users.map((u, idx) => ({
+			id: u.userId || `user-${idx}`,
+			noIndex: idx + 1,
+			cif: u.customerId,
+			customerName: u.customerName,
+			status: u.isBlocked ? "Blocked" : "Active",
+			accountCount: u.countAccount,
+			raw: u,
+		}));
+	}, [userData]);
 
-		const groupedByCif = rawAccounts.reduce((acc, account) => {
-			if (!acc[account.cif]) {
-				acc[account.cif] = {
-					cif: account.cif,
-					customerName: account.customerName,
-					accounts: [],
-				};
-			}
-			acc[account.cif].accounts.push(account);
-			return acc;
-		}, {});
-
-		return Object.values(groupedByCif).map((user) => {
-			const hasBlocked = user.accounts.some((acc) => acc.status === "Blocked");
-			// Check if status has been manually updated in sessionStorage
-			const manualStatus = savedStatuses[user.cif];
-			return {
-				cif: user.cif,
-				customerName: user.customerName,
-				status: manualStatus || (hasBlocked ? "Blocked" : "Active"),
-				accountCount: user.accounts.length,
-				accounts: user.accounts,
-			};
+	const filteredUsers = useMemo(() => {
+		const q = searchQuery.trim().toLowerCase();
+		return users.filter((u) => {
+			const matchesSearch =
+				!q ||
+				u.customerName.toLowerCase().includes(q) ||
+				(u.cif && u.cif.includes(q));
+			const matchesStatus =
+				filterStatus.length === 0 || filterStatus.includes(u.status);
+			return matchesSearch && matchesStatus;
 		});
-	}, [refreshKey]); // Re-compute when refreshKey changes
+	}, [users, searchQuery, filterStatus]);
+
+	const handleSort = (key) => {
+		setSortConfig((prev) => {
+			if (!prev || prev.key !== key) return { key, direction: "asc" };
+			if (prev.direction === "asc") return { key, direction: "desc" };
+			return null;
+		});
+	};
+
+	const sortedUsers = useMemo(() => {
+		if (!sortConfig) return filteredUsers;
+		const { key, direction } = sortConfig;
+		const dir = direction === "asc" ? 1 : -1;
+		return [...filteredUsers].sort((a, b) => {
+			const va = a[key];
+			const vb = b[key];
+			if (va == null && vb == null) return 0;
+			if (va == null) return -1 * dir;
+			if (vb == null) return 1 * dir;
+
+			if (typeof va === "number" && typeof vb === "number") {
+				return (va - vb) * dir;
+			}
+			return String(va).localeCompare(String(vb)) * dir;
+		});
+	}, [filteredUsers, sortConfig]);
+
+	const totalPages = Math.max(1, Math.ceil(sortedUsers.length / rowsPerPage));
+
+	useEffect(() => {
+		if (page > totalPages) setPage(totalPages);
+		if (page < 1) setPage(1);
+	}, [totalPages, page]);
+
+	const paginatedData = useMemo(() => {
+		const start = (page - 1) * rowsPerPage;
+		return sortedUsers.slice(start, start + rowsPerPage);
+	}, [sortedUsers, page, rowsPerPage]);
+
+	const statuses = ["Active", "Blocked"];
+	const hasActiveFilters = filterStatus.length > 0;
 
 	const tableColumns = [
-		{ key: "no", label: "No", sortable: false },
+		{ key: "noIndex", label: "No" },
 		{ key: "cif", label: "CIF", sortable: true },
 		{ key: "customerName", label: "Customer Name", sortable: true },
 		{ key: "status", label: "Customer Status", sortable: true, filterable: true },
 		{ key: "accountCount", label: "# of Accounts", sortable: true },
-		{ key: "action", label: "Action", sortable: false },
+		{ key: "action", label: "Action" },
 	];
-
-	// Get unique statuses
-	const statuses = ["Active", "Blocked"];
-
-	// Calculate statistics
-	const totalUsers = users.length;
-	const activeUsers = users.filter(u => u.status === "Active").length;
-	const blockedUsers = users.filter(u => u.status === "Blocked").length;
-	const avgAccountsPerUser = users.length > 0
-		? Math.round(users.reduce((sum, u) => sum + u.accountCount, 0) / users.length)
-		: 0;
-
-	// Filter and search
-	const filteredUsers = users.filter((user) => {
-		// Search filter
-		const matchesSearch =
-			user.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			user.cif.includes(searchQuery);
-
-		// Status filter
-		const matchesStatus = filterStatus.length === 0 || filterStatus.includes(user.status);
-
-		return matchesSearch && matchesStatus;
-	});
-
-	const handleSort = (key) => {
-        setSortConfig((prev) => {
-            if (!prev || prev.key !== key) {
-                return { key, direction: "asc" };
-            }
-            if (prev.direction === "asc") {
-                return { key, direction: "desc" };
-            }
-            return null;
-        });
-    };
-
-	const sortedUsers = sortConfig
-        ? [...filteredUsers].sort((a, b) => {
-            const aVal = a[sortConfig.key];
-            const bVal = b[sortConfig.key];
-
-            if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-            if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-            return 0;
-          })
-        : filteredUsers;
-
-	const handleViewDetails = (user) => {
-		navigate(`/admin/users/${user.cif}`, {
-			state: {
-				user: user
-			}
-		});
-	};
-
-	const toggleStatusFilter = (status) => {
-		setFilterStatus((prev) =>
-			prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
-		);
-	};
-
-	const clearStatusFilter = () => {
-		setFilterStatus([]);
-	};
-
-	const clearAllFilters = () => {
-		setFilterStatus([]);
-	};
-
-	const hasActiveFilters = filterStatus.length > 0;
 
 	const renderColumnHeader = (column) => {
 		if (!column.filterable || column.key !== "status") return null;
 
-		const hasFilter = filterStatus.length > 0;
-
 		return (
 			<div className="filter-dropdown-container">
 				<button
-					className={`filter-icon-btn ${hasFilter ? "active" : ""}`}
+					className={`filter-icon-btn ${hasActiveFilters ? "active" : ""}`}
 					onClick={(e) => {
 						e.stopPropagation();
-						setShowStatusFilter(!showStatusFilter);
+						setShowStatusFilter((v) => !v);
 					}}
 					title="Filter"
 				>
 					<Filter size={16} />
-					{hasFilter && <span className="filter-badge">{filterStatus.length}</span>}
+					{hasActiveFilters && <span className="filter-badge">{filterStatus.length}</span>}
 				</button>
 
 				{showStatusFilter && (
 					<>
-						<div
-							className="filter-dropdown-overlay"
-							onClick={() => setShowStatusFilter(false)}
-						/>
+						<div className="filter-dropdown-overlay" onClick={() => setShowStatusFilter(false)} />
 						<div className="filter-dropdown">
 							<div className="filter-dropdown-header">
 								<span className="filter-dropdown-title">{column.label}</span>
-								{hasFilter && (
+								{hasActiveFilters && (
 									<button
 										className="clear-filter-btn"
-										onClick={clearStatusFilter}
+										onClick={() => setFilterStatus([])}
 										title="Clear filter"
 									>
-										<X size={14} />
-										Clear
+										<X size={14} /> Clear
 									</button>
 								)}
 							</div>
+
 							<div className="filter-options">
-								{statuses.map((status) => (
-									<label key={status} className="filter-checkbox-label">
+								{statuses.map((s) => (
+									<label key={s} className="filter-checkbox-label">
 										<input
 											type="checkbox"
-											checked={filterStatus.includes(status)}
-											onChange={() => toggleStatusFilter(status)}
+											checked={filterStatus.includes(s)}
+											onChange={() =>
+												setFilterStatus((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
+											}
 										/>
-										<span>{status}</span>
+										<span>{s}</span>
 									</label>
 								))}
 							</div>
@@ -392,24 +183,21 @@ export default function AdminUsers() {
 	};
 
 	const renderCell = (row, column, index) => {
-		if (column.key === "no") return index + 1;
-
+		if (column.key === "noIndex") return (page - 1) * rowsPerPage + index + 1;
 		if (column.key === "status") {
 			return <StatusBadge status={row.status} type="user" />;
 		}
-
 		if (column.key === "action") {
 			return (
 				<button
 					className="view-details-btn"
-					onClick={() => handleViewDetails(row)}
+					onClick={() => navigate(`/admin/users/detail`, { state: { userId: row.id } })}
 					type="button"
 				>
-					<Eye size={30} />
+					<Eye size={24} />
 				</button>
 			);
 		}
-
 		return row[column.key];
 	};
 
@@ -419,56 +207,96 @@ export default function AdminUsers() {
 			<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
 			<main className="admin-users-main">
-				{/* Statistics Cards */}
-				<div className="stats-grid">
-					<div className="stat-card stat-total">
-						<h3 className="stat-label">Total Users</h3>
-						<hr></hr>
-						<div className="stat-value">{totalUsers.toLocaleString('id-ID')}</div>
-					</div>
-					<div className="stat-card stat-active">
-						<h3 className="stat-label">Active Users</h3>
-						<hr></hr>
-						<div className="stat-value stat-value-active">{activeUsers.toLocaleString('id-ID')}</div>
-					</div>
-					<div className="stat-card stat-blocked">
-						<h3 className="stat-label">Blocked Users</h3>
-						<hr></hr>
-						<div className="stat-value stat-value-blocked">{blockedUsers.toLocaleString('id-ID')}</div>
-					</div>
-					<div className="stat-card stat-avg">
-						<h3 className="stat-label">Avg. # of Accounts per User</h3>
-						<hr></hr>
-						<div className="stat-value">{avgAccountsPerUser}</div>
-					</div>
-				</div>
+				{loading ? (
+					<div style={{ padding: 20 }}>Loading users...</div>
+				) : loadError ? (
+					<div style={{ padding: 20, color: "red" }}>Failed to load users. Using dummy data.</div>
+				) : (
+					<>
+						<div className="stats-grid">
+							<div className="stat-card stat-total">
+								<h3 className="stat-label">Total Users</h3>
+								<hr />
+								<div className="stat-value">{userData.totalUsers.toLocaleString("id-ID")}</div>
+							</div>
 
-				{/* Users Table */}
-				<DataTable
-					title="Users List"
-					columns={tableColumns}
-					data={sortedUsers}
-					sortConfig={sortConfig}
-					onSort={handleSort}
-					renderCell={renderCell}
-					renderColumnHeader={renderColumnHeader}
-					searchBar={
-						<div className="search-and-filter">
-							<SearchBar
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-							/>
-							{hasActiveFilters && (
-								<button className="clear-all-filters-btn" onClick={clearAllFilters}>
-									<X size={16} />
-									Clear All Filters
-								</button>
-							)}
+							<div className="stat-card stat-active">
+								<h3 className="stat-label">Active Users</h3>
+								<hr />
+								<div className="stat-value stat-value-active">{userData.activeUsers.toLocaleString("id-ID")}</div>
+							</div>
+
+							<div className="stat-card stat-blocked">
+								<h3 className="stat-label">Blocked Users</h3>
+								<hr />
+								<div className="stat-value stat-value-blocked">{userData.blockedUsers.toLocaleString("id-ID")}</div>
+							</div>
+
+							<div className="stat-card stat-avg">
+								<h3 className="stat-label">Avg. # of Accounts per User</h3>
+								<hr />
+								<div className="stat-value">{userData.avgAccountPerUser}</div>
+							</div>
 						</div>
-					}
-					tableClassName="users-list-table"
-					headerColor="peach"
-				/>
+
+						<DataTable
+							title="Users List"
+							columns={tableColumns}
+							data={paginatedData}
+							sortConfig={sortConfig}
+							onSort={handleSort}
+							renderCell={renderCell}
+							renderColumnHeader={renderColumnHeader}
+							searchBar={
+								<div className="search-and-filter">
+									<SearchBar value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }} />
+									{hasActiveFilters && (
+										<button className="clear-all-filters-btn" onClick={() => setFilterStatus([])}>
+											<X size={16} /> Clear All Filters
+										</button>
+									)}
+								</div>
+							}
+							tableClassName="users-list-table"
+							headerColor="peach"
+						/>
+
+						<div className="pagination-container" style={{ marginTop: 12 }}>
+							<div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+								<span>Show</span>
+								<select value={rowsPerPage} onChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(1); }}>
+									<option value={10}>10</option>
+									<option value={25}>25</option>
+									<option value={50}>50</option>
+									<option value={100}>100</option>
+								</select>
+								<span>rows</span>
+							</div>
+
+							<div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+								<button className="pagination-btn" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+									Prev
+								</button>
+
+								{[...Array(totalPages)].slice(0, 9).map((_, i) => (
+									<button
+										key={i}
+										className={`pagination-number ${page === i + 1 ? "active" : ""}`}
+										onClick={() => setPage(i + 1)}
+									>
+										{i + 1}
+									</button>
+								))}
+
+								{totalPages > 9 && <span style={{ alignSelf: "center" }}>…</span>}
+
+								<button className="pagination-btn" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+									Next
+								</button>
+							</div>
+						</div>
+					</>
+				)}
 			</main>
 		</div>
 	);

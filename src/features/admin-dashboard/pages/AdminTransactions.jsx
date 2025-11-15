@@ -118,7 +118,6 @@ export default function AdminTransactions() {
 		return sorted;
 	}, [filteredTransactions, sortConfig]);
 
-	// PAGINATION
 	const [rowsPerPage, setRowsPerPage] = useState(10);
 	const [currentPage, setCurrentPage] = useState(1);
 
