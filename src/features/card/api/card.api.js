@@ -47,7 +47,7 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
     const trx = resp?.data?.transactions || resp?.data?.transaction;
 
     if (Array.isArray(trx) && trx.length > 0) {
-      return { transaction: trx };
+      return { transactions: trx };       // << konsisten
     }
 
     console.warn("⚠️ API empty trx, using dummy");
@@ -58,13 +58,13 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
   // === DUMMY FALLBACK ===
   const dummy = DUMMY_TRX_HISTORY[accountNumber];
 
-  if (!dummy) return { transaction: [] };
+  if (!dummy) return { transactions: [] };
 
   const found = dummy.find(
     r => Number(r.month) === Number(month) && String(r.year) === String(year)
   );
 
   return found
-    ? { transaction: found.transaction }
-    : { transaction: [] };
+    ? { transactions: found.transaction }   
+    : { transactions: [] };
 }

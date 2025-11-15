@@ -1,26 +1,34 @@
 import React from "react";
+import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { X, ArrowUpRight, ArrowDownLeft, DollarSign, Receipt } from "lucide-react";
 import "../styles/components/transaction-detail-modal.css";
 
-const TransactionDetailModal = ({
+import billPaymentIcon from "../../assets/images/bill_payment.png";
+import qrisIcon from "../../assets/images/qris.png";
+import vaIcon from "../../assets/images/va.png";
+import transferIcon from "../../assets/images/transfer.png";
+import ewalletIcon from "../../assets/images/e_wallet.png";
+
+export default function TransactionDetailModal({
   transaction,
   onClose,
   onSplitBill,
-  productType = "SAV", // SAV, LFG, DEP, DPLK
-}) => {
+  productType = "SAV",
+}) {
   const navigate = useNavigate();
-
   if (!transaction) return null;
 
-  const isExpense = transaction.debit_credit === "D" || transaction.jenisTransaksi === "Pengeluaran";
+  const isExpense =
+    transaction.debit_credit === "D" ||
+    transaction.jenisTransaksi === "Pengeluaran";
+
   const canSplitBill = isExpense && productType === "SAV";
   const hasSplitBill = transaction.split_bill_id;
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "-";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("id-ID", {
+    const d = new Date(dateStr);
+    return d.toLocaleString("id-ID", {
       day: "2-digit",
       month: "long",
       year: "numeric",
@@ -30,115 +38,94 @@ const TransactionDetailModal = ({
   };
 
   const formatAmount = (amount) => {
-    const numAmount = typeof amount === "string" 
-      ? Number(amount.replace(/[^\d-]/g, ""))
-      : Number(amount);
-    return `Rp ${Math.abs(numAmount).toLocaleString("id-ID")}`;
+    const num =
+      typeof amount === "string"
+        ? Number(amount.replace(/[^\d-]/g, ""))
+        : Number(amount);
+    return `Rp ${Math.abs(num).toLocaleString("id-ID")}`;
   };
 
-  const getTransactionIcon = () => {
-    const type = transaction.transactionType?.toLowerCase() || transaction.type?.toLowerCase() || "";
-    
-    if (type.includes("transfer")) {
-      return isExpense ? <ArrowUpRight size={32} /> : <ArrowDownLeft size={32} />;
-    }
-    if (type.includes("qris") || type.includes("payment")) {
-      return <Receipt size={32} />;
-    }
-    return <DollarSign size={32} />;
+  const getIcon = () => {
+    const t = (transaction.transactionType || "").toLowerCase();
+
+    if (t.includes("qris")) return qrisIcon;
+    if (t.includes("virtual") || t.includes("va")) return vaIcon;
+    if (t.includes("transfer")) return transferIcon;
+    if (t.includes("wallet")) return ewalletIcon;
+    if (t.includes("payment")) return billPaymentIcon;
+
+    return billPaymentIcon;
   };
 
-  const handleSplitBillAction = () => {
+  const handleSplit = () => {
     if (hasSplitBill) {
       navigate(`/splitbill/detail`, {
-        state: {
-          splitBillId: transaction.split_bill_id,
-          color: "#6dddd0",
-        },
+        state: { splitBillId: transaction.split_bill_id, color: "#6dddd0" },
       });
     } else {
-      onSplitBill?.(transaction);
+      onSplitBill(transaction);
     }
-    onClose();
   };
 
   return (
-    <div className="trx-modal-overlay" onClick={onClose}>
-      <div className="trx-modal-container" onClick={(e) => e.stopPropagation()}>
-        <button className="trx-modal-close" onClick={onClose} aria-label="Close">
-          <X size={24} />
+    <div className="modal-overlay">
+      <div className="trxv2-modal">
+
+        <button className="trxv2-close" onClick={onClose}>
+          <X size={20} />
         </button>
 
-        <div className="trx-modal-header">
-          <div className={`trx-modal-icon ${isExpense ? "expense" : "income"}`}>
-            {getTransactionIcon()}
+        <div className="trxv2-icon-wrapper">
+          <div className="trxv2-icon-circle">
+            <img src={getIcon()} className="trxv2-icon" alt="trx-icon" />
           </div>
-          <h2 className="trx-modal-title">Transaction Detail</h2>
         </div>
 
-        <div className="trx-modal-body">
-          <div className="trx-detail-row">
-            <span className="trx-detail-label">Transaction Type</span>
-            <span className="trx-detail-value">
-              {transaction.transactionType || transaction.type || "-"}
-            </span>
+        <p className="trxv2-party">
+          {transaction.partyName || transaction.detail || "-"}
+        </p>
+
+        <p className="trxv2-sub">
+          {transaction.transactionId
+            ? `ID: ${transaction.transactionId}`
+            : ""}
+        </p>
+
+        <p
+          className={`trxv2-amount ${
+            isExpense ? "trxv2-expense" : "trxv2-income"
+          }`}
+        >
+          {isExpense ? "-" : "+"} {formatAmount(transaction.amount)}
+        </p>
+
+        {canSplitBill && (
+          <button className="trxv2-split-btn" onClick={handleSplit}>
+            {hasSplitBill ? "View Split Bill" : "Split Bill?"}
+          </button>
+        )}
+
+        <div className="trxv2-divider"></div>
+
+        <p className="trxv2-details-title">Transaction Details</p>
+
+        <div className="trxv2-table">
+          <div className="trxv2-row">
+            <span>Transaction Type</span>
+            <span>{transaction.transactionType || "-"}</span>
           </div>
 
-          <div className="trx-detail-row">
-            <span className="trx-detail-label">Date & Time</span>
-            <span className="trx-detail-value">
-              {formatDate(transaction.transactionDate)}
-            </span>
+          <div className="trxv2-row">
+            <span>Date</span>
+            <span>{formatDate(transaction.transactionDate)}</span>
           </div>
 
-          <div className="trx-detail-row">
-            <span className="trx-detail-label">Transaction ID</span>
-            <span className="trx-detail-value trx-id">
-              {transaction.transactionId || "-"}
-            </span>
+          <div className="trxv2-row">
+            <span>Description</span>
+            <span>{transaction.partyDetail || "-"}</span>
           </div>
-
-          <div className="trx-detail-row">
-            <span className="trx-detail-label">Party Name</span>
-            <span className="trx-detail-value">
-              {transaction.partyName || transaction.detail || "-"}
-            </span>
-          </div>
-
-          {transaction.partyDetail && (
-            <div className="trx-detail-row">
-              <span className="trx-detail-label">Description</span>
-              <span className="trx-detail-value">
-                {transaction.partyDetail}
-              </span>
-            </div>
-          )}
-
-          <div className="trx-detail-divider" />
-
-          <div className="trx-detail-row trx-amount-row">
-            <span className="trx-detail-label">Amount</span>
-            <span className={`trx-detail-amount ${isExpense ? "expense" : "income"}`}>
-              {isExpense ? "- " : "+ "}
-              {formatAmount(transaction.amount)}
-            </span>
-          </div>
-
-          {canSplitBill && (
-            <>
-              <div className="trx-detail-divider" />
-              <button
-                className={`trx-split-bill-btn ${hasSplitBill ? "view" : "create"}`}
-                onClick={handleSplitBillAction}
-              >
-                {hasSplitBill ? "View Split Bill" : "Split this Bill"}
-              </button>
-            </>
-          )}
         </div>
       </div>
     </div>
   );
-};
-
-export default TransactionDetailModal;
+}
