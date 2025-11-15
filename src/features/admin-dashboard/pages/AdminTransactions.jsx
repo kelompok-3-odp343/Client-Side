@@ -14,7 +14,7 @@ export default function AdminTransactions() {
 	const location = useLocation();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+	const [sortConfig, setSortConfig] = useState(null);
 	const [filterProductType, setFilterProductType] = useState([]);
 	const [filterCategory, setFilterCategory] = useState([]);
 	const [showProductTypeFilter, setShowProductTypeFilter] = useState(false);
@@ -147,35 +147,39 @@ export default function AdminTransactions() {
 	});
 
 	const handleSort = (key) => {
-		let direction = "asc";
-		if (sortConfig.key === key && sortConfig.direction === "asc") {
-			direction = "desc";
-		}
-		setSortConfig({ key, direction });
-	};
+        setSortConfig((prev) => {
+            if (!prev || prev.key !== key) {
+                return { key, direction: "asc" };
+            }
+            if (prev.direction === "asc") {
+                return { key, direction: "desc" };
+            }
+            return null;
+        });
+    };
 
-	const sortedTransactions = [...filteredTransactions].sort((a, b) => {
-		if (!sortConfig.key) return 0;
+	const sortedTransactions = sortConfig
+        ? [...filteredTransactions].sort((a, b) => {
+            let aVal = a[sortConfig.key];
+            let bVal = b[sortConfig.key];
 
-		let aVal = a[sortConfig.key];
-		let bVal = b[sortConfig.key];
+            // Special handling for amount - parse to number
+            if (sortConfig.key === "amount") {
+                aVal = parseAmount(aVal);
+                bVal = parseAmount(bVal);
+            }
 
-		// Special handling for amount - parse to number
-		if (sortConfig.key === "amount") {
-			aVal = parseAmount(aVal);
-			bVal = parseAmount(bVal);
-		}
+            // Special handling for date
+            if (sortConfig.key === "dateTime") {
+                aVal = new Date(aVal).getTime();
+                bVal = new Date(bVal).getTime();
+            }
 
-		// Special handling for date
-		if (sortConfig.key === "dateTime") {
-			aVal = new Date(aVal).getTime();
-			bVal = new Date(bVal).getTime();
-		}
-
-		if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-		if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-		return 0;
-	});
+            if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+            if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+            return 0;
+		  })
+		: filteredTransactions;
 
 	const renderCell = (row, column, index) => {
 		if (column.key === "no") return index + 1;
