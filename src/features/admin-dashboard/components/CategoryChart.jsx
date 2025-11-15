@@ -36,10 +36,11 @@ export default function CategoryChart({ data, title = "Transaction Category" }) 
 
 			<div className="category-content">
 				<div className="category-list">
-					{data.map((item) => (
-						<div key={item.name} className="category-item">
-							<span className="category-name">{item.name}</span>
-							<span className="category-amount">: {item.amount}</span>
+					{data.map((item, i) => (
+						<div className="category-row" key={i}>
+							<span className="cat-name">{item.name}</span>
+							<span className="cat-separator">:</span>
+							<span className="cat-amount">{item.amount}</span>
 						</div>
 					))}
 				</div>
