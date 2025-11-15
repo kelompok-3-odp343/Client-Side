@@ -12,7 +12,7 @@ export default function AdminUsers() {
 	const navigate = useNavigate();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+	const [sortConfig, setSortConfig] = useState(null);
 	const [filterStatus, setFilterStatus] = useState([]);
 	const [showStatusFilter, setShowStatusFilter] = useState(false);
 	const [refreshKey, setRefreshKey] = useState(0);
@@ -287,23 +287,27 @@ export default function AdminUsers() {
 	});
 
 	const handleSort = (key) => {
-		let direction = "asc";
-		if (sortConfig.key === key && sortConfig.direction === "asc") {
-			direction = "desc";
-		}
-		setSortConfig({ key, direction });
-	};
+        setSortConfig((prev) => {
+            if (!prev || prev.key !== key) {
+                return { key, direction: "asc" };
+            }
+            if (prev.direction === "asc") {
+                return { key, direction: "desc" };
+            }
+            return null;
+        });
+    };
 
-	const sortedUsers = [...filteredUsers].sort((a, b) => {
-		if (!sortConfig.key) return 0;
+	const sortedUsers = sortConfig
+        ? [...filteredUsers].sort((a, b) => {
+            const aVal = a[sortConfig.key];
+            const bVal = b[sortConfig.key];
 
-		const aVal = a[sortConfig.key];
-		const bVal = b[sortConfig.key];
-
-		if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-		if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-		return 0;
-	});
+            if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+            if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+            return 0;
+          })
+        : filteredUsers;
 
 	const handleViewDetails = (user) => {
 		navigate(`/admin/users/${user.cif}`, {
