@@ -216,7 +216,11 @@ export default function PensionFunds() {
                           <p className="tx-detail">{tx.detail}</p>
                         </div>
                       </div>
-                      <div className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"}`}>
+                      <div
+                        className={`tx-amount ${
+                          tx.amount.startsWith("-") ? "neg" : "pos"
+                        }`}
+                      >
                         {tx.amount}
                       </div>
                     </div>
