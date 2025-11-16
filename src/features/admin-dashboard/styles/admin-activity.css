@@ -4,29 +4,38 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.table-wrapper {
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: visible;
 }
 
 .activity-list-table {
-	min-width: 2000px;
+	min-width: 1200px;
 }
 
-/* Purple header variant */
 .data-table.header-purple thead {
 	background: linear-gradient(180deg, #AD96DE 0%, #fff 100%);
 }
 
-/* Status Badge Styles */
 .status-approved {
 	color: #3dbf4a;
+	font-weight: 600;
 }
 
 .status-rejected {
 	color: #f94449;
+	font-weight: 600;
 }
 
 .status-pending-check,
 .status-pending-approval {
 	color: #ff954c;
+	font-weight: 600;
 }
 
 .view-details-btn-activity {
@@ -35,23 +44,106 @@
 	color: #AD96DE;
 	border: none;
 	padding: 0;
-	/* border-radius: 10px; */
-	font-size: 0.9rem;
-	font-weight: 700;
-	margin-top: 0.25rem;
-	margin-bottom: 0.25rem;
 	cursor: pointer;
 	transition: all 0.2s;
 	white-space: nowrap;
 }
 
 .view-details-btn-activity:hover {
-	background: none;
 	color: #cabee3;
 }
 
-@media (max-width: 768px) {
+.pagination-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.pagination-btn,
+.pagination-number {
+	padding: 6px 12px;
+	cursor: pointer;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+	background: white;
+	font-size: 14px;
+}
+
+.pagination-number.active {
+	background: #AD96DE;
+	color: white;
+	border-color: #AD96DE;
+}
+
+.filter-dropdown-container {
+	position: relative;
+}
+
+.filter-dropdown {
+	position: absolute;
+	top: 28px;
+	right: 0;
+	width: 220px;
+	background: white;
+	padding: 10px;
+	border-radius: 8px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+	z-index: 1000;
+}
+
+.filter-dropdown-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 50;
+}
+
+@media (max-width: 1024px) {
+	.activity-list-table {
+		min-width: 1000px;
+	}
+
 	.admin-activity-main {
 		padding: 1rem;
+	}
+}
+
+@media (max-width: 768px) {
+	.activity-list-table {
+		min-width: 900px;
+	}
+
+	.pagination-container {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.pagination-container select {
+		width: 80px;
+	}
+}
+
+@media (max-width: 480px) {
+	.admin-activity-main {
+		padding: 0.8rem;
+	}
+
+	.activity-list-table {
+		min-width: 800px;
+	}
+
+	.filter-dropdown {
+		width: 180px;
+	}
+
+	.pagination-btn,
+	.pagination-number {
+		padding: 5px 10px;
+		font-size: 12px;
 	}
 }

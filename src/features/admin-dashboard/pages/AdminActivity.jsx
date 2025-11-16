@@ -1,162 +1,38 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Filter, X, Eye } from "lucide-react";
+
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
 import DataTable from "../components/DataTable";
+
+import { fetchAdminActivityList } from "../service/adminActivityService";
 import "../styles/admin-activity.css";
 
-// Default dummy activities - will be used if no activities exist
-const DEFAULT_ACTIVITIES = [
-	{
-		id: 1,
-		activityId: "ACK000001",
-		menu: "User Management",
-		actionFlow: "Check & Approval",
-		actionType: "unblock",
-		actionMenu: "Unblock User",
-		data: "P001",
-		createdTime: "2025-11-01 10:00:00",
-		createdBy: "ADM001",
-		checkerId: "ADM002",
-		approverId: "ADM003",
-		status: "Pending Approval",
-		customerName: "Ulion Pardede",
-		cif: "1234567890",
-		reason: "System automatically blocked the user due to multiple failed login attempts.",
-		rejectionNotes: "-",
-		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
-		checkedBy: "ADM002",
-		checkedAt: "2025-11-01 12:02:32 by Khairuddin Nasty (ADM002)",
-		approvedBy: "",
-		approvedAt: "",
-	},
-	{
-		id: 2,
-		activityId: "ACK000002",
-		menu: "User Management",
-		actionFlow: "Check & Approval",
-		actionType: "unblock",
-		actionMenu: "Unblock User",
-		data: "P002",
-		createdTime: "2025-11-01 10:00:00",
-		createdBy: "ADM001",
-		checkerId: "ADM002",
-		approverId: "ADM003",
-		status: "Pending Check",
-		customerName: "Sample User 2",
-		cif: "1234567891",
-		reason: "User requested account unblock after verification.",
-		rejectionNotes: "-",
-		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
-		checkedBy: "ADM002",
-		checkedAt: "",
-		approvedBy: "",
-		approvedAt: "",
-	},
-	{
-		id: 3,
-		activityId: "ACK000003",
-		menu: "User Management",
-		actionFlow: "Check & Approval",
-		actionType: "block",
-		actionMenu: "Block User",
-		data: "P003",
-		createdTime: "2025-11-01 10:00:00",
-		createdBy: "ADM001",
-		checkerId: "ADM002",
-		approverId: "ADM003",
-		status: "Rejected",
-		customerName: "Sample User 3",
-		cif: "1234567892",
-		reason: "Suspicious activity detected, need to block account.",
-		rejectionNotes: "Documentation incomplete",
-		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
-		checkedBy: "ADM002",
-		checkedAt: "2025-11-01 11:15:20 by Khairuddin Nasty (ADM002)",
-		approvedBy: "",
-		approvedAt: "",
-	},
-	{
-		id: 4,
-		activityId: "ACK000004",
-		menu: "User Management",
-		actionFlow: "Check & Approval",
-		actionType: "unblock",
-		actionMenu: "Unblock User",
-		data: "P004",
-		createdTime: "2025-11-01 10:00:00",
-		createdBy: "ADM001",
-		checkerId: "ADM002",
-		approverId: "ADM003",
-		status: "Approved",
-		customerName: "Sample User 4",
-		cif: "1234567893",
-		reason: "Routine unblock after security check.",
-		rejectionNotes: "-",
-		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
-		checkedBy: "ADM002",
-		checkedAt: "2025-11-01 12:05:10 by Khairuddin Nasty (ADM002)",
-		approvedBy: "ADM003",
-		approvedAt: "2025-11-02 08:00:00 by Wira Natanael Uli (ADM003)",
-	},
-	{
-		id: 5,
-		activityId: "ACK000005",
-		menu: "User Management",
-		actionFlow: "Check & Approval",
-		actionType: "block",
-		actionMenu: "Block User",
-		data: "P005",
-		createdTime: "2025-11-01 10:00:00",
-		createdBy: "ADM001",
-		checkerId: "ADM002",
-		approverId: "ADM003",
-		status: "Pending Approval",
-		customerName: "Sample User 5",
-		cif: "1234567894",
-		reason: "Multiple violations detected, need to block account.",
-		rejectionNotes: "-",
-		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
-		checkedBy: "ADM002",
-		checkedAt: "2025-11-01 13:20:45 by Khairuddin Nasty (ADM002)",
-		approvedBy: "",
-		approvedAt: "",
-	},
-	{
-		id: 6,
-		activityId: "ACK000006",
-		menu: "User Management",
-		actionFlow: "Check & Approval",
-		actionType: "unblock",
-		actionMenu: "Unblock User",
-		data: "P006",
-		createdTime: "2025-11-01 10:00:00",
-		createdBy: "ADM001",
-		checkerId: "ADM002",
-		approverId: "ADM003",
-		status: "Pending Approval",
-		customerName: "Sample User 6",
-		cif: "1234567895",
-		reason: "User forgot password multiple times, account blocked.",
-		rejectionNotes: "-",
-		createdAt: "2025-11-01 10:00:00 by Della Puspita (ADM001)",
-		checkedBy: "ADM002",
-		checkedAt: "2025-11-01 14:10:30 by Khairuddin Nasty (ADM002)",
-		approvedBy: "",
-		approvedAt: "",
-	},
-];
+const formatDateID = (isoString) => {
+	if (!isoString) return "-";
+	const d = new Date(isoString.replace("TZ", "Z"));
+	if (isNaN(d.getTime())) return "-";
+
+	return d.toLocaleDateString("id-ID", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+	});
+};
 
 export default function AdminActivity() {
 	const navigate = useNavigate();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+	const [activityData, setActivityData] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [loadError, setLoadError] = useState(false);
+
 	const [searchQuery, setSearchQuery] = useState("");
 	const [sortConfig, setSortConfig] = useState(null);
-	// const [filterStatus, setFilterStatus] = useState([]);
-	// const [showStatusFilter, setShowStatusFilter] = useState(false);
-	const [refreshKey, setRefreshKey] = useState(0);
+
 	const [openFilterFor, setOpenFilterFor] = useState(null);
 	const [columnFilters, setColumnFilters] = useState({
 		status: [],
@@ -165,180 +41,102 @@ export default function AdminActivity() {
 		actionFlow: [],
 		createdBy: [],
 		checkerId: [],
-		approverId: [],
+		approverId: []
 	});
+
+	const [page, setPage] = useState(1);
+	const [rowsPerPage, setRowsPerPage] = useState(10);
 
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-	// Initialize activities on first load
 	useEffect(() => {
-		const stored = sessionStorage.getItem('activities');
-		if (!stored) {
-			// First time - set default activities
-			sessionStorage.setItem('activities', JSON.stringify(DEFAULT_ACTIVITIES));
-		}
-	}, []);
-
-	// Listen for activity changes
-	useEffect(() => {
-		const handleActivityChange = () => {
-			setRefreshKey(prev => prev + 1);
-		};
-		
-		window.addEventListener('activityStatusChanged', handleActivityChange);
-		
-		return () => {
-			window.removeEventListener('activityStatusChanged', handleActivityChange);
-		};
-	}, []);
-
-	// Load activities from sessionStorage
-	const activities = useMemo(() => {
-		const stored = sessionStorage.getItem('activities');
-		if (stored) {
+		const load = async () => {
+			setLoading(true);
 			try {
-				const parsed = JSON.parse(stored);
-				if (Array.isArray(parsed) && parsed.length > 0) {
-					return parsed;
+				const resp = await fetchAdminActivityList();
+
+				const mapped = resp.data.activityList.map((a, idx) => ({
+					id: idx + 1,
+					activityId: a.id,
+					menu: "User Management",
+					actionFlow: a.activiationFlow,
+					actionMenu: a.activiationFlow === "CHECKER_AND_APPROVER" ? "Checker & Approver" : "-",
+					createdTime: formatDateID(a.createdTime),
+					createdBy: a.createdBy || "-",
+					checkerId: a.checkerId || "-",
+					approverId: a.approverId || "-",
+					status: a.activityStatus,
+				}));
+
+				setActivityData(mapped);
+				setLoadError(resp.error);
+			} catch (_) {
+				setLoadError(true);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		load();
+	}, []);
+
+	const filteredActivities = useMemo(() => {
+		const q = searchQuery.toLowerCase();
+
+		return activityData.filter((act) => {
+			const matchesSearch = Object.values(act).some((val) =>
+				String(val).toLowerCase().includes(q)
+			);
+
+			const matchesColumnFilters = Object.entries(columnFilters).every(
+				([key, selected]) => {
+					if (!selected || selected.length === 0) return true;
+					return selected.includes(act[key]);
 				}
-			} catch (e) {
-				console.error('Error parsing activities:', e);
-			}
-		}
+			);
 
-		// Fallback to default if nothing in storage
-		return DEFAULT_ACTIVITIES;
-	}, [refreshKey]);
-
-	const getUniqueValuesForColumn = (key) => {
-		const values = activities
-			.map((a) => a[key])
-			.filter((v) => v !== undefined && v !== null && v !== "");
-
-		return [...new Set(values)];
-	};
-
-	const tableColumns = [
-		{ key: "no", label: "No", sortable: false },
-		{ key: "activityId", label: "Activity ID", sortable: false },
-		{ key: "menu", label: "Menu", sortable: true, filterable: true },
-		{ key : "actionMenu", label: "Action Menu", sortable: true, filterable: true },
-		{ key: "actionFlow", label: "Action Flow", sortable: true, filterable: true },
-		// { key: "data", label: "Data", sortable: false },
-		{ key: "createdTime", label: "Created Time", sortable: true },
-		{ key: "createdBy", label: "Created by", sortable: false, filterable: true },
-		{ key: "checkerId", label: "Checker ID", sortable: false, filterable: true },
-		{ key: "approverId", label: "Approver ID", sortable: false, filterable: true },
-		{ key: "status", label: "Status", sortable: true, filterable: true },
-		{ key: "action", label: "Action", sortable: false },
-	];
-
-	// Get unique statuses
-	// const statuses = ["Pending Check", "Pending Approval", "Rejected", "Approved"];
-
-	// Filter and search
-	const filteredActivities = activities.filter((activity) => {
-		// Search filter
-		const matchesSearch = Object.values(activity).some((val) =>
-			String(val).toLowerCase().includes(searchQuery.toLowerCase())
-		);
-
-		// Filter generic
-		const matchesColumnFilters = Object.entries(columnFilters).every(
-			([key, selectedValues]) => {
-				if (!selectedValues || selectedValues.length === 0) return true;
-				return selectedValues.includes(activity[key]);
-			}
-		);
-
-		return matchesSearch && matchesColumnFilters;
-	});
-
-	const handleSort = (key) => {
-        setSortConfig((prev) => {
-            if (!prev || prev.key !== key) {
-                return { key, direction: "asc" };
-            }
-            if (prev.direction === "asc") {
-                return { key, direction: "desc" };
-            }
-            return null;
-        });
-    };
-
-	const sortedActivities = sortConfig
-        ? [...filteredActivities].sort((a, b) => {
-            const aVal = a[sortConfig.key];
-            const bVal = b[sortConfig.key];
-
-            // Special handling for date
-            if (sortConfig.key === "createdTime") {
-                const aTime = new Date(aVal).getTime();
-                const bTime = new Date(bVal).getTime();
-                return sortConfig.direction === "asc" ? aTime - bTime : bTime - aTime;
-            }
-
-            if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-            if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-            return 0;
-          })
-        : filteredActivities;
-
-	const handleViewDetails = (activity) => {
-		navigate(`/admin/activity/${activity.activityId}`, {
-			state: { activity },
+			return matchesSearch && matchesColumnFilters;
 		});
-	};
+	}, [activityData, searchQuery, columnFilters]);
 
-	// const toggleStatusFilter = (status) => {
-	// 	setFilterStatus((prev) =>
-	// 		prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
-	// 	);
-	// };
+	const sortedActivities = useMemo(() => {
+		if (!sortConfig) return filteredActivities;
 
-	// const clearStatusFilter = () => {
-	// 	setFilterStatus([]);
-	// };
+		const { key, direction } = sortConfig;
+		const dirFactor = direction === "asc" ? 1 : -1;
 
-	const clearAllFilters = () => {
-		setColumnFilters({
-			status: [],
-			menu: [],
-			actionMenu: [],
-			actionFlow: [],
-			createdBy: [],
-			checkerId: [],
-			approverId: [],
+		return [...filteredActivities].sort((a, b) => {
+			let va = a[key];
+			let vb = b[key];
+
+			return String(va).localeCompare(String(vb)) * dirFactor;
 		});
-	};
+	}, [filteredActivities, sortConfig]);
 
-	const hasActiveFilters = Object.values(columnFilters).some(
-		(arr) => arr && arr.length > 0
-	);
+	const totalPages = Math.max(1, Math.ceil(sortedActivities.length / rowsPerPage));
 
-	const getStatusClass = (status) => {
-		switch (String(status || "").toLowerCase()) {
-			case "approved":
-				return "status-approved";
-			case "rejected":
-				return "status-rejected";
-			case "pending check":
-				return "status-pending-check";
-			case "pending approval":
-				return "status-pending-approval";
-			default:
-				return "";
-		}
+	const paginatedData = useMemo(() => {
+		const start = (page - 1) * rowsPerPage;
+		return sortedActivities.slice(start, start + rowsPerPage);
+	}, [sortedActivities, page, rowsPerPage]);
+
+	useEffect(() => {
+		if (page > totalPages) setPage(totalPages);
+	}, [totalPages, page]);
+
+	const getUniqueValues = (key) => {
+		const list = activityData.map((a) => a[key]).filter((x) => x && x !== "-");
+		return [...new Set(list)];
 	};
 
 	const renderColumnHeader = (column) => {
 		if (!column.filterable) return null;
 
 		const key = column.key;
-		const options = getUniqueValuesForColumn(key);
-		const selectedValues = columnFilters[key] || [];
-		const hasFilter = selectedValues.length > 0;
+		const options = getUniqueValues(key);
+		const selected = columnFilters[key] || [];
 		const isOpen = openFilterFor === key;
+		const hasFilter = selected.length > 0;
 
 		if (options.length === 0) return null;
 
@@ -350,64 +148,45 @@ export default function AdminActivity() {
 						e.stopPropagation();
 						setOpenFilterFor((prev) => (prev === key ? null : key));
 					}}
-					title={`Filter ${column.label}`}
-					type="button"
 				>
 					<Filter size={16} />
-					{hasFilter && (
-						<span className="filter-badge">{selectedValues.length}</span>
-					)}
+					{hasFilter && <span className="filter-badge">{selected.length}</span>}
 				</button>
 
 				{isOpen && (
 					<>
-						<div
-							className="filter-dropdown-overlay"
-							onClick={() => setOpenFilterFor(null)}
-						/>
+						<div className="filter-dropdown-overlay" onClick={() => setOpenFilterFor(null)} />
 						<div className="filter-dropdown">
 							<div className="filter-dropdown-header">
-								<span className="filter-dropdown-title">
-									{column.label}
-								</span>
+								<span className="filter-dropdown-title">{column.label}</span>
+
 								{hasFilter && (
 									<button
 										className="clear-filter-btn"
-										onClick={(e) => {
-											e.stopPropagation();
-											setColumnFilters((prev) => ({
-												...prev,
-												[key]: [],
-											}));
-										}}
-										title="Clear filter"
-										type="button"
+										onClick={() =>
+											setColumnFilters({ ...columnFilters, [key]: [] })
+										}
 									>
 										<X size={14} />
 										Clear
 									</button>
 								)}
 							</div>
+
 							<div className="filter-options">
 								{options.map((opt) => (
 									<label key={opt} className="filter-checkbox-label">
 										<input
 											type="checkbox"
-											checked={selectedValues.includes(opt)}
-											onChange={(e) => {
-												const checked = e.target.checked;
-												setColumnFilters((prev) => {
-													const current = prev[key] || [];
-													let next;
-													if (checked) {
-														next = [...current, opt];
-													} else {
-														next = current.filter((v) => v !== opt);
-													}
-													return {
-														...prev,
-														[key]: next,
-													};
+											checked={selected.includes(opt)}
+											onChange={() => {
+												let newVal = selected.includes(opt)
+													? selected.filter((x) => x !== opt)
+													: [...selected, opt];
+
+												setColumnFilters({
+													...columnFilters,
+													[key]: newVal,
 												});
 											}}
 										/>
@@ -422,28 +201,62 @@ export default function AdminActivity() {
 		);
 	};
 
-	const renderCell = (row, column, index) => {
-		if (column.key === "no") return index + 1;
-
-		if (column.key === "status") {
-			return <span className={`status-badge ${getStatusClass(row.status)}`}>{row.status}</span>;
+	const getStatusClass = (status) => {
+		switch (status) {
+			case "APPROVED": return "status-approved";
+			case "REJECTED": return "status-rejected";
+			case "PENDING_CHECKER": return "status-pending-check";
+			case "PENDING_APPROVER": return "status-pending-approval";
+			default: return "";
 		}
+	};
 
-		if (column.key === "action") {
+	const renderCell = (row, column, index) => {
+		if (column.key === "no") return (page - 1) * rowsPerPage + index + 1;
+
+		if (column.key === "status")
+			return <span className={`status-badge ${getStatusClass(row.status)}`}>{row.status}</span>;
+
+		if (column.key === "action")
 			return (
 				<button
 					className="view-details-btn-activity"
-					onClick={() => handleViewDetails(row)}
-					type="button"
-					title="View details"
+					onClick={() => navigate(`/admin/activity/${row.activityId}`, { state: { activity: row } })}
 				>
-					<Eye size={30} />
+					<Eye size={26} />
 				</button>
 			);
-		}
 
 		return row[column.key];
 	};
+
+	const tableColumns = [
+		{ key: "no", label: "No" },
+		{ key: "activityId", label: "Activity ID" },
+		{ key: "menu", label: "Menu", sortable: true, filterable: true },
+		{ key: "actionMenu", label: "Action Menu", sortable: true, filterable: true },
+		{ key: "actionFlow", label: "Action Flow", sortable: true, filterable: true },
+		{ key: "createdTime", label: "Created Time", sortable: true },
+		{ key: "createdBy", label: "Created By", filterable: true },
+		{ key: "checkerId", label: "Checker ID", filterable: true },
+		{ key: "approverId", label: "Approver ID", filterable: true },
+		{ key: "status", label: "Status", sortable: true, filterable: true },
+		{ key: "action", label: "Action" }
+	];
+
+	const clearAllFilters = () => {
+		setColumnFilters({
+			status: [],
+			menu: [],
+			actionMenu: [],
+			actionFlow: [],
+			createdBy: [],
+			checkerId: [],
+			approverId: []
+		});
+	};
+
+	const hasActiveFilters = Object.values(columnFilters).some((v) => v.length > 0);
 
 	return (
 		<div className="admin-container">
@@ -451,20 +264,33 @@ export default function AdminActivity() {
 			<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
 			<main className="admin-activity-main">
+
 				<DataTable
 					title="Activity List"
 					columns={tableColumns}
-					data={sortedActivities}
+					data={paginatedData}
 					sortConfig={sortConfig}
-					onSort={handleSort}
+					onSort={(key) =>
+						setSortConfig((prev) =>
+							!prev || prev.key !== key
+								? { key, direction: "asc" }
+								: prev.direction === "asc"
+									? { key, direction: "desc" }
+									: null
+						)
+					}
 					renderCell={renderCell}
 					renderColumnHeader={renderColumnHeader}
 					searchBar={
 						<div className="search-and-filter">
 							<SearchBar
 								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
+								onChange={(e) => {
+									setSearchQuery(e.target.value);
+									setPage(1);
+								}}
 							/>
+
 							{hasActiveFilters && (
 								<button className="clear-all-filters-btn" onClick={clearAllFilters}>
 									<X size={16} />
@@ -476,6 +302,56 @@ export default function AdminActivity() {
 					tableClassName="activity-list-table"
 					headerColor="purple"
 				/>
+
+				<div className="pagination-container" style={{ marginTop: 12 }}>
+					<div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+						<span>Show</span>
+						<select
+							value={rowsPerPage}
+							onChange={(e) => {
+								setRowsPerPage(Number(e.target.value));
+								setPage(1);
+							}}
+						>
+							<option value={10}>10</option>
+							<option value={25}>25</option>
+							<option value={50}>50</option>
+							<option value={100}>100</option>
+						</select>
+						<span>rows</span>
+					</div>
+
+					<div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+						<button
+							className="pagination-btn"
+							disabled={page === 1}
+							onClick={() => setPage(page - 1)}
+						>
+							Prev
+						</button>
+
+						{[...Array(Math.min(totalPages, 9))].map((_, i) => (
+							<button
+								key={i}
+								className={`pagination-number ${page === i + 1 ? "active" : ""}`}
+								onClick={() => setPage(i + 1)}
+							>
+								{i + 1}
+							</button>
+						))}
+
+						{totalPages > 9 && <span>…</span>}
+
+						<button
+							className="pagination-btn"
+							disabled={page === totalPages}
+							onClick={() => setPage(page + 1)}
+						>
+							Next
+						</button>
+					</div>
+				</div>
+
 			</main>
 		</div>
 	);
