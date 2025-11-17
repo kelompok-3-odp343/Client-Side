@@ -237,31 +237,37 @@ export default function AdminHome() {
 					</div>
 
 					<div className="pagination-container">
-						<button
-							disabled={page === 1}
-							onClick={() => setPage(page - 1)}
-							className="pagination-btn"
-						>
-							‹
-						</button>
-
-						{[...Array(totalPages)].map((_, i) => (
+						<div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
 							<button
-								key={i}
-								className={`pagination-number ${page === i + 1 ? "active" : ""}`}
-								onClick={() => setPage(i + 1)}
+								className="pagination-btn"
+								disabled={page === 1}
+								onClick={() => setPage(page - 1)}
 							>
-								{i + 1}
+								Prev
 							</button>
-						))}
 
-						<button
-							disabled={page === totalPages}
-							onClick={() => setPage(page + 1)}
-							className="pagination-btn"
-						>
-							›
-						</button>
+							{[...Array(totalPages)].slice(0, 9).map((_, i) => (
+								<button
+									key={i}
+									className={`pagination-number ${page === i + 1 ? "active" : ""}`}
+									onClick={() => setPage(i + 1)}
+								>
+									{i + 1}
+								</button>
+							))}
+
+							{totalPages > 9 && (
+								<span className="pagination-dots">…</span>
+							)}
+
+							<button
+								className="pagination-btn"
+								disabled={page === totalPages}
+								onClick={() => setPage(page + 1)}
+							>
+								Next
+							</button>
+						</div>
 					</div>
 				</section>
 			</main>
