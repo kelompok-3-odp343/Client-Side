@@ -2,9 +2,9 @@ name: Frontend CI/CD
 
 on:
   push:
-    branches: ["ci/adam/setup-github-actions"]
+    branches: ["staging"]
   pull_request:
-    branches: ["ci/adam/setup-github-actions"]
+    branches: ["staging"]
 
 jobs:
   build-test-lint-analyze-deploy:
