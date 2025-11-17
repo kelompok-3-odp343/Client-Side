@@ -20,12 +20,11 @@ export async function postAuthLogin({ username, password }) {
           ok: true,
           data: {
             status: true,
-            sessionId: "ADMIN_DEV_SESSION",
-            token: "ADMIN_DEV_TOKEN",
-            role: "admin",
-            message: "DEV: Admin login success (offline mode)",
+            sessionIdOrToken: "ADMIN_DEV_TOKEN",
+            message: "DEV: Admin login success",
           },
         };
+
       }
 
       if (uname === "user" && password === "password") {
@@ -33,12 +32,11 @@ export async function postAuthLogin({ username, password }) {
           ok: true,
           data: {
             status: true,
-            sessionId: "USER_DEV_SESSION",
-            token: "USER_DEV_TOKEN",
-            role: "user",
-            message: "DEV: User login success (offline mode)",
+            sessionIdOrToken: "USER_DEV_TOKEN",
+            message: "DEV: User login success",
           },
         };
+
       }
 
       return {
