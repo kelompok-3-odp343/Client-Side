@@ -52,7 +52,7 @@ export default function Login() {
 		sessionStorage.setItem("token", token);
 		sessionStorage.setItem("role", decoded.role || "NASABAH");
 
-		setMessage(apiMsg || "Login success");
+		setMessage(respLogin.data.message || "Login success");
 		setModalType("success");
 		setShowModal(true);
 
