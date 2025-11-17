@@ -60,9 +60,9 @@ export default function Login() {
 
 			const roleUpper = (decoded.role || "").toUpperCase();
 			const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVAL"];
-			sessionStorage.setItem("role", decoded.role);
 
 			if (ADMIN_ROLES.includes(roleUpper)) {
+				sessionStorage.setItem("role", decoded.role);
 				sessionStorage.setItem('npp', decoded.npp || "ADM001");
 				navigate("/admin/home");
 				return;
