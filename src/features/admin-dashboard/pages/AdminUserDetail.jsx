@@ -75,7 +75,15 @@ export default function AdminUserDetail() {
 		if (!isFormValid) return;
 
 		const now = new Date();
-		const createdTimeDisplay = now.toLocaleString("en-GB");
+		const createdTimeDisplay = now.toLocaleString("en-GB", {
+			day: "numeric",
+			month: "short",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: false,
+		});
 		let activities = [];
 		try {
 			const stored = sessionStorage.getItem("activities");
@@ -292,7 +300,7 @@ export default function AdminUserDetail() {
 							Created at <strong>{lastActivity.createdTimeDisplay}</strong>
 						</p>
 
-						<div className="activity-summary-card">
+						<div className="activity-summary-card-user-detail">
 							<div className="activity-row">
 								<span className="activity-label">Activity ID</span>
 								<span className="activity-value">: {lastActivity.activityId}</span>

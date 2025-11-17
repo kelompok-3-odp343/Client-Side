@@ -266,46 +266,6 @@ body {
 	flex-shrink: 0;
 }
 
-.pagination-container {
-	margin-top: 1rem;
-	display: flex;
-	justify-content: flex-end;
-	gap: 8px;
-	align-items: center;
-}
-
-.pagination-btn,
-.pagination-number {
-	padding: 6px 12px;
-	border-radius: 8px;
-	border: 1px solid #d1d5db;
-	background: white;
-	cursor: pointer;
-	font-size: 0.9rem;
-	font-weight: 600;
-	transition: all 0.2s;
-}
-
-.pagination-btn:hover,
-.pagination-number:hover {
-	background: var(--teal-primary);
-	color: white;
-	border-color: var(--teal-primary);
-}
-
-.pagination-number.active {
-	background: var(--teal-primary);
-	color: white;
-	border-color: var(--teal-primary);
-}
-
-.pagination-btn:disabled {
-	background: #e5e7eb;
-	cursor: not-allowed;
-	color: #9ca3af;
-	border-color: #e5e7eb;
-}
-
 @media (max-width: 1024px) {
 	.top-row {
 		grid-template-columns: 1fr;

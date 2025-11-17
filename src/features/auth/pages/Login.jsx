@@ -4,6 +4,7 @@ import "../styles/auth.css";
 import "../styles/auth-login.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
 import { postAuthLogin } from "../api/authService";
+import { decodeJwtToken } from "../api/jwtHelper";
 
 export default function Login() {
 	const [username, setUsername] = useState("");
@@ -39,23 +40,39 @@ export default function Login() {
 			return;
 		}
 
-		const { role, sessionIdOrToken, token, message: apiMsg } = respLogin.data;
+		const token = respLogin.data.sessionIdOrToken;
 
-		sessionStorage.setItem("sessionID", sessionIdOrToken || "NO_SESSION");
-		sessionStorage.setItem("token", token || "DUMMY_TOKEN");
-		sessionStorage.setItem("role", role || "user");
+		let decoded = {};
+		try {
+			decoded = decodeJwtToken(token);
+		} catch (err) {
+			console.error("JWT decode error:", err);
+		}
 
-		setMessage(apiMsg || "Login success");
+		sessionStorage.setItem("token", token);
+		sessionStorage.setItem("role", decoded.role || "NASABAH");
+
+		setMessage(respLogin.data.message || "Login success");
 		setModalType("success");
 		setShowModal(true);
 
 		setTimeout(() => {
 			setShowModal(false);
-			if (role === "admin") {
+
+			const roleUpper = (decoded.role || "").toUpperCase();
+			const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVAL"];
+
+			if (ADMIN_ROLES.includes(roleUpper)) {
+				sessionStorage.setItem('npp', decoded.npp || "ADM001");
 				navigate("/admin/home");
-			} else {
-				navigate("/otpLogin");
+				return;
 			}
+
+			if (roleUpper === "NASABAH") {
+				navigate("/otpLogin");
+				return;
+			}
+			navigate("/otpLogin");
 		}, 800);
 	};
 

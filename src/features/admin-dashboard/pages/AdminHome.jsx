@@ -6,6 +6,7 @@ import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
 import CategoryChart from "../components/CategoryChart";
+import Pagination from "../components/Pagination";
 
 import { fetchAdminDashboard } from "../service/adminDashboardServices";
 
@@ -85,6 +86,7 @@ export default function AdminHome() {
 
 	const transactions = dashboard.users.map((u, i) => ({
 		id: i + 1,
+		userId: u.userId,
 		cif: u.customerId,
 		nik: u.nik,
 		name: u.customerName,
@@ -112,7 +114,7 @@ export default function AdminHome() {
 	);
 
 	const handleViewTransactions = (transaction) => {
-		navigate("/admin/transactions", { state: { cif: transaction.cif } });
+		navigate("/admin/transactions", { state: { userId: transaction.userId } });
 	};
 
 	return (
@@ -195,6 +197,7 @@ export default function AdminHome() {
 							<thead>
 								<tr>
 									<th className="col-no">No</th>
+									<th>User ID</th>
 									<th>CIF</th>
 									<th>NIK</th>
 									<th
@@ -218,6 +221,7 @@ export default function AdminHome() {
 										<td className="col-no">
 											{(page - 1) * rowsPerPage + index + 1}
 										</td>
+										<td>{transaction.userId}</td>
 										<td>{transaction.cif}</td>
 										<td>{transaction.nik}</td>
 										<td>{transaction.name}</td>
@@ -235,34 +239,12 @@ export default function AdminHome() {
 							</tbody>
 						</table>
 					</div>
-
-					<div className="pagination-container">
-						<button
-							disabled={page === 1}
-							onClick={() => setPage(page - 1)}
-							className="pagination-btn"
-						>
-							‹
-						</button>
-
-						{[...Array(totalPages)].map((_, i) => (
-							<button
-								key={i}
-								className={`pagination-number ${page === i + 1 ? "active" : ""}`}
-								onClick={() => setPage(i + 1)}
-							>
-								{i + 1}
-							</button>
-						))}
-
-						<button
-							disabled={page === totalPages}
-							onClick={() => setPage(page + 1)}
-							className="pagination-btn"
-						>
-							›
-						</button>
-					</div>
+					
+					<Pagination
+						currentPage={page}
+						totalPages={totalPages}
+						onPageChange={setPage}
+					/>
 				</section>
 			</main>
 		</div>

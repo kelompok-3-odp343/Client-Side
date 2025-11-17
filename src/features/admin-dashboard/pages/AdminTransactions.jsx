@@ -9,6 +9,7 @@ import CategoryChart from "../components/CategoryChart";
 import InfoCard from "../components/InfoCard";
 import DataTable from "../components/DataTable";
 import StatusBadge from "../components/StatusBadge";
+import Pagination from "../components/Pagination";
 
 import "../styles/admin-transactions.css";
 import { fetchAdminTransactionList } from "../service/adminTransactionService";
@@ -32,7 +33,7 @@ export default function AdminTransactions() {
 
 	useEffect(() => {
 		const loadData = async () => {
-			const userId = location.state?.cif || "DEFAULT_USER";
+			const userId = location.state?.userId || "DEFAULT_USER";
 			const resp = await fetchAdminTransactionList(userId);
 			setTransactionData(resp.data);
 		};
@@ -321,52 +322,14 @@ export default function AdminTransactions() {
 						headerColor="teal"
 					/>
 				</div>
-
-				<div className="pagination-wrapper">
-					<div className="rows-per-page">
-						Show:
-						<select
-							value={rowsPerPage}
-							onChange={(e) => setRowsPerPage(Number(e.target.value))}
-						>
-							<option value={10}>10</option>
-							<option value={25}>25</option>
-							<option value={50}>50</option>
-							<option value={100}>100</option>
-						</select>
-						rows
-					</div>
-
-					<div className="pagination-container">
-						<button
-							className="pagination-btn"
-							onClick={() => goToPage(currentPage - 1)}
-							disabled={currentPage === 1}
-						>
-							Prev
-						</button>
-
-						{[...Array(totalPages)].map((_, i) => (
-							<button
-								key={i}
-								className={`pagination-number ${currentPage === i + 1 ? "active" : ""}`}
-								onClick={() => goToPage(i + 1)}
-							>
-								{i + 1}
-							</button>
-						))}
-
-						<button
-							className="pagination-btn"
-							onClick={() => goToPage(currentPage + 1)}
-							disabled={currentPage === totalPages}
-						>
-							Next
-						</button>
-					</div>
-
-				</div>
-
+				<Pagination
+					currentPage={currentPage}
+					totalPages={totalPages}
+					rowsPerPage={rowsPerPage}
+					onPageChange={goToPage}
+					onRowsPerPageChange={(num) => setRowsPerPage(num)}
+					theme="teal"
+				/>
 			</main>
 		</div>
 	);

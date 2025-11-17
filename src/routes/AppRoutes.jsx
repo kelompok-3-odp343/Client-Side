@@ -73,7 +73,7 @@ export default function AppRoutes() {
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/users/detail" element={<AdminUserDetail />} />
           <Route path="/admin/activity" element={<AdminActivity />} />
-          <Route path="/admin/activity/:id" element={<AdminActivityDetail />} />
+          <Route path="/admin/activity/detail" element={<AdminActivityDetail />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" />} />

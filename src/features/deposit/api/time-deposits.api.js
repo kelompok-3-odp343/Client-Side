@@ -105,6 +105,7 @@ export const getTimeDepositTransactions = async ({ month, year, accountNumber })
             month,
             year,
             accountNumber,
+            productType: 'DEP'
         };
 
         const response = await api.post(`/api/v1/trx-history`, payload, {
@@ -121,7 +122,7 @@ export const getTimeDepositTransactions = async ({ month, year, accountNumber })
         if (response.data?.transaction?.length) {
             return { transactions: response.data.transaction };
         }
-        
+
         console.warn("⚠️ No transactions from API, using dummy");
         return { transactions: DUMMY_DEPOSIT_TRX.transactions };
     } catch (error) {

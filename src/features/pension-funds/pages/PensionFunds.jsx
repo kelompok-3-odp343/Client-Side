@@ -3,7 +3,7 @@ import Navbar from "../../../shared/components/Navbar";
 import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
 import "../styles/pension-funds.css";
 import { Download } from "lucide-react";
-import pensionfunds from "../../../assets/images/pension.png";
+import pensionfunds from "../../../assets/images/Pension.png";
 import { getPensionFunds, fetchDPLKTransactionHistory } from "../api/pension-funds.api";
 
 const getLastMonths = () => {
@@ -106,7 +106,7 @@ export default function PensionFunds() {
     const data = await fetchDPLKTransactionHistory({
       month: m.month,
       year: m.year,
-      accountNumber: selectedAccount,
+      accountNumber: "",
     });
 
     const list = data.transactions || data.transaction || [];
@@ -200,8 +200,8 @@ export default function PensionFunds() {
                   <p className="transaction-date"><strong>{group.date}</strong></p>
                   <hr />
                   {group.items.map((tx, i) => (
-                    <div 
-                      key={i} 
+                    <div
+                      key={i}
                       className="transaction-item"
                       onClick={() => {
                         setSelectedTransaction(tx);
@@ -217,9 +217,8 @@ export default function PensionFunds() {
                         </div>
                       </div>
                       <div
-                        className={`tx-amount ${
-                          tx.amount.startsWith("-") ? "neg" : "pos"
-                        }`}
+                        className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"
+                          }`}
                       >
                         {tx.amount}
                       </div>

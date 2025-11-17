@@ -35,7 +35,7 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
   try {
     const token = sessionStorage.getItem("token");
     const resp = await api.post("/api/v1/trx-history", {
-      month, year, accountNumber
+      month, year, accountNumber, productType: 'SVG'
     }, {
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -47,12 +47,12 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
     const trx = resp?.data?.transactions || resp?.data?.transaction;
 
     if (Array.isArray(trx) && trx.length > 0) {
-      return { transactions: trx };       // << konsisten
+      return { transactions: trx };
     }
 
-    console.warn("⚠️ API empty trx, using dummy");
+    console.warn("API empty trx, using dummy");
   } catch (error) {
-    console.warn("⚠️ API trx failed, using dummy:", error?.message);
+    console.warn("API trx failed, using dummy:", error?.message);
   }
 
   // === DUMMY FALLBACK ===
@@ -65,6 +65,6 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
   );
 
   return found
-    ? { transactions: found.transaction }   
+    ? { transactions: found.transaction }
     : { transactions: [] };
 }
