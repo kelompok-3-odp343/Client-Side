@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import "../styles/admin-activity-detail.css";
@@ -7,6 +7,7 @@ import "../styles/admin-activity-detail.css";
 export default function AdminActivityDetail() {
 	const location = useLocation();
 	const { id } = useParams();
+	const navigate = useNavigate();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	// Modals and form state
@@ -14,6 +15,7 @@ export default function AdminActivityDetail() {
 	const [showApproveModal, setShowApproveModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [successMessage, setSuccessMessage] = useState("");
+	const [successDetails, setSuccessDetails] = useState(null);
 	const [rejectNotes, setRejectNotes] = useState("");
 	const [selectedApprover, setSelectedApprover] = useState("");
 
@@ -103,50 +105,96 @@ export default function AdminActivityDetail() {
 		}
 	};
 
+	const buildSuccessDetails = (activity, label, timestamp) => {
+		if (!activity) return null;
+
+		const actionMenu =
+			activity.actionMenu ||
+			(activity.actionType === "block" ? "Block User" : "Unblock User");
+
+		return {
+			timestampLabel: label,          // "Checked at" / "Approved at" / "Rejected at"
+			timestamp,
+			activityId: activity.activityId || "-",
+			menu: activity.menu || "User Management",
+			actionMenu,
+		};
+	};
+
 	const confirmRejection = () => {
 		if (!rejectNotes.trim()) {
 			alert("Please provide rejection notes");
 			return;
 		}
 
-		// Prepare admin info
 		const now = new Date();
-		const dateStr = now.toISOString().replace('T', ' ').substring(0, 19);
-		const adminName = sessionStorage.getItem('adminName') || 'Admin User';
-		const storedAdminId = sessionStorage.getItem('adminId');
-		const adminId = storedAdminId ? storedAdminId : (currentUserRole === 'checker' ? 'ADM002' : 'ADM003');
+		const dateStr = now.toISOString().replace("T", " ").substring(0, 19);
+		const displayTime = now.toLocaleString("en-GB", {
+			day: "numeric",
+			month: "short",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: false,
+		});
 
-		// Update activity in sessionStorage
-		const stored = sessionStorage.getItem('activities');
+		const adminName = sessionStorage.getItem("adminName") || "Admin User";
+		const storedAdminId = sessionStorage.getItem("adminId");
+		const adminId = storedAdminId
+			? storedAdminId
+			: currentUserRole === "checker"
+			? "ADM002"
+			: "ADM003";
+
+		let updatedActivity = activityData;
+
+		const stored = sessionStorage.getItem("activities");
 		if (stored) {
 			try {
 				const activities = JSON.parse(stored);
-				const index = activities.findIndex(a => a.activityId === activityData.activityId);
-				
+				const index = activities.findIndex(
+					(a) => a.activityId === activityData.activityId
+				);
+
 				if (index !== -1) {
 					activities[index] = {
 						...activities[index],
 						status: "Rejected",
 						rejectionNotes: rejectNotes,
-						checkedAt: currentUserRole === 'checker' ? `${dateStr} by ${adminName} (${adminId})` : activities[index].checkedAt,
-						approvedAt: currentUserRole === 'approver' ? `${dateStr} by ${adminName} (${adminId})` : activities[index].approvedAt,
+						checkedAt:
+							currentUserRole === "checker"
+								? `${dateStr} by ${adminName} (${adminId})`
+								: activities[index].checkedAt,
+						approvedAt:
+							currentUserRole === "approver"
+								? `${dateStr} by ${adminName} (${adminId})`
+								: activities[index].approvedAt,
 					};
-					
-					sessionStorage.setItem('activities', JSON.stringify(activities));
-					
-					// Update local state
+
+					sessionStorage.setItem("activities", JSON.stringify(activities));
+
 					setActivityData(activities[index]);
+					updatedActivity = activities[index];
 				}
 			} catch (e) {
-				console.error('Error updating activity:', e);
+				console.error("Error updating activity:", e);
 			}
 		}
 
 		setShowRejectModal(false);
 		setRejectNotes("");
 
-		// Show success modal
-		setSuccessMessage("Activity has been rejected successfully.");
+		const actionType = updatedActivity?.actionType === "block" ? "Block User" : "Unblock User";
+
+		setSuccessMessage("Activity Rejected");
+		setSuccessDetails(
+			buildSuccessDetails(
+				{ ...updatedActivity, actionMenu: updatedActivity?.actionMenu || actionType },
+				"Rejected at",
+				<strong>{displayTime}</strong>
+			)
+		);
 		setShowSuccessModal(true);
 
 		// Trigger refresh event
@@ -160,9 +208,20 @@ export default function AdminActivityDetail() {
 		}
 
 		const now = new Date();
-		const dateStr = now.toISOString().replace('T', ' ').substring(0, 19);
-		const adminName = sessionStorage.getItem('adminName') || 'Khairuddin Nasty';
-		const adminId = sessionStorage.getItem('adminId') || 'ADM002';
+		const dateStr = now.toISOString().replace("T", " ").substring(0, 19);
+		const displayTime = now.toLocaleString("en-GB", {
+			day: "numeric",
+			month: "short",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: false,
+		});
+		const adminName = sessionStorage.getItem("adminName") || "Khairuddin Nasty";
+		const adminId = sessionStorage.getItem("adminId") || "ADM002";
+
+		let updatedActivity = activityData;
 
 		const stored = sessionStorage.getItem('activities');
 		if (stored) {
@@ -182,6 +241,7 @@ export default function AdminActivityDetail() {
 					
 					// Update local state
 					setActivityData(activities[index]);
+					updatedActivity = activities[index];
 				}
 			} catch (e) {
 				console.error('Error updating activity:', e);
@@ -191,8 +251,17 @@ export default function AdminActivityDetail() {
 		setShowApproveModal(false);
 		setSelectedApprover("");
 
-		// Show success modal
-		setSuccessMessage("Activity has been checked and sent to approver successfully.");
+		// Success modal general (Checked)
+		const actionType = updatedActivity?.actionType === "block" ? "Block User" : "Unblock User";
+
+		setSuccessMessage("Activity Checked");
+		setSuccessDetails(
+			buildSuccessDetails(
+				{ ...updatedActivity, actionMenu: updatedActivity?.actionMenu || actionType },
+				"Checked at",
+				<strong>{displayTime}</strong>
+			)
+		);
 		setShowSuccessModal(true);
 
 		// Trigger refresh event
@@ -201,9 +270,18 @@ export default function AdminActivityDetail() {
 
 	const confirmApproval = () => {
 		const now = new Date();
-		const dateStr = now.toISOString().replace('T', ' ').substring(0, 19);
-		const adminName = sessionStorage.getItem('adminName') || 'Wira Natanael Uli';
-		const adminId = sessionStorage.getItem('adminId') || 'ADM003';
+		const dateStr = now.toISOString().replace("T", " ").substring(0, 19);
+		const displayTime = now.toLocaleString("en-GB", {
+			day: "numeric",
+			month: "short",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: false,
+		});
+		const adminName = sessionStorage.getItem("adminName") || "Wira Natanael Uli";
+		const adminId = sessionStorage.getItem("adminId") || "ADM003";
 
 		const stored = sessionStorage.getItem('activities');
 		if (stored) {
@@ -248,8 +326,16 @@ export default function AdminActivityDetail() {
 
 					// Show success modal
 					const actionType = activities[index].actionType || "unblock";
-					const actionText = actionType === "unblock" ? "unblocked" : "blocked";
-					setSuccessMessage(`Activity has been approved. Account has been ${actionText} successfully!`);
+					const actionMenu = actionType === "block" ? "Block User" : "Unblock User";
+
+					setSuccessMessage("Activity Approved");
+					setSuccessDetails(
+						buildSuccessDetails(
+							{ ...activities[index], actionMenu },
+							"Approved at",
+							<strong>{displayTime}</strong>
+						)
+					);
 					setShowSuccessModal(true);
 				}
 			} catch (e) {
@@ -271,6 +357,7 @@ export default function AdminActivityDetail() {
 	const closeSuccess = () => {
 		setShowSuccessModal(false);
 		setSuccessMessage("");
+		setSuccessDetails(null);
 	};
 
 	// Determine workflow step based on status
@@ -574,10 +661,49 @@ export default function AdminActivityDetail() {
 				<div className="modal-overlay">
 					<div className="modal-content modal-success">
 						<h3 className="modal-title">{successMessage}</h3>
+
+						{successDetails && (
+							<>
+								<p className="modal-subtitle">
+									{successDetails.timestampLabel} {successDetails.timestamp}
+								</p>
+
+								<div className="activity-summary-card">
+									<div className="activity-row">
+										<span className="activity-label">Activity ID</span>
+										<span className="activity-value">
+											: {successDetails.activityId}
+										</span>
+									</div>
+									<div className="activity-row">
+										<span className="activity-label">Menu</span>
+										<span className="activity-value">: {successDetails.menu}</span>
+									</div>
+									<div className="activity-row">
+										<span className="activity-label">Action Menu</span>
+										<span className="activity-value">
+											: {successDetails.actionMenu}
+										</span>
+									</div>
+								</div>
+							</>
+						)}
+
 						<div className="modal-actions">
 							<button className="modal-btn modal-btn-close" onClick={closeSuccess}>
 								Close
 							</button>
+							{successDetails && (
+								<button
+									className="modal-btn modal-btn-view"
+									onClick={() => {
+										closeSuccess();
+										navigate("/admin/activity");
+									}}
+								>
+									View Activity List
+								</button>
+							)}
 						</div>
 					</div>
 				</div>
