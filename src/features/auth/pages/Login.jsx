@@ -49,7 +49,9 @@ export default function Login() {
 			console.error("JWT decode error:", err);
 		}
 
-		sessionStorage.setItem("token", token);
+		sessionStorage.setItem("sessionID", token);
+		console.log('zxcxz', decoded);
+
 
 		setMessage(respLogin.data.message || "Login success");
 		setModalType("success");
@@ -57,7 +59,6 @@ export default function Login() {
 
 		setTimeout(() => {
 			setShowModal(false);
-
 			const roleUpper = (decoded.role || "").toUpperCase();
 			const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVAL"];
 
@@ -68,11 +69,10 @@ export default function Login() {
 				return;
 			}
 
-			if (roleUpper === "NASABAH") {
+			if (!ADMIN_ROLES.includes(roleUpper)) {
 				navigate("/otpLogin");
 				return;
 			}
-			navigate("/otpLogin");
 		}, 800);
 	};
 
