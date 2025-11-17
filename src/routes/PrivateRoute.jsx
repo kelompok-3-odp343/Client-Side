@@ -8,14 +8,24 @@ export default function PrivateRoute() {
 
   if (!token) return <Navigate to="/" replace />;
 
-  // role-based protection
-  if (location.pathname.startsWith("/admin") && role !== "admin") {
-    return <Navigate to="/dashboard" replace />;
+  const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVAL"];
+
+  const isAdminPage = location.pathname.startsWith("/admin");
+  const isUserPage = !isAdminPage;
+
+  if (role === "NASABAH") {
+    if (isAdminPage) {
+      return <Navigate to="/dashboard" replace />;
+    }
+    return <Outlet />;
   }
 
-  if (!location.pathname.startsWith("/admin") && role === "admin") {
-    return <Navigate to="/admin/home" replace />;
+  if (ADMIN_ROLES.includes(role)) {
+    if (isUserPage) {
+      return <Navigate to="/admin/home" replace />;
+    }
+    return <Outlet />;
   }
 
-  return <Outlet />;
+  return <Navigate to="/" replace />;
 }
