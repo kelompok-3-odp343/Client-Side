@@ -50,7 +50,6 @@ export default function Login() {
 		}
 
 		sessionStorage.setItem("token", token);
-		sessionStorage.setItem("role", decoded.role || "NASABAH");
 
 		setMessage(respLogin.data.message || "Login success");
 		setModalType("success");
@@ -61,6 +60,7 @@ export default function Login() {
 
 			const roleUpper = (decoded.role || "").toUpperCase();
 			const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVAL"];
+			sessionStorage.setItem("role", decoded.role);
 
 			if (ADMIN_ROLES.includes(roleUpper)) {
 				sessionStorage.setItem('npp', decoded.npp || "ADM001");
