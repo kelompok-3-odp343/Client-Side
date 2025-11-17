@@ -221,7 +221,11 @@ export default function AdminActivity() {
 			return (
 				<button
 					className="view-details-btn-activity"
-					onClick={() => navigate(`/admin/activity/${row.activityId}`, { state: { activity: row } })}
+					onClick={() =>
+						navigate("/admin/activity/detail", {
+							state: { activityId: row.activityId, activity: row }
+						})
+					}
 				>
 					<Eye size={26} />
 				</button>
