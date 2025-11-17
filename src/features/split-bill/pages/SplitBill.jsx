@@ -112,37 +112,43 @@ export default function SplitBill() {
                     </div>
                   </div>
 
-                  <div className="sb-members">
-                    {membersToShow.map((m, idx) => (
-                      <div key={m.member_id || idx} className="sb-member-row">
-                        <span>{m.member_name}</span>
-                        <span>
-                          Rp{Number(m.amount || 0).toLocaleString("id-ID")}{" "}
-                          <span
-                            className={`status ${m.hasPaid || m.status === "Paid" ? "paid" : "unpaid"}`}
-                          >
-                            {m.hasPaid || m.status === "Paid" ? "Paid" : "Unpaid"}
+                  <div className="sb-main-section">
+                    <div className="sb-members">
+                      {membersToShow.map((m, idx) => (
+                        <div key={m.member_id || idx} className="sb-member-row">
+                          <span>{m.member_name}</span>
+                          <span>
+                            Rp{Number(m.amount || 0).toLocaleString("id-ID")}{" "}
+                            <span
+                              className={`status ${
+                                m.hasPaid || m.status === "Paid" ? "paid" : "unpaid"
+                              }`}
+                            >
+                              {m.hasPaid || m.status === "Paid" ? "Paid" : "Unpaid"}
+                            </span>
                           </span>
-                        </span>
-                      </div>
-                    ))}
-                    {extraCount > 0 && <div className="sb-member-more">+{extraCount} more</div>}
-                  </div>
+                        </div>
+                      ))}
+                      {extraCount > 0 && (
+                        <div className="sb-member-more">+{extraCount} more</div>
+                      )}
+                    </div>
 
-                  <div className="sb-actions sb-actions-right">
-                    <button
-                      className="view-btn"
-                      onClick={() =>
-                        navigate("/splitbill/detail", {
-                          state: {
-                            splitBillId: bill.split_bill_id || bill.splitBillId,
-                            color,
-                          },
-                        })
-                      }
-                    >
-                      View Detail
-                    </button>
+                    <div className="sb-actions sb-actions-right">
+                      <button
+                        className="view-btn"
+                        onClick={() =>
+                          navigate("/splitbill/detail", {
+                            state: {
+                              splitBillId: bill.split_bill_id || bill.splitBillId,
+                              color,
+                            },
+                          })
+                        }
+                      >
+                        View Detail
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
