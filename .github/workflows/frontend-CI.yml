@@ -63,11 +63,11 @@ jobs:
         with:
           push: false
           load: true
-          tags: jrtr1/wandoor-backend-app:temp-scan
+          tags: jrtr1/wandoor-frontend-app:temp-scan
 
       # Verifikasi image sudah ada
       - name: Verify Docker image exists
-        run: docker images | grep jrtr1/wandoor-backend-app
+        run: docker images | grep jrtr1/wandoor-frontend-app
 
       # Cache Trivy binary agar tidak download setiap run
       - name: Cache Trivy binary
@@ -86,7 +86,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0  # Pin ke versi stabil
         with:
-          image-ref: 'jrtr1/wandoor-backend-app:backend-latest'
+          image-ref: 'jrtr1/wandoor-frontend-app:frontend-latest'
           format: 'table'
           exit-code: '0'  # Staging: '0' (warning only) | Production: '1' (block deploy)
           ignore-unfixed: true  # Skip vuln yang belum ada patch
