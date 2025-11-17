@@ -7,6 +7,7 @@ import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
 import DataTable from "../components/DataTable";
 import StatusBadge from "../components/StatusBadge";
+import Pagination from "../components/Pagination";
 
 import "../styles/admin-users.css";
 import { fetchAdminUsers } from "../service/adminUsersService";
@@ -24,6 +25,7 @@ export default function AdminUsers() {
 	const [showStatusFilter, setShowStatusFilter] = useState(false);
 	const [page, setPage] = useState(1);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
+
 	const toggleSidebar = () => setIsSidebarOpen((v) => !v);
 
 	useEffect(() => {
@@ -45,7 +47,6 @@ export default function AdminUsers() {
 		};
 
 		load();
-
 		return () => {
 			mounted = false;
 		};
@@ -71,8 +72,10 @@ export default function AdminUsers() {
 				!q ||
 				u.customerName.toLowerCase().includes(q) ||
 				(u.cif && u.cif.includes(q));
+
 			const matchesStatus =
 				filterStatus.length === 0 || filterStatus.includes(u.status);
+
 			return matchesSearch && matchesStatus;
 		});
 	}, [users, searchQuery, filterStatus]);
@@ -92,6 +95,7 @@ export default function AdminUsers() {
 		return [...filteredUsers].sort((a, b) => {
 			const va = a[key];
 			const vb = b[key];
+
 			if (va == null && vb == null) return 0;
 			if (va == null) return -1 * dir;
 			if (vb == null) return 1 * dir;
@@ -146,7 +150,10 @@ export default function AdminUsers() {
 
 				{showStatusFilter && (
 					<>
-						<div className="filter-dropdown-overlay" onClick={() => setShowStatusFilter(false)} />
+						<div
+							className="filter-dropdown-overlay"
+							onClick={() => setShowStatusFilter(false)}
+						/>
 						<div className="filter-dropdown">
 							<div className="filter-dropdown-header">
 								<span className="filter-dropdown-title">{column.label}</span>
@@ -168,7 +175,11 @@ export default function AdminUsers() {
 											type="checkbox"
 											checked={filterStatus.includes(s)}
 											onChange={() =>
-												setFilterStatus((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
+												setFilterStatus((prev) =>
+													prev.includes(s)
+														? prev.filter((x) => x !== s)
+														: [...prev, s]
+												)
 											}
 										/>
 										<span>{s}</span>
@@ -184,58 +195,76 @@ export default function AdminUsers() {
 
 	const renderCell = (row, column, index) => {
 		if (column.key === "noIndex") return (page - 1) * rowsPerPage + index + 1;
+
 		if (column.key === "status") {
 			return <StatusBadge status={row.status} type="user" />;
 		}
+
 		if (column.key === "action") {
 			return (
 				<button
 					className="view-details-btn"
-					onClick={() => navigate(`/admin/users/detail`, { state: { userId: row.id } })}
+					onClick={() =>
+						navigate(`/admin/users/detail`, { state: { userId: row.id } })
+					}
 					type="button"
 				>
 					<Eye size={24} />
 				</button>
 			);
 		}
+
 		return row[column.key];
 	};
 
 	return (
 		<div className="admin-container">
 			<AdminNavBar onMenuToggle={toggleSidebar} />
-			<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+			<AdminSideBar
+				isOpen={isSidebarOpen}
+				onClose={() => setIsSidebarOpen(false)}
+			/>
 
 			<main className="admin-users-main">
 				{loading ? (
 					<div style={{ padding: 20 }}>Loading users...</div>
 				) : loadError ? (
-					<div style={{ padding: 20, color: "red" }}>Failed to load users. Using dummy data.</div>
+					<div style={{ padding: 20, color: "red" }}>
+						Failed to load users. Using dummy data.
+					</div>
 				) : (
 					<>
 						<div className="stats-grid">
 							<div className="stat-card stat-total">
 								<h3 className="stat-label">Total Users</h3>
 								<hr />
-								<div className="stat-value">{userData.totalUsers.toLocaleString("id-ID")}</div>
+								<div className="stat-value">
+									{userData.totalUsers.toLocaleString("id-ID")}
+								</div>
 							</div>
 
 							<div className="stat-card stat-active">
 								<h3 className="stat-label">Active Users</h3>
 								<hr />
-								<div className="stat-value stat-value-active">{userData.activeUsers.toLocaleString("id-ID")}</div>
+								<div className="stat-value stat-value-active">
+									{userData.activeUsers.toLocaleString("id-ID")}
+								</div>
 							</div>
 
 							<div className="stat-card stat-blocked">
 								<h3 className="stat-label">Blocked Users</h3>
 								<hr />
-								<div className="stat-value stat-value-blocked">{userData.blockedUsers.toLocaleString("id-ID")}</div>
+								<div className="stat-value stat-value-blocked">
+									{userData.blockedUsers.toLocaleString("id-ID")}
+								</div>
 							</div>
 
 							<div className="stat-card stat-avg">
 								<h3 className="stat-label">Avg. # of Accounts per User</h3>
 								<hr />
-								<div className="stat-value">{userData.avgAccountPerUser}</div>
+								<div className="stat-value">
+									{userData.avgAccountPerUser}
+								</div>
 							</div>
 						</div>
 
@@ -249,9 +278,18 @@ export default function AdminUsers() {
 							renderColumnHeader={renderColumnHeader}
 							searchBar={
 								<div className="search-and-filter">
-									<SearchBar value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }} />
+									<SearchBar
+										value={searchQuery}
+										onChange={(e) => {
+											setSearchQuery(e.target.value);
+											setPage(1);
+										}}
+									/>
 									{hasActiveFilters && (
-										<button className="clear-all-filters-btn" onClick={() => setFilterStatus([])}>
+										<button
+											className="clear-all-filters-btn"
+											onClick={() => setFilterStatus([])}
+										>
 											<X size={16} /> Clear All Filters
 										</button>
 									)}
@@ -261,40 +299,18 @@ export default function AdminUsers() {
 							headerColor="peach"
 						/>
 
-						<div className="pagination-container" style={{ marginTop: 12 }}>
-							<div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-								<span>Show</span>
-								<select value={rowsPerPage} onChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(1); }}>
-									<option value={10}>10</option>
-									<option value={25}>25</option>
-									<option value={50}>50</option>
-									<option value={100}>100</option>
-								</select>
-								<span>rows</span>
-							</div>
-
-							<div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-								<button className="pagination-btn" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
-									Prev
-								</button>
-
-								{[...Array(totalPages)].slice(0, 9).map((_, i) => (
-									<button
-										key={i}
-										className={`pagination-number ${page === i + 1 ? "active" : ""}`}
-										onClick={() => setPage(i + 1)}
-									>
-										{i + 1}
-									</button>
-								))}
-
-								{totalPages > 9 && <span style={{ alignSelf: "center" }}>…</span>}
-
-								<button className="pagination-btn" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
-									Next
-								</button>
-							</div>
-						</div>
+						<Pagination
+							currentPage={page}
+							totalPages={totalPages}
+							rowsPerPage={rowsPerPage}
+							onPageChange={setPage}
+							onRowsPerPageChange={(v) => {
+								setRowsPerPage(v);
+								setPage(1);
+							}}
+							theme="peach"
+							maxVisiblePages={9}
+						/>
 					</>
 				)}
 			</main>

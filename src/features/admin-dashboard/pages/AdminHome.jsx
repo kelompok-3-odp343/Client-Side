@@ -6,6 +6,7 @@ import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
 import CategoryChart from "../components/CategoryChart";
+import Pagination from "../components/Pagination";
 
 import { fetchAdminDashboard } from "../service/adminDashboardServices";
 
@@ -238,40 +239,12 @@ export default function AdminHome() {
 							</tbody>
 						</table>
 					</div>
-
-					<div className="pagination-container">
-						<div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-							<button
-								className="pagination-btn"
-								disabled={page === 1}
-								onClick={() => setPage(page - 1)}
-							>
-								Prev
-							</button>
-
-							{[...Array(totalPages)].slice(0, 9).map((_, i) => (
-								<button
-									key={i}
-									className={`pagination-number ${page === i + 1 ? "active" : ""}`}
-									onClick={() => setPage(i + 1)}
-								>
-									{i + 1}
-								</button>
-							))}
-
-							{totalPages > 9 && (
-								<span className="pagination-dots">…</span>
-							)}
-
-							<button
-								className="pagination-btn"
-								disabled={page === totalPages}
-								onClick={() => setPage(page + 1)}
-							>
-								Next
-							</button>
-						</div>
-					</div>
+					
+					<Pagination
+						currentPage={page}
+						totalPages={totalPages}
+						onPageChange={setPage}
+					/>
 				</section>
 			</main>
 		</div>

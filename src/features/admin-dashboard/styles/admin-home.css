@@ -266,61 +266,6 @@ body {
 	flex-shrink: 0;
 }
 
-.pagination-container {
-	margin-top: 1rem;
-	width: 100%;
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
-	gap: 8px;
-	flex-shrink: 0;
-}
-
-.pagination-btn {
-	padding: 6px 12px;
-	background: #f3f4f6;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	font-size: 0.9rem;
-	cursor: pointer;
-	transition: 0.2s;
-}
-
-.pagination-btn:hover {
-	background: #dcdcdc;
-}
-
-.pagination-btn:disabled {
-	opacity: 0.5;
-	cursor: not-allowed;
-}
-
-.pagination-number {
-	padding: 6px 12px;
-	background: white;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	font-size: 0.9rem;
-	cursor: pointer;
-	transition: 0.2s;
-}
-
-.pagination-number:hover {
-	background: #f3f4f6;
-}
-
-.pagination-number.active {
-	background: #b79cf4;
-	color: white;
-	border-color: #b79cf4;
-}
-
-.pagination-dots {
-	padding: 6px 10px;
-	color: #888;
-	font-size: 1rem;
-}
-
 @media (max-width: 1024px) {
 	.top-row {
 		grid-template-columns: 1fr;

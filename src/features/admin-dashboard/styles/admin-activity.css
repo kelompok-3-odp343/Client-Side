@@ -53,30 +53,6 @@
 	color: #cabee3;
 }
 
-.pagination-container {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 12px;
-	margin-top: 16px;
-}
-
-.pagination-btn,
-.pagination-number {
-	padding: 6px 12px;
-	cursor: pointer;
-	border-radius: 6px;
-	border: 1px solid #ccc;
-	background: white;
-	font-size: 14px;
-}
-
-.pagination-number.active {
-	background: #AD96DE;
-	color: white;
-	border-color: #AD96DE;
-}
 
 .filter-dropdown-container {
 	position: relative;
@@ -117,15 +93,6 @@
 	.activity-list-table {
 		min-width: 900px;
 	}
-
-	.pagination-container {
-		flex-direction: column;
-		align-items: flex-start;
-	}
-
-	.pagination-container select {
-		width: 80px;
-	}
 }
 
 @media (max-width: 480px) {
@@ -139,11 +106,5 @@
 
 	.filter-dropdown {
 		width: 180px;
-	}
-
-	.pagination-btn,
-	.pagination-number {
-		padding: 5px 10px;
-		font-size: 12px;
 	}
 }

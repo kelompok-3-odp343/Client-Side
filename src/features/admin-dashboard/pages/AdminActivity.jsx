@@ -6,6 +6,7 @@ import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import SearchBar from "../components/SearchBar";
 import DataTable from "../components/DataTable";
+import Pagination from "../components/Pagination";
 
 import { fetchAdminActivityList } from "../service/adminActivityService";
 import "../styles/admin-activity.css";
@@ -307,55 +308,17 @@ export default function AdminActivity() {
 					headerColor="purple"
 				/>
 
-				<div className="pagination-container" style={{ marginTop: 12 }}>
-					<div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-						<span>Show</span>
-						<select
-							value={rowsPerPage}
-							onChange={(e) => {
-								setRowsPerPage(Number(e.target.value));
-								setPage(1);
-							}}
-						>
-							<option value={10}>10</option>
-							<option value={25}>25</option>
-							<option value={50}>50</option>
-							<option value={100}>100</option>
-						</select>
-						<span>rows</span>
-					</div>
-
-					<div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
-						<button
-							className="pagination-btn"
-							disabled={page === 1}
-							onClick={() => setPage(page - 1)}
-						>
-							Prev
-						</button>
-
-						{[...Array(Math.min(totalPages, 9))].map((_, i) => (
-							<button
-								key={i}
-								className={`pagination-number ${page === i + 1 ? "active" : ""}`}
-								onClick={() => setPage(i + 1)}
-							>
-								{i + 1}
-							</button>
-						))}
-
-						{totalPages > 9 && <span>…</span>}
-
-						<button
-							className="pagination-btn"
-							disabled={page === totalPages}
-							onClick={() => setPage(page + 1)}
-						>
-							Next
-						</button>
-					</div>
-				</div>
-
+				<Pagination
+					currentPage={page}
+					totalPages={totalPages}
+					rowsPerPage={rowsPerPage}
+					onPageChange={(newPage) => setPage(newPage)}
+					onRowsPerPageChange={(newRowsPerPage) => {
+						setRowsPerPage(newRowsPerPage);
+						setPage(1);
+					}}
+					theme="purple"
+				/>
 			</main>
 		</div>
 	);
