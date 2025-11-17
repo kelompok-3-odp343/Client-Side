@@ -76,6 +76,7 @@
 .activity-label {
 	font-weight: 700;
 	color: var(--text-dark);
+	text-align: left;
 }
 
 .activity-value {
@@ -184,14 +185,14 @@
 
 .activity-btn-approve {
 	background: none;
-	color: var(--purple);
-	border: 3px solid var(--purple);
+	color: #9C7EDC;
+	border: 3px solid #9C7EDC;
 }
 
 .activity-btn-approve:hover:not(.disabled) {
 	background: #f5f0fb;
-	border-color: var(--purple);
-	color: var(--purple);
+	border-color: #9C7EDC;
+	color: #9C7EDC;
 }
 
 .activity-btn.disabled {
@@ -219,13 +220,17 @@
 
 .modal-content {
 	background: var(--white);
-	border: 3px solid #cabee3;
+	border: 3px solid #9C7EDC;
 	border-radius: 12px;
 	padding: 1.5rem;
 	max-width: 600px;
 	width: 90%;
 	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 	animation: slideUp 0.3s ease;
+}
+
+.modal-content.modal-success {
+	max-width: 450px;
 }
 
 .modal-reject,
@@ -261,14 +266,15 @@
 	color: var(--text-dark);
 	margin: 0 0 1.5rem 0;
 	text-align: center;
+	line-height: 1.5;
 }
 
 .modal-subtitle {
-	font-size: 0.95rem;
+	font-size: 0.85rem;
 	color: var(--text-muted);
-	margin: -1rem 0 1.5rem 0;
+	margin: -1.25rem 0 1.5rem 0;
 	text-align: center;
-	line-height: 1.4;
+	/* line-height: 1.4; */
 }
 
 .modal-field {
@@ -290,7 +296,7 @@
 .modal-select {
 	width: 100%;
 	padding: 0.625rem 1rem;
-	border: 2px solid #cabee3;
+	border: 2px solid #9C7EDC;
 	border-radius: 8px;
 	font-size: 0.9rem;
 	color: var(--text-dark);
@@ -300,13 +306,13 @@
 }
 
 .modal-select:focus {
-	border-color: var(--purple);
+	border-color: #9C7EDC;
 }
 
 .modal-textarea {
 	width: 100%;
 	padding: 0.75rem 1rem;
-	border: 2px solid #cabee3;
+	border: 2px solid #9C7EDC;
 	border-radius: 8px;
 	font-size: 0.9rem;
 	color: var(--text-dark);
@@ -317,14 +323,14 @@
 }
 
 .modal-textarea:focus {
-	border-color: var(--purple);
+	border-color: #9C7EDC;
 }
 
 .modal-required {
 	display: block;
 	font-size: 0.8rem;
 	color: #f94449;
-	margin-top: 0.25rem;
+	margin-top: 0.5rem;
 	text-align: right;
 }
 
@@ -364,14 +370,14 @@
 
 .modal-btn-submit {
 	background: none;
-	color: var(--purple);
-	border-color: var(--purple);
+	color: #9C7EDC;
+	border-color: #9C7EDC;
 }
 
 .modal-btn-submit:hover:not(.disabled) {
-	background: #f8f5ff;
-	color: var(--purple);
-	border-color: var(--purple);
+	background: #f5f0fb;
+	color: #9C7EDC;
+	border-color: #9C7EDC;
 }
 
 .modal-btn-submit.disabled {
@@ -384,16 +390,30 @@
 
 .modal-btn-close,
 .modal-btn-primary {
-	background: var(--purple);
-	color: var(--white);
-	border-color: var(--purple);
-	width: 100%;
+	background: var(--white);
+	color: #f94449;
+	border-color: #f94449;
+	/* width: 100%; */
 }
 
 .modal-btn-close:hover,
 .modal-btn-primary:hover {
-	background: #b9a8d6;
-	border-color: #b9a8d6;
+	background: #fef5f5;
+	border-color: #f94449;
+	color: #f94449;
+}
+
+.modal-btn-view {
+	background: none;
+	color: #9C7EDC;
+	border-color: #9C7EDC;
+	/* width: 100%; */
+}
+
+.modal-btn-view:hover {
+	background: #f5f0fb;
+	color: #9C7EDC;
+	border-color: #9C7EDC;
 }
 
 .modal-btn-secondary {
@@ -405,6 +425,36 @@
 
 .modal-btn-secondary:hover {
 	background: #f3f4f6;
+}
+
+.activity-summary-card {
+	margin-top: -0.5rem;
+	margin-bottom: -0.25rem;
+	padding: 0.9rem 1.25rem;
+	/* max-width: 450px; */
+	background: #ffffff;
+	border-radius: 10px;
+	border: 2px solid #9C7EDC;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.activity-row {
+	display: flex;
+	font-size: 0.9rem;
+	margin-bottom: 0.25rem;
+}
+
+.activity-row:last-child {
+	margin-bottom: 0;
+}
+
+.activity-label {
+	font-weight: 700;
+	min-width: 8rem;
+}
+
+.activity-value {
+  	font-weight: 500;
 }
 
 /* RESPONSIVE */
