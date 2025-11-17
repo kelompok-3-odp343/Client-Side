@@ -78,7 +78,7 @@ export default function Deposits() {
       const data = await getTimeDepositTransactions({
         month: m.month,
         year: m.year,
-        accountNumber,
+        accountNumber: ""
       });
 
       if (!data?.transactions) {

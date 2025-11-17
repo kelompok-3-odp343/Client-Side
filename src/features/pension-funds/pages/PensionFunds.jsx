@@ -106,7 +106,7 @@ export default function PensionFunds() {
     const data = await fetchDPLKTransactionHistory({
       month: m.month,
       year: m.year,
-      accountNumber: selectedAccount,
+      accountNumber: "",
     });
 
     const list = data.transactions || data.transaction || [];

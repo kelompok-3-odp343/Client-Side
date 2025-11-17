@@ -79,7 +79,7 @@ export const getPensionFunds = async () => {
 export async function fetchDPLKTransactionHistory({ month, year, accountNumber }) {
     try {
         const token = sessionStorage.getItem("token");
-        const payload = { month, year, accountNumber };
+        const payload = { month, year, accountNumber, productType: 'DPLK' };
 
         const resp = await api.post("/api/v1/trx-history", payload, {
             headers: {
@@ -92,11 +92,11 @@ export async function fetchDPLKTransactionHistory({ month, year, accountNumber }
         if (resp.data?.transaction?.length) return resp.data;
         if (resp.data?.transactions?.length) return resp.data;
 
-        console.warn("⚠️ No transaction data, using dummy");
+        console.warn("No transaction data, using dummy");
         return DUMMY_DPLK_TRX;
 
     } catch (error) {
-        console.warn("⚠️ DPLK transaction API failed, using dummy:", error?.message);
+        console.warn("DPLK transaction API failed, using dummy:", error?.message);
         return DUMMY_DPLK_TRX;
     }
 }
