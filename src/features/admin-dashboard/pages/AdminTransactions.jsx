@@ -32,7 +32,7 @@ export default function AdminTransactions() {
 
 	useEffect(() => {
 		const loadData = async () => {
-			const userId = location.state?.cif || "DEFAULT_USER";
+			const userId = location.state?.userId || "DEFAULT_USER";
 			const resp = await fetchAdminTransactionList(userId);
 			setTransactionData(resp.data);
 		};

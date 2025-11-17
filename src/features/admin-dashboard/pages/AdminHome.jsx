@@ -85,6 +85,7 @@ export default function AdminHome() {
 
 	const transactions = dashboard.users.map((u, i) => ({
 		id: i + 1,
+		userId: u.userId,
 		cif: u.customerId,
 		nik: u.nik,
 		name: u.customerName,
@@ -112,7 +113,7 @@ export default function AdminHome() {
 	);
 
 	const handleViewTransactions = (transaction) => {
-		navigate("/admin/transactions", { state: { cif: transaction.cif } });
+		navigate("/admin/transactions", { state: { userId: transaction.userId } });
 	};
 
 	return (
@@ -195,6 +196,7 @@ export default function AdminHome() {
 							<thead>
 								<tr>
 									<th className="col-no">No</th>
+									<th>User ID</th>
 									<th>CIF</th>
 									<th>NIK</th>
 									<th
@@ -218,6 +220,7 @@ export default function AdminHome() {
 										<td className="col-no">
 											{(page - 1) * rowsPerPage + index + 1}
 										</td>
+										<td>{transaction.userId}</td>
 										<td>{transaction.cif}</td>
 										<td>{transaction.nik}</td>
 										<td>{transaction.name}</td>
