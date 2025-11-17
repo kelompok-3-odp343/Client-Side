@@ -65,6 +65,7 @@ jobs:
           repository: kelompok-3-odp343/infra
           token: ${{ secrets.ACCESS_TOKEN }}
           path: infra
+          ref: staging
 
       - name: Update image tag in frontend deployment
         run: |
