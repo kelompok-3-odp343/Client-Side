@@ -43,15 +43,15 @@ export default function Login() {
 		const token = respLogin.data.sessionIdOrToken;
 
 		let decoded = {};
-		try {
-			decoded = decodeJwtToken(token);
-		} catch (err) {
-			console.error("JWT decode error:", err);
+		if (respLogin.data.role !== "NASABAH") {
+			try {
+				decoded = decodeJwtToken(token);
+			} catch (err) {
+				console.error("JWT decode error:", err);
+			}
 		}
 
 		sessionStorage.setItem("sessionID", token);
-		console.log('zxcxz', decoded);
-
 
 		setMessage(respLogin.data.message || "Login success");
 		setModalType("success");
@@ -59,20 +59,30 @@ export default function Login() {
 
 		setTimeout(() => {
 			setShowModal(false);
-			const roleUpper = (decoded.role || "").toUpperCase();
-			const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVAL"];
 
-			if (ADMIN_ROLES.includes(roleUpper)) {
-				sessionStorage.setItem("role", decoded.role);
-				sessionStorage.setItem('npp', decoded.npp || "ADM001");
-				navigate("/admin/home");
-				return;
-			}
+			const apiRole = respLogin.data.role?.toUpperCase();
+			const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVER"];
 
-			if (!ADMIN_ROLES.includes(roleUpper)) {
+			if (apiRole === "NASABAH") {
 				navigate("/otpLogin");
 				return;
 			}
+
+			if (ADMIN_ROLES.includes(apiRole)) {
+				let decoded = {};
+				try {
+					decoded = decodeJwtToken(token);
+				} catch (err) {
+					console.error("JWT decode error:", err);
+				}
+
+				sessionStorage.setItem("role", apiRole);
+				sessionStorage.setItem("npp", decoded.npp || "ADM001");
+
+				navigate("/admin/home");
+				return;
+			}
+			navigate("/otpLogin");
 		}, 800);
 	};
 
