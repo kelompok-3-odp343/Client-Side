@@ -58,6 +58,43 @@ jobs:
             jrtr1/wandoor-frontend-app:frontend-${{ github.sha }}
             jrtr1/wandoor-frontend-app:frontend-latest
 
+      - name: Build Docker image (local)
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          load: true
+          tags: jrtr1/wandoor-backend-app:temp-scan
+
+      # Verifikasi image sudah ada
+      - name: Verify Docker image exists
+        run: docker images | grep jrtr1/wandoor-backend-app
+
+      # Cache Trivy binary agar tidak download setiap run
+      - name: Cache Trivy binary
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/trivy
+          key: trivy-binary-v0.56.1-Linux-X64
+          restore-keys: trivy-binary-
+
+      # Install Trivy
+      - name: Setup Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+      
+      # 1. Scan Docker image (PRIORITAS UTAMA)
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0  # Pin ke versi stabil
+        with:
+          image-ref: 'jrtr1/wandoor-backend-app:backend-latest'
+          format: 'table'
+          exit-code: '0'  # Staging: '0' (warning only) | Production: '1' (block deploy)
+          ignore-unfixed: true  # Skip vuln yang belum ada patch
+          vuln-type: 'os,library'  # Scan OS packages & library dependencies
+          severity: 'LOW,MEDIUM,HIGH,CRITICAL'  # Fokus ke yang paling berbahaya
+          timeout: '10m0s'  # Timeout 10 menit
+          scanners: 'vuln'  # Hanya scan vulnerability (skip secret/config
+
       # === Find & Replace image tag di repo infra ===
       - name: Checkout infra repository
         uses: actions/checkout@v3
