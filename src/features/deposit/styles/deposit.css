@@ -188,7 +188,7 @@
 .circle-inner .day {
   font-size: 0.85rem;
   font-weight: 800;
-  color: #A37B16
+  color: #A37B16;
 }
 
 .circle-inner .month {
@@ -231,135 +231,6 @@
   width: 100%;
 }
 
-.transaction-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.transaction-header .lg-title {
-  font-size: 1.25rem;
-  margin-top: 0.5rem;
-}
-
-.download-icon {
-  color: #000;
-  cursor: pointer;
-  margin-top: -0.3rem;
-}
-
-/* ======== MONTH BUTTONS ======== */
-.months {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin: 1.5rem 0 0.8rem;
-  justify-content: flex-start;
-}
-
-.month-btn-dep {
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.5rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  background: #f4f4f4;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.month-btn-dep:hover {
-  background: #A37B16;
-  color: #fff;
-}
-
-.month-btn-dep.active {
-  background: #ffe9b0 !important;
-  color: #000 !important;
-  font-weight: 700;
-  box-shadow: 0 2px 6px #bca159;
-}
-
-/* ======== TRANSACTION LIST ======== */
-.transaction-list {
-  border-top: none !important;
-}
-
-.transaction-group {
-  margin-top: 0 !important;
-  border-bottom: none;
-}
-
-.transaction-group hr {
-  margin-bottom: 0.3rem; /* semula biasanya sekitar 0.6rem */
-}
-
-.transaction-date {
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-bottom: 0.3rem;
-}
-
-.transaction-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.4rem 0;
-  border-bottom: none !important;
-}
-
-.tx-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.tx-icon {
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: 50%;
-  border: 1px solid #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  color: #888;
-}
-
-.tx-type {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #000;
-}
-
-.tx-detail {
-  font-size: 0.75rem;
-  color: #999;
-}
-
-.tx-amount {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #222;
-}
-
-.tx-amount.neg {
-  color: #c62828;
-}
-
-.tx-amount.pos {
-  color: #2e7d32;
-}
-
-/* ======== NO TRANSACTION TEXT ======== */
-.no-tx {
-  color: #777;
-  font-size: 0.9rem;
-  text-align: center;
-  margin-top: 1.5rem;
-}
-
 /* ======== RESPONSIVE ======== */
 @media (max-width: 992px) {
   .deposit-container {
@@ -398,16 +269,5 @@
   .deposit-card {
     width: 90%;
     max-width: 18rem;
-  }
-
-  .month-btn-dep {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
-  }
-
-  .transaction-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.3rem;
   }
 }

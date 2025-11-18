@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
 import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
+import TransactionHistory from "../../../shared/components/TransactionHistory";
 import "../styles/deposit.css";
-import { Download } from "lucide-react";
 import depositIcon from "../../../assets/images/deposit-icon.png";
 import { getTimeDeposits, getTimeDepositTransactions } from "../api/time-deposits.api";
 
 export default function Deposits() {
   const [depositsData, setDepositsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  const [chartData, setChartData] = useState({ income: 0, expense: 0 });
-  const [showBalance, setShowBalance] = useState(true);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
@@ -78,7 +76,7 @@ export default function Deposits() {
       const data = await getTimeDepositTransactions({
         month: m.month,
         year: m.year,
-        accountNumber: ""
+        accountNumber: "",
       });
 
       if (!data?.transactions) {
@@ -93,19 +91,25 @@ export default function Deposits() {
     }
   };
 
-  const toISOFromDMY = (dateTimeStr) => {
-    if (!dateTimeStr) return null;
-    const [dPart, tPart = "00:00:00"] = dateTimeStr.split("T");
-    const [dd, mm, yyyy] = dPart.split("-");
-    if (!dd || !mm || !yyyy) return null;
-    return `${yyyy}-${mm}-${dd}T${tPart}`;
-  };
-
   const mapTransactionsToGroups = (flat) => {
     const groups = {};
     flat.forEach((trx) => {
-      const iso = toISOFromDMY(trx.transactionDate);
-      const d = iso ? new Date(iso) : new Date(trx.transactionDate);
+      let d;
+      try {
+        const dateStr = trx.transactionDate;
+        if (!dateStr) return;
+        
+        d = new Date(dateStr);
+        
+        if (isNaN(d.getTime())) {
+          console.warn('Invalid date:', dateStr);
+          return;
+        }
+      } catch (e) {
+        console.warn('Error parsing date:', trx.transactionDate, e);
+        return;
+      }
+
       const key = d.toLocaleDateString("id-ID", {
         day: "2-digit",
         month: "short",
@@ -132,17 +136,6 @@ export default function Deposits() {
       .sort((a, b) => b.sortKey - a.sortKey)
       .map(({ sortKey, ...rest }) => rest);
   };
-
-  useEffect(() => {
-    const flatItems = transactions.flatMap((g) => g.items || []);
-    const income = flatItems
-      .filter((i) => typeof i.amount === "string" && i.amount.startsWith("+"))
-      .reduce((s, i) => s + Number((i.amount || "").replace(/[^\d]/g, "")), 0);
-    const expense = flatItems
-      .filter((i) => typeof i.amount === "string" && i.amount.startsWith("-"))
-      .reduce((s, i) => s + Number((i.amount || "").replace(/[^\d]/g, "")), 0);
-    setChartData({ income, expense });
-  }, [transactions]);
 
   useEffect(() => {
     fetchDeposits();
@@ -195,71 +188,22 @@ export default function Deposits() {
 
         {/* RIGHT PANEL */}
         <section className="deposit-right">
-          <div className="transaction-header">
-            <h2 className="lg-title">Transaction History</h2>
-          </div>
-
-          <div className="months">
-            {months.map((m) => (
-              <button
-                key={m.month + "-" + m.year}
-                className={
-                  m.month === selectedMonth?.month &&
-                    m.year === selectedMonth?.year
-                    ? "active"
-                    : ""
-                }
-                onClick={() => handleSelectedMonth(m)}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="transaction-list-modern">
-            {transactions.length ? (
-              transactions.map((group) => (
-                <div key={group.date} className="transaction-group">
-                  <p className="transaction-date">
-                    <strong>{group.date}</strong>
-                  </p>
-                  <hr />
-                  {group.items.map((item) => (
-                    <div
-                      key={
-                        item.transactionId ||
-                        `${group.date}-${item.detail}-${item.amount}`
-                      }
-                      className="transaction-modern-item"
-                      onClick={() => {
-                        setSelectedTransaction(item);
-                        setShowDetailModal(true);
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <div className="transaction-text">
-                        <p className="transaction-type">{item.type}</p>
-                        <p className="transaction-detail">{item.detail}</p>
-                      </div>
-                      <div className="transaction-amount-modern">
-                        <span
-                          className={`amount ${item.amount.startsWith("+") ? "credit" : "debit"
-                            }`}
-                        >
-                          {item.amount}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ))
-            ) : (
-              <p className="no-data">
-                No transactions available for {selectedMonth?.label}{" "}
-                {selectedMonth?.year}
-              </p>
-            )}
-          </div>
+          <TransactionHistory
+            transactions={transactions}
+            months={months}
+            selectedMonth={selectedMonth}
+            onMonthChange={handleSelectedMonth}
+            themeColor="#FFE8B0"
+            title="Transaction History"
+            onTransactionClick={(item) => {
+              setSelectedTransaction(item);
+              setShowDetailModal(true);
+            }}
+            productType="DEP"
+            showDownloadButton={true}
+            onDownload={() => console.log("Download deposits transactions")}
+            emptyMessage="No transactions available"
+          />
         </section>
       </main>
 
@@ -283,7 +227,11 @@ function DepositCard({ title, balance, date, interest, opening, period }) {
   return (
     <div className="deposit-card">
       <h4 className="deposit-title">{title}</h4>
-      <p className="deposit-balance">Balance:<br /><strong>Rp{balance.toLocaleString()}</strong></p>
+      <p className="deposit-balance">
+        Balance:
+        <br />
+        <strong>Rp{balance.toLocaleString()}</strong>
+      </p>
 
       <div className="circle-container">
         <div className="circle-ring">
@@ -297,9 +245,18 @@ function DepositCard({ title, balance, date, interest, opening, period }) {
 
       <hr />
       <div className="deposit-info">
-        <p><span>Interest</span><span>{interest}</span></p>
-        <p><span>Opening date</span><span>{opening}</span></p>
-        <p><span>Period</span><span>{period}</span></p>
+        <p>
+          <span>Interest</span>
+          <span>{interest}</span>
+        </p>
+        <p>
+          <span>Opening date</span>
+          <span>{opening}</span>
+        </p>
+        <p>
+          <span>Period</span>
+          <span>{period}</span>
+        </p>
       </div>
     </div>
   );
