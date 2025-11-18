@@ -13,8 +13,6 @@ export async function postAuthLogin({ username, password }) {
   } catch (error) {
     if (import.meta.env.MODE !== "production") {
       const uname = username?.toLowerCase?.() || "";
-
-      // Admin dummy
       if (uname === "admin" && password === "password") {
         return {
           ok: true,
@@ -32,11 +30,10 @@ export async function postAuthLogin({ username, password }) {
           ok: true,
           data: {
             status: true,
-            sessionIdOrToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJQMDAzIiwiY2lmIjoiQ0lGMDAzIiwicm9sZSI6Ik5BU0FCQUgiLCJ1c2VybmFtZSI6IlAwMDMiLCJpYXQiOjE3NjMzOTIxNDksImV4cCI6MTc2MzM5NTc0OX0.Q49wJYYTQGjOszvJkfsM5itYzGbXZ9icnpQcDum7pmY",
+            sessionIdOrToken: "01de79e5-3803-4013-ab6c-b1e1809b6b51",
             message: "DEV: User login success",
           },
         };
-
       }
 
       return {
@@ -62,7 +59,6 @@ export async function postVerifyOtp({ sessionID, otp_code }) {
       otpCode: otp_code,
     };
     const res = await api.post(`/api/auth/verify-otp`, payload);
-    console.log('cxxz', res)
     return { ok: true, data: res.data };
   } catch (error) {
     if (import.meta.env.MODE !== "production") {
@@ -165,6 +161,32 @@ export async function postForgotPasswordReset({
         error?.response?.data?.message ||
         error?.message ||
         "Gagal memperbarui password. Silakan coba beberapa saat lagi.",
+    };
+  }
+}
+
+export async function postLogout() {
+  try {
+    const token = sessionStorage.getItem("token") || sessionStorage.getItem("sessionID");
+
+    const res = await api.post(
+      `/api/auth/logout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { ok: true, data: res.data };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Logout failed. Please try again.",
     };
   }
 }

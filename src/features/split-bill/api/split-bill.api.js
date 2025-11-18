@@ -52,32 +52,37 @@ export async function fetchSplitBills() {
   try {
     const token = sessionStorage.getItem("token");
 
-    const res = await api.get("/api/split-bill", {
+    const res = await api.get("/api/v1/split-bill", {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
       timeout: 5000,
     });
 
-    if (res?.data?.data && Array.isArray(res.data.data) && res.data.data.length > 0) {
+    if (Array.isArray(res?.data?.data)) {
+      const bills = res.data.data;
+      if (bills.length === 0) {
+        return {
+          status: true,
+          data: [],
+        };
+      }
+
       return {
         status: true,
-        data: res.data.data.map(normalizeBill),
+        data: bills.map(normalizeBill),
       };
     }
 
-    console.warn("API split bills tidak valid atau kosong, menggunakan dummy");
-    return {
-      status: true,
-      data: DUMMY_STORAGE.map(normalizeBill),
-    };
+    return { status: true, data: [] };
+
   } catch (error) {
     console.error("Gagal memuat Split Bill:", error?.message || error);
     return {
       status: true,
-      data: DUMMY_STORAGE.map(normalizeBill),
+      data: [],
     };
   }
 }

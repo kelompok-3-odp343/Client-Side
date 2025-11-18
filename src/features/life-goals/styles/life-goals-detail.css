@@ -59,7 +59,11 @@
   transform: translate(-50%, -50%);
   width: 250%;
   height: 250%;
-  background: radial-gradient(circle closest-side, rgba(255, 255, 255, 0.28), transparent 70%);
+  background: radial-gradient(
+    circle closest-side,
+    rgba(255, 255, 255, 0.28),
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.18s ease;
   pointer-events: none;
@@ -99,138 +103,6 @@
   flex-direction: column;
   gap: 1.25rem;
   min-height: 120px;
-}
-
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.panel-title {
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--text-main);
-  margin: 0;
-}
-
-/* ===== MONTHS ROW ===== */
-.months-row {
-  display: flex;
-  overflow-x: auto;
-  gap: 0.6rem;
-  padding-bottom: 0.4rem;
-  -webkit-overflow-scrolling: touch;
-}
-
-.month-pill {
-  border: none;
-  border-radius: 999px;
-  background: #f3f4f6;
-  color: var(--text-sub);
-  font-size: 0.85rem;
-  padding: 0.4rem 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.03);
-}
-
-.month-pill:hover {
-  background: color-mix(in srgb, var(--theme) 90%, #ffffff 10%);
-  color: #000;
-  transform: translateY(-1px);
-}
-
-.month-pill.active {
-  background: var(--theme);
-  color: #000;
-  font-weight: 600;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-}
-
-/* ===== TRANSACTION LIST ===== */
-.tx-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  overflow-y: auto;
-  max-height: 56vh;
-  padding-right: 6px;
-  scroll-behavior: smooth;
-}
-
-.tx-list::-webkit-scrollbar {
-  width: 8px;
-}
-.tx-list::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 6px;
-}
-
-.tx-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.tx-date {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 0.25rem;
-}
-
-.tx-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.65rem 0;
-  border-bottom: 1px solid var(--border);
-  transition: background 0.12s ease;
-}
-.tx-row:hover {
-  background: rgba(0, 0, 0, 0.02);
-}
-
-.tx-left {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-}
-
-.tx-dot {
-  width: 9px;
-  height: 9px;
-  background: var(--theme);
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.tx-type {
-  font-size: 0.92rem;
-  color: var(--text-main);
-  font-weight: 600;
-}
-
-.tx-sub {
-  font-size: 0.82rem;
-  color: var(--text-sub);
-}
-
-.tx-empty {
-  padding: 1rem;
-  color: var(--text-sub);
-  font-size: 0.95rem;
-}
-
-.tx-amount.pos {
-  color: #16a34a;
-  font-weight: 700;
-}
-
-.tx-amount.neg {
-  color: #dc2626;
-  font-weight: 700;
 }
 
 /* ===== RIGHT COLUMN ===== */
@@ -287,9 +159,5 @@
   .lg-grid {
     grid-template-columns: 1fr;
     gap: 1.75rem;
-  }
-
-  .tx-list {
-    max-height: 48vh;
   }
 }

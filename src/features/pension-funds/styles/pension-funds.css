@@ -117,14 +117,6 @@
   margin-top: 0.625rem;
 }
 
-.pension-fund-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  gap: 1rem;
-  width: 100%;
-  margin-top: -1rem;
-}
-
 .account-number-card {
   flex: 1 1 calc(50% - 0.5rem);
   background: #fff;
@@ -204,115 +196,6 @@
   height: 100%;
 }
 
-.transaction-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.download-icon {
-  color: #000;
-  cursor: pointer;
-}
-
-.months {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.625rem;
-  margin: 1.125rem 0 0.75rem;
-  justify-content: flex-start;
-  overflow-x: auto;
-}
-
-.month-btn-dplk {
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.5rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  background: #f4f4f4;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05);
-  white-space: nowrap;
-}
-
-.month-btn-dplk:hover {
-  background: #FFBC8E;
-  color: #fff;
-}
-
-.month-btn-dplk.active {
-  background: #FFBC8E !important;
-  color: #000 !important;
-  font-weight: 700;
-  box-shadow: 0 0.125rem 0.375rem #FFBC8E;
-}
-
-.transaction-list {
-  border-top: 0.0625rem solid #ddd;
-}
-
-.transaction-group {
-  margin-top: 1.125rem;
-}
-
-.transaction-date {
-  font-weight: 600;
-  font-size: 0.875rem;
-  margin-bottom: 0.375rem;
-}
-
-.transaction-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 0.0625rem solid #eee;
-}
-
-.tx-left {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-}
-
-.tx-icon {
-  width: 1.625rem;
-  height: 1.625rem;
-  border-radius: 50%;
-  border: 0.0625rem solid #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8125rem;
-  color: #888;
-}
-
-.tx-type {
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #000;
-}
-
-.tx-detail {
-  font-size: 0.75rem;
-  color: #999;
-}
-
-.tx-amount {
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #222;
-}
-
-.no-tx {
-  color: #777;
-  font-size: 0.875rem;
-  text-align: center;
-  margin-top: 1.25rem;
-}
-
 @media (max-width: 48rem) {
   .pension-fund-container {
     flex-direction: column;
@@ -323,11 +206,6 @@
   .pension-fund-left,
   .pension-fund-right {
     max-width: 100%;
-  }
-
-  .month-btn-dplk {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
   }
 
   .account-number-grid {

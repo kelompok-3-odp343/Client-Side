@@ -5,6 +5,13 @@ import "../styles/auth-login.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
 import { postAuthLogin } from "../api/authService";
 import { decodeJwtToken } from "../api/jwtHelper";
+import { fetchMenuAccess } from "../../admin-dashboard/service/adminUsersService";
+
+import {
+	saveMenuAccessToSession,
+	getUserBlockRule,
+	getUserUnblockRule
+} from "../../../utils/menuAccessSession";
 
 export default function Login() {
 	const [username, setUsername] = useState("");
@@ -41,24 +48,13 @@ export default function Login() {
 		}
 
 		const token = respLogin.data.sessionIdOrToken;
-		console.log('token', token)
-
-		// let decoded = {};
-		// if (respLogin.data.role !== "NASABAH") {
-		// 	try {
-		// 		decoded = decodeJwtToken(token);
-		// 	} catch (err) {
-		// 		console.error("JWT decode error:", err);
-		// 	}
-		// }
-
 		sessionStorage.setItem("sessionID", respLogin.data.sessionIdOrToken);
 
 		setMessage(respLogin.data.message || "Login success");
 		setModalType("success");
 		setShowModal(true);
 
-		setTimeout(() => {
+		setTimeout(async () => {
 			setShowModal(false);
 
 			const apiRole = respLogin.data.role?.toUpperCase();
@@ -79,6 +75,16 @@ export default function Login() {
 
 				sessionStorage.setItem("role", apiRole);
 				sessionStorage.setItem("npp", decoded.npp || "ADM001");
+
+				try {
+					const resp = await fetchMenuAccess();
+
+					saveMenuAccessToSession(resp.data);
+					sessionStorage.setItem("user_block", getUserBlockRule());
+					sessionStorage.setItem("user_unblock", getUserUnblockRule());
+				} catch (err) {
+					console.warn("Failed to load menu access.", err);
+				}
 
 				navigate("/admin/home");
 				return;

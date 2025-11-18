@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
 import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
+import TransactionHistory from "../../../shared/components/TransactionHistory";
 import "../styles/pension-funds.css";
-import { Download } from "lucide-react";
 import pensionfunds from "../../../assets/images/Pension.png";
 import { getPensionFunds, fetchDPLKTransactionHistory } from "../api/pension-funds.api";
 
@@ -22,7 +22,9 @@ const getLastMonths = () => {
 
 export default function PensionFunds() {
   const [months] = useState(getLastMonths());
-  const [selectedMonth, setSelectedMonth] = useState(getLastMonths()[getLastMonths().length - 1]);
+  const [selectedMonth, setSelectedMonth] = useState(
+    getLastMonths()[getLastMonths().length - 1]
+  );
 
   const [pensionFundsData, setPensionFundsData] = useState(null);
   const [transactions, setTransactions] = useState([]);
@@ -56,7 +58,6 @@ export default function PensionFunds() {
       if (pensionFunds.length) {
         setSelectedAccount(pensionFunds[0].accountNumber);
       }
-
     } catch (error) {
       console.error("error", error);
       setPensionFundsData({
@@ -65,6 +66,47 @@ export default function PensionFunds() {
         pensionFunds: [],
       });
     }
+  };
+
+  const handleDownloadCSV = () => {
+    if (!transactions || transactions.length === 0) {
+      alert("No transactions to download");
+      return;
+    }
+
+    // Prepare CSV data
+    const csvData = [];
+    csvData.push(["Date", "Transaction Type", "Description", "Amount", "Type"]);
+
+    transactions.forEach((group) => {
+      group.items.forEach((item) => {
+        const type = item.debit_credit === "C" ? "Credit" : "Debit";
+        const amount = item.amount.replace(/[^\d]/g, "");
+        csvData.push([
+          item.transactionDate,
+          item.type,
+          item.detail,
+          amount,
+          type,
+        ]);
+      });
+    });
+
+    const csvContent = csvData.map((row) => row.join(",")).join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `DPLK_Transactions_${selectedMonth?.label}_${selectedMonth?.year}.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const mapDPLKTransactions = (list) => {
@@ -101,8 +143,6 @@ export default function PensionFunds() {
   };
 
   const fetchDPLKTransactionsForMonth = async (m) => {
-    if (!selectedAccount) return;
-
     const data = await fetchDPLKTransactionHistory({
       month: m.month,
       year: m.year,
@@ -175,61 +215,22 @@ export default function PensionFunds() {
 
         {/* RIGHT PANEL */}
         <section className="pension-fund-right">
-          <div className="transaction-header">
-            <h4 className="lg-title">Transaction History</h4>
-            <Download className="download-icon" />
-          </div>
-
-          <div className="months">
-            {months.map((m) => (
-              <button
-                key={m.month + "-" + m.year}
-                className={`month-btn-dplk ${m.month === selectedMonth.month && m.year === selectedMonth.year ? "active" : ""
-                  }`}
-                onClick={() => setSelectedMonth(m)}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="transaction-list">
-            {transactions.length > 0 ? (
-              transactions.map((group) => (
-                <div key={group.date} className="transaction-group">
-                  <p className="transaction-date"><strong>{group.date}</strong></p>
-                  <hr />
-                  {group.items.map((tx, i) => (
-                    <div
-                      key={i}
-                      className="transaction-item"
-                      onClick={() => {
-                        setSelectedTransaction(tx);
-                        setShowDetailModal(true);
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <div className="tx-left">
-                        <div className="tx-icon">★</div>
-                        <div className="tx-text">
-                          <p className="tx-type">{tx.type}</p>
-                          <p className="tx-detail">{tx.detail}</p>
-                        </div>
-                      </div>
-                      <div
-                        className={`tx-amount ${tx.amount.startsWith("-") ? "neg" : "pos"
-                          }`}
-                      >
-                        {tx.amount}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ))
-            ) : (
-              <p className="no-tx">No transactions available for {selectedMonth.label}</p>
-            )}
-          </div>
+          <TransactionHistory
+            transactions={transactions}
+            months={months}
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+            themeColor="#FFBC8E"
+            title="Transaction History"
+            onTransactionClick={(item) => {
+              setSelectedTransaction(item);
+              setShowDetailModal(true);
+            }}
+            productType="DPLK"
+            showDownloadButton={true}
+            onDownload={handleDownloadCSV}
+            emptyMessage="No transactions available"
+          />
         </section>
       </main>
 
@@ -258,18 +259,21 @@ function AccountNumberCard({ title, accountNumber, balance, growth }) {
       <div className="account-balance">
         <p>
           <span>Accumulated balance</span>
-          <span><strong>Rp{balance.toLocaleString()}</strong></span>
+          <span>
+            <strong>Rp{balance.toLocaleString()}</strong>
+          </span>
         </p>
 
         <p>
           <span>Growth</span>
-          <span style={{
-            color:
-              growth > 0 ? "#3DBF4A" :
-                growth < 0 ? "#F94449" : "#000"
-          }}>
+          <span
+            style={{
+              color: growth > 0 ? "#3DBF4A" : growth < 0 ? "#F94449" : "#000",
+            }}
+          >
             <strong>
-              ({growth > 0 ? "+" : ""}{(growth * 100).toFixed(2)}%)
+              ({growth > 0 ? "+" : ""}
+              {(growth * 100).toFixed(2)}%)
             </strong>
           </span>
         </p>

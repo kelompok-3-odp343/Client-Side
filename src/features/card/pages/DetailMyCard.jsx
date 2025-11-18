@@ -1,6 +1,56 @@
+const handleDownloadCSV = () => {
+  if (!transactions || transactions.length === 0) {
+    alert("No transactions to download");
+    return;
+  }
+
+  const csvData = [];
+  csvData.push([
+    "Date",
+    "Transaction Type",
+    "Description",
+    "Amount",
+    "Type",
+    "Split Bill Status",
+  ]);
+
+  transactions.forEach((group) => {
+    group.items.forEach((item) => {
+      const type = item.debit_credit === "C" ? "Credit" : "Debit";
+      const amount = item.amount.replace(/[^\d]/g, "");
+      const splitStatus = item.split_bill_id ? "Split Bill Created" : "-";
+      csvData.push([
+        item.transactionDate,
+        item.type,
+        item.detail,
+        amount,
+        type,
+        splitStatus,
+      ]);
+    });
+  });
+
+  const csvContent = csvData.map((row) => row.join(",")).join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+
+  link.setAttribute("href", url);
+  link.setAttribute(
+    "download",
+    `Savings_Transactions_${selectedCard?.account_number}_${selectedMonth?.label}_${selectedMonth?.year}.csv`
+  );
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 import React, { useState, useEffect } from "react";
 import SplitBillForm from "../../../shared/components/SplitBillForm";
 import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
+import TransactionHistory from "../../../shared/components/TransactionHistory";
 import "../styles/detail-my-card.css";
 import Navbar from "../../../shared/components/Navbar";
 import { EyeOff, Eye } from "lucide-react";
@@ -22,19 +72,29 @@ export default function DetailMyCard() {
     return arr.reverse();
   };
 
-  const toISOFromDMY = (dateTimeStr) => {
-    if (!dateTimeStr) return null;
-    const [dPart, tPart = "00:00:00"] = dateTimeStr.split("T");
-    const [dd, mm, yyyy] = dPart.split("-");
-    if (!dd || !mm || !yyyy) return null;
-    return `${yyyy}-${mm}-${dd}T${tPart}`;
-  };
-
   const mapTransactionsToGroups = (flat) => {
     const groups = {};
     flat.forEach((trx) => {
-      const iso = toISOFromDMY(trx.transactionDate);
-      const d = iso ? new Date(iso) : new Date(trx.transactionDate);
+      let d;
+      try {
+        const dateStr = trx.transactionDate;
+        if (!dateStr) return;
+        if (dateStr.includes('-')) {
+          d = new Date(dateStr);
+        } else {
+          d = new Date(dateStr);
+        }
+
+        // Check if date is valid
+        if (isNaN(d.getTime())) {
+          console.warn('Invalid date:', dateStr);
+          return;
+        }
+      } catch (e) {
+        console.warn('Error parsing date:', trx.transactionDate, e);
+        return;
+      }
+
       const key = d.toLocaleDateString("id-ID", {
         day: "2-digit",
         month: "short",
@@ -52,10 +112,10 @@ export default function DetailMyCard() {
         detail: trx.partyName,
         partyName: trx.partyName,
         partyDetail: trx.partyDetail,
-        amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
-        debit_credit: trx.debit_credit,
-        jenisTransaksi: trx.debit_credit === "D" ? "Pengeluaran" : "Pemasukan",
-        split_bill_id: trx.split_bill_id ?? null,
+        amount: (trx.debitCredit === "C" ? "+" : "-") + trx.amount,
+        debit_credit: trx.debitCredit,
+        jenisTransaksi: trx.debitCredit === "D" ? "Pengeluaran" : "Pemasukan",
+        split_bill_id: trx.splitBillId ?? null,
       });
     });
 
@@ -65,11 +125,11 @@ export default function DetailMyCard() {
   };
 
   const location = useLocation();
+  const navigate = useNavigate();
   const initialCards = location.state?.cards || [];
   const [cards, setCards] = useState(initialCards);
   const [selectedCard, setSelectedCard] = useState(initialCards[0] || null);
   const [showBalance, setShowBalance] = useState(true);
-  const navigate = useNavigate();
 
   const [months] = useState(getLastMonths());
   const [selectedMonth, setSelectedMonth] = useState(
@@ -139,6 +199,7 @@ export default function DetailMyCard() {
       amount: item.amount,
       account_id: selectedCard.account_id,
       accountNumber: selectedCard.account_number,
+      transactionDate: item.transactionDate,
     });
     setShowSplitModal(true);
   };
@@ -168,7 +229,19 @@ export default function DetailMyCard() {
     const grouped = mapTransactionsToGroups(data.transactions);
     setTransactions(grouped);
   };
-
+  if (!selectedCard) {
+    return (
+      <div className="detail-mycard">
+        <Navbar />
+        <main className="main" style={{ padding: "2rem", textAlign: "center" }}>
+          <h2>No cards found</h2>
+          <p style={{ color: "#777" }}>
+            You don’t have any cards linked to your account.
+          </p>
+        </main>
+      </div>
+    );
+  }
   return (
     <div className="detail-mycard">
       <Navbar />
@@ -177,7 +250,9 @@ export default function DetailMyCard() {
         <section className="left-panel">
           <div className="account-details">
             <div className="account-details-dropdown">
-              <h2><strong>Account Details</strong></h2>
+              <h2>
+                <strong>Account Details</strong>
+              </h2>
               <select
                 value={selectedCard?.account_number}
                 onChange={(e) => handleChangeCard(e.target.value)}
@@ -198,7 +273,9 @@ export default function DetailMyCard() {
               <div className="account-header">
                 <div>
                   <h4>{selectedCard?.type}</h4>
-                  <p className="acc-number"><strong>{selectedCard?.account_number}</strong></p>
+                  <p className="acc-number">
+                    <strong>{selectedCard?.account_number}</strong>
+                  </p>
                   <p className="acc-name">{selectedCard?.account_holder_name}</p>
                 </div>
 
@@ -236,16 +313,23 @@ export default function DetailMyCard() {
             <div className="numbers">
               <div>
                 <h3>Rp{chartData.income.toLocaleString("id-ID")}</h3>
-                <p><strong>Income</strong></p>
+                <p>
+                  <strong>Income</strong>
+                </p>
               </div>
               <div>
                 <h3>Rp{chartData.expense.toLocaleString("id-ID")}</h3>
-                <p><strong>Expenses</strong></p>
+                <p>
+                  <strong>Expenses</strong>
+                </p>
               </div>
             </div>
 
             <p className="difference">
-              <strong>A difference of Rp{(chartData.income - chartData.expense).toLocaleString("id-ID")}</strong>
+              <strong>
+                A difference of Rp
+                {(chartData.income - chartData.expense).toLocaleString("id-ID")}
+              </strong>
             </p>
 
             <div className="bar-chart">
@@ -254,12 +338,13 @@ export default function DetailMyCard() {
                 style={{
                   height: `${chartData.income
                     ? Math.max(
-                        10,
-                        (chartData.income /
-                          Math.max(chartData.income, chartData.expense || 1)) *
-                          100
-                      )
-                    : 8}%`,
+                      10,
+                      (chartData.income /
+                        Math.max(chartData.income, chartData.expense || 1)) *
+                      100
+                    )
+                    : 8
+                    }%`,
                 }}
               />
               <div
@@ -267,12 +352,13 @@ export default function DetailMyCard() {
                 style={{
                   height: `${chartData.expense
                     ? Math.max(
-                        6,
-                        (chartData.expense /
-                          Math.max(chartData.income || 1, chartData.expense)) *
-                          100
-                      )
-                    : 6}%`,
+                      6,
+                      (chartData.expense /
+                        Math.max(chartData.income || 1, chartData.expense)) *
+                      100
+                    )
+                    : 6
+                    }%`,
                 }}
               />
             </div>
@@ -280,91 +366,19 @@ export default function DetailMyCard() {
         </section>
 
         <section className="right-panel">
-          <div className="transactions">
-            <div className="transaction-header">
-              <h3>Transaction History</h3>
-            </div>
-
-            <div className="months">
-              {months.map((m) => (
-                <button
-                  key={m.month + "-" + m.year}
-                  className={
-                    m.month === selectedMonth?.month &&
-                    m.year === selectedMonth?.year
-                      ? "active"
-                      : ""
-                  }
-                  onClick={() => handleSelectedMonth(m)}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="transaction-list-modern">
-              {transactions.length ? (
-                transactions.map((group) => (
-                  <div key={group.date} className="transaction-group">
-                    <p className="transaction-date">
-                      <strong>{group.date}</strong>
-                    </p>
-                    <hr />
-
-                    {group.items.map((item, idx) => (
-                      <div
-                        key={`${item.transactionId}-${idx}`}
-                        className="transaction-modern-item"
-                        onClick={() => handleOpenDetail(item)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <div className="transaction-text">
-                          <p className="transaction-type">{item.type}</p>
-                          <p className="transaction-detail">{item.detail}</p>
-                        </div>
-
-                        <div className="transaction-amount-modern">
-                          <span
-                            className={`amount ${
-                              item.amount.startsWith("+") ? "credit" : "debit"
-                            }`}
-                          >
-                            {item.amount}
-                          </span>
-
-                          {item.jenisTransaksi === "Pengeluaran" && (
-                            <button
-                              className="split-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-
-                                if (item.split_bill_id) {
-                                  navigate(`/splitbill/detail`, {
-                                    state: {
-                                      splitBillId: item.split_bill_id,
-                                      color: "#6dddd0",
-                                    },
-                                  });
-                                } else {
-                                  handleOpenSplit(item);
-                                }
-                              }}
-                            >
-                              {item.split_bill_id ? "View Split Bill" : "Split Bill?"}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ))
-              ) : (
-                <p className="no-data">
-                  No transactions available for {selectedMonth?.label} {selectedMonth?.year}
-                </p>
-              )}
-            </div>
-          </div>
+          <TransactionHistory
+            transactions={transactions}
+            months={months}
+            selectedMonth={selectedMonth}
+            onMonthChange={handleSelectedMonth}
+            themeColor="#ffa96b"
+            title="Transaction History"
+            onTransactionClick={handleOpenDetail}
+            productType="SAV"
+            showDownloadButton={true}
+            onDownload={handleDownloadCSV}
+            emptyMessage="No transactions available"
+          />
         </section>
       </main>
 
@@ -388,7 +402,7 @@ export default function DetailMyCard() {
                   amount: trx.amount,
                   account_id: selectedCard.account_id,
                   accountNumber: selectedCard.account_number,
-                  transactionDate: trx.transactionDate
+                  transactionDate: trx.transactionDate,
                 });
               }}
               productType="SAV"
