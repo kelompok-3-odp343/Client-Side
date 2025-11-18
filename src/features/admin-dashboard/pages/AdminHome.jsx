@@ -75,7 +75,7 @@ export default function AdminHome() {
 
 	if (!dashboard) return <div style={{ padding: "2rem" }}>Loading...</div>;
 
-	const colorPalette = ["#FF9F40", "#4BC0C0", "#FF6384", "#9966FF", "#36A2EB"];
+	const colorPalette = ["#FFB3BA", "#FFDFBA", "#FFFFBA", "#BAFFC9", "#BAE1FF"];
 
 	const categoryData = dashboard.categories.map((item, index) => ({
 		name: item.categoryName,

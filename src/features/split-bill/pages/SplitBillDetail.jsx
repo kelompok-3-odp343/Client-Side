@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ChevronLeft, Edit, Download } from "lucide-react";
 import Navbar from "../../../shared/components/Navbar";
 import generateSplitBillPDF from "../modules/generateSplitBillPDF";
 import Swal from "sweetalert2";
@@ -27,9 +28,9 @@ export default function SplitBillDetail() {
       if (!state?.splitBillId) {
         await Swal.fire({
           icon: "info",
-          title: "Data tidak valid",
-          text: "Split Bill ID tidak ditemukan.",
-          confirmButtonText: "Kembali",
+          title: "Invalid Data",
+          text: "Split Bill ID not found.",
+          confirmButtonText: "Back",
           confirmButtonColor: "#6dddd0",
         });
         navigate("/splitbill");
@@ -40,9 +41,9 @@ export default function SplitBillDetail() {
       if (!data || !data.members?.length) {
         await Swal.fire({
           icon: "warning",
-          title: "Tidak memiliki Split Bill Detail",
-          text: "Data detail tidak ditemukan.",
-          confirmButtonText: "Kembali",
+          title: "Split Bill Detail Not Found",
+          text: "Detail not found.",
+          confirmButtonText: "Back",
           confirmButtonColor: "#6dddd0",
         });
         navigate("/splitbill");
@@ -71,8 +72,8 @@ export default function SplitBillDetail() {
       <div className="sb-detail-container">
         <Navbar />
         <div className="sb-detail-error">
-          <p>{error || "Data tidak ditemukan."}</p>
-          <button onClick={() => navigate("/splitbill")}>Kembali</button>
+          <p>{error || "Data not found."}</p>
+          <button onClick={() => navigate("/splitbill")}>Back</button>
         </div>
       </div>
     );
@@ -141,8 +142,8 @@ export default function SplitBillDetail() {
       if (target.isNew) {
         Swal.fire({
           icon: "warning",
-          title: "Tidak dapat mengubah status",
-          text: "Row baru hanya bisa dipaid setelah disimpan.",
+          title: "Cannot change status",
+          text: "New row can only be marked as paid after being saved.",
           confirmButtonColor: color,
         });
         return;
@@ -173,8 +174,8 @@ export default function SplitBillDetail() {
     } catch {
       Swal.fire({
         icon: "error",
-        title: "Gagal",
-        text: "Tidak dapat update status.",
+        title: "Failed",
+        text: "Cannot update status.",
       });
     }
   };
@@ -191,11 +192,11 @@ export default function SplitBillDetail() {
     const emptyName = members.some(
       (m) => !String(m.member_name).trim()
     );
-    if (emptyName) return setError("Nama peserta tidak boleh kosong.");
+    if (emptyName) return setError("Member name cannot be empty.");
 
     const sum = members.reduce((s, m) => s + Number(m.amount || 0), 0);
     if (sum !== bill.total_bill)
-      return setError("Jumlah total harus sama dengan total bill.");
+      return setError("Total amount must match the bill total.");
 
     try {
       const updatedBill = await updateSplitBillStatus(
@@ -209,12 +210,12 @@ export default function SplitBillDetail() {
 
       Swal.fire({
         icon: "success",
-        title: "Berhasil disimpan",
+        title: "Saved successfully",
         timer: 1400,
         showConfirmButton: false,
       });
     } catch {
-      setError("Gagal menyimpan perubahan.");
+      setError("Failed saving changes.");
     }
   };
 
@@ -240,7 +241,8 @@ export default function SplitBillDetail() {
         {/* Header */}
         <div className="sb-top-row">
           <button className="back-btn" onClick={() => navigate("/splitbill")}>
-            ← Back to Split Bill
+            <ChevronLeft size={24} className="back-icon" />
+            Back to Split Bill
           </button>
 
           <div className="title-wrap">
@@ -249,13 +251,14 @@ export default function SplitBillDetail() {
               Ref ID: {bill.ref_id}
               <br />
               Created:{" "}
-              {new Date(bill.created_time).toLocaleString("id-ID", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              {(() => {
+                const d = new Date(bill.created_time);
+                const day = d.getDate();
+                const month = d.toLocaleString("en-US", { month: "long" });
+                const year = d.getFullYear();
+                const time = d.toLocaleString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+                return `${day} ${month} ${year}, ${time}`;
+              })()}
             </p>
           </div>
 
@@ -265,16 +268,18 @@ export default function SplitBillDetail() {
                 <button className="cancel-btn" onClick={handleCancelEdit}>
                   Cancel
                 </button>
-                <button className="edit-btn" onClick={handleSaveEdit}>
+                <button className="save-btn-sb" onClick={handleSaveEdit}>
                   Save
                 </button>
               </>
             ) : (
               <>
                 <button className="edit-btn" onClick={() => setIsEditing(true)}>
+                  <Edit size={24} className="edit-icon" />
                   Edit
                 </button>
                 <button className="pdf-btn" onClick={handleDownloadPDF}>
+                  <Download size={24} className="pdf-icon" />
                   Download PDF
                 </button>
               </>
@@ -282,40 +287,43 @@ export default function SplitBillDetail() {
           </div>
         </div>
 
-        {/* Summary */}
         <section className="bill-summary">
-          <div className="summary-left">
-            <div className="label">Bill Total</div>
-            <div className="total">
+
+          {/* Baris 1: Bill Total */}
+          <div className="summary-row">
+            <div className="summary-label total-label">Bill Total</div>
+            <div className="summary-value total-value">
               Rp{Number(bill.total_bill).toLocaleString("id-ID")}
             </div>
           </div>
 
-          <div className="summary-right">
-            <div className="label-inline">
-              <div className="label-small">Paid Amount</div>
-              <div className="value paid">
-                Rp{Number(totalPaid).toLocaleString("id-ID")}
-              </div>
-            </div>
-            <div className="label-inline">
-              <div className="label-small">Unpaid Amount</div>
-              <div className="value unpaid">
-                Rp{Number(totalUnpaid).toLocaleString("id-ID")}
-              </div>
+          {/* Baris 2: Progress Bar (full width) */}
+          <div className="summary-progress-row">
+            <div className="progress-track">
+              <div
+                className="progress-fill"
+                style={{ width: `${progressPercent}%`, background: color }}
+              />
             </div>
           </div>
-        </section>
 
-        {/* Progress */}
-        <div className="progress-section">
-          <div className="progress-track">
-            <div
-              className="progress-fill"
-              style={{ width: `${progressPercent}%`, background: color }}
-            ></div>
+          {/* Baris 3: Paid */}
+          <div className="summary-row">
+            <div className="summary-label paid-label">Paid Amount</div>
+            <div className="summary-value paid-value">
+              Rp{Number(totalPaid).toLocaleString("id-ID")}
+            </div>
           </div>
-        </div>
+
+          {/* Baris 4: Unpaid */}
+          <div className="summary-row">
+            <div className="summary-label unpaid-label">Unpaid Amount</div>
+            <div className="summary-value unpaid-value">
+              Rp{Number(totalUnpaid).toLocaleString("id-ID")}
+            </div>
+          </div>
+
+        </section>
 
         {/* Tables */}
         <div className="table-card">
@@ -408,7 +416,6 @@ export default function SplitBillDetail() {
                             ) : (
                               <button
                                 className="mark-btn"
-                                style={{ background: color, color: "#fff" }}
                                 onClick={() => handleToggleStatus(i)}
                               >
                                 Mark as Paid
