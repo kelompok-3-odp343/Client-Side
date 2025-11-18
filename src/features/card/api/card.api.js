@@ -22,12 +22,11 @@ export async function fetchAllCards() {
       return result;
     }
 
-    console.warn("⚠️ API returned empty card list, using dummy");
-    return DUMMY_CARDS;
+    return [];
 
   } catch (error) {
     console.warn("⚠️ API failed, using dummy cards:", error?.message);
-    return DUMMY_CARDS;
+    return [];
   }
 }
 
@@ -37,13 +36,13 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
       month,
       year,
       accountNumber,
-      productType: 'SVG'
-    }
+      productType: "SVG"
+    };
 
     const token = sessionStorage.getItem("token");
     const resp = await api.post("/api/v1/trx-history", payload, {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "true",
       },
@@ -51,25 +50,14 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
 
     const trx = resp?.data?.transaction;
 
-    if (Array.isArray(trx) && trx.length > 0) {
+    if (Array.isArray(trx)) {
       return { transactions: trx };
     }
 
-    console.warn("API empty trx, using dummy");
+    return { transactions: [] };
+
   } catch (error) {
-    console.warn("API trx failed, using dummy:", error?.message);
+    console.warn("API trx failed:", error?.message);
+    return { transactions: [] };
   }
-
-  // === DUMMY FALLBACK ===
-  const dummy = DUMMY_TRX_HISTORY[accountNumber];
-
-  if (!dummy) return { transactions: [] };
-
-  const found = dummy.find(
-    r => Number(r.month) === Number(month) && String(r.year) === String(year)
-  );
-
-  return found
-    ? { transactions: found.transaction }
-    : { transactions: [] };
 }

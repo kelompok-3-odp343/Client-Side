@@ -1,54 +1,53 @@
 const handleDownloadCSV = () => {
-    if (!transactions || transactions.length === 0) {
-      alert("No transactions to download");
-      return;
-    }
+  if (!transactions || transactions.length === 0) {
+    alert("No transactions to download");
+    return;
+  }
 
-    // Prepare CSV data
-    const csvData = [];
-    csvData.push([
-      "Date",
-      "Transaction Type",
-      "Description",
-      "Amount",
-      "Type",
-      "Split Bill Status",
-    ]);
+  const csvData = [];
+  csvData.push([
+    "Date",
+    "Transaction Type",
+    "Description",
+    "Amount",
+    "Type",
+    "Split Bill Status",
+  ]);
 
-    transactions.forEach((group) => {
-      group.items.forEach((item) => {
-        const type = item.debit_credit === "C" ? "Credit" : "Debit";
-        const amount = item.amount.replace(/[^\d]/g, "");
-        const splitStatus = item.split_bill_id ? "Split Bill Created" : "-";
-        csvData.push([
-          item.transactionDate,
-          item.type,
-          item.detail,
-          amount,
-          type,
-          splitStatus,
-        ]);
-      });
+  transactions.forEach((group) => {
+    group.items.forEach((item) => {
+      const type = item.debit_credit === "C" ? "Credit" : "Debit";
+      const amount = item.amount.replace(/[^\d]/g, "");
+      const splitStatus = item.split_bill_id ? "Split Bill Created" : "-";
+      csvData.push([
+        item.transactionDate,
+        item.type,
+        item.detail,
+        amount,
+        type,
+        splitStatus,
+      ]);
     });
+  });
 
-    // Convert to CSV string
-    const csvContent = csvData.map((row) => row.join(",")).join("\n");
+  const csvContent = csvData.map((row) => row.join(",")).join("\n");
 
-    // Create blob and download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
 
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `Savings_Transactions_${selectedCard?.account_number}_${selectedMonth?.label}_${selectedMonth?.year}.csv`
-    );
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };import React, { useState, useEffect } from "react";
+  link.setAttribute("href", url);
+  link.setAttribute(
+    "download",
+    `Savings_Transactions_${selectedCard?.account_number}_${selectedMonth?.label}_${selectedMonth?.year}.csv`
+  );
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+import React, { useState, useEffect } from "react";
 import SplitBillForm from "../../../shared/components/SplitBillForm";
 import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
 import TransactionHistory from "../../../shared/components/TransactionHistory";
@@ -78,17 +77,14 @@ export default function DetailMyCard() {
     flat.forEach((trx) => {
       let d;
       try {
-        // Try parsing the date in various formats
         const dateStr = trx.transactionDate;
         if (!dateStr) return;
-        
-        // Format: YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss
         if (dateStr.includes('-')) {
           d = new Date(dateStr);
         } else {
           d = new Date(dateStr);
         }
-        
+
         // Check if date is valid
         if (isNaN(d.getTime())) {
           console.warn('Invalid date:', dateStr);
@@ -116,10 +112,10 @@ export default function DetailMyCard() {
         detail: trx.partyName,
         partyName: trx.partyName,
         partyDetail: trx.partyDetail,
-        amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
-        debit_credit: trx.debit_credit,
-        jenisTransaksi: trx.debit_credit === "D" ? "Pengeluaran" : "Pemasukan",
-        split_bill_id: trx.split_bill_id ?? null,
+        amount: (trx.debitCredit === "C" ? "+" : "-") + trx.amount,
+        debit_credit: trx.debitCredit,
+        jenisTransaksi: trx.debitCredit === "D" ? "Pengeluaran" : "Pemasukan",
+        split_bill_id: trx.splitBillId ?? null,
       });
     });
 
@@ -233,7 +229,19 @@ export default function DetailMyCard() {
     const grouped = mapTransactionsToGroups(data.transactions);
     setTransactions(grouped);
   };
-
+  if (!selectedCard) {
+    return (
+      <div className="detail-mycard">
+        <Navbar />
+        <main className="main" style={{ padding: "2rem", textAlign: "center" }}>
+          <h2>No cards found</h2>
+          <p style={{ color: "#777" }}>
+            You don’t have any cards linked to your account.
+          </p>
+        </main>
+      </div>
+    );
+  }
   return (
     <div className="detail-mycard">
       <Navbar />
@@ -328,31 +336,29 @@ export default function DetailMyCard() {
               <div
                 className="bar income-bar"
                 style={{
-                  height: `${
-                    chartData.income
-                      ? Math.max(
-                          10,
-                          (chartData.income /
-                            Math.max(chartData.income, chartData.expense || 1)) *
-                            100
-                        )
-                      : 8
-                  }%`,
+                  height: `${chartData.income
+                    ? Math.max(
+                      10,
+                      (chartData.income /
+                        Math.max(chartData.income, chartData.expense || 1)) *
+                      100
+                    )
+                    : 8
+                    }%`,
                 }}
               />
               <div
                 className="bar expense-bar"
                 style={{
-                  height: `${
-                    chartData.expense
-                      ? Math.max(
-                          6,
-                          (chartData.expense /
-                            Math.max(chartData.income || 1, chartData.expense)) *
-                            100
-                        )
-                      : 6
-                  }%`,
+                  height: `${chartData.expense
+                    ? Math.max(
+                      6,
+                      (chartData.expense /
+                        Math.max(chartData.income || 1, chartData.expense)) *
+                      100
+                    )
+                    : 6
+                    }%`,
                 }}
               />
             </div>

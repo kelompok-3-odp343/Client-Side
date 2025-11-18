@@ -68,7 +68,7 @@ export default function PensionFunds() {
     }
   };
 
-const handleDownloadCSV = () => {
+  const handleDownloadCSV = () => {
     if (!transactions || transactions.length === 0) {
       alert("No transactions to download");
       return;
@@ -92,14 +92,12 @@ const handleDownloadCSV = () => {
       });
     });
 
-    // Convert to CSV string
     const csvContent = csvData.map((row) => row.join(",")).join("\n");
 
-    // Create blob and download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
@@ -148,7 +146,7 @@ const handleDownloadCSV = () => {
     const data = await fetchDPLKTransactionHistory({
       month: m.month,
       year: m.year,
-      accountNumber: selectedAccount || "",
+      accountNumber: "",
     });
 
     const list = data.transactions || data.transaction || [];

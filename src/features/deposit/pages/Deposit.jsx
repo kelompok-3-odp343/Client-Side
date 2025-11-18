@@ -71,11 +71,11 @@ export default function Deposits() {
 
     try {
       const accountNumber = depositsData?.deposits?.[0]?.account_number;
-      
+
       const data = await getTimeDepositTransactions({
         month: m.month,
         year: m.year,
-        accountNumber: accountNumber || "",
+        accountNumber: "",
       });
 
       if (!data?.transactions) {
@@ -91,7 +91,7 @@ export default function Deposits() {
     }
   };
 
-const handleDownloadCSV = () => {
+  const handleDownloadCSV = () => {
     if (!transactions || transactions.length === 0) {
       alert("No transactions to download");
       return;
@@ -122,7 +122,7 @@ const handleDownloadCSV = () => {
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
@@ -141,9 +141,9 @@ const handleDownloadCSV = () => {
       try {
         const dateStr = trx.transactionDate;
         if (!dateStr) return;
-        
+
         d = new Date(dateStr);
-        
+
         if (isNaN(d.getTime())) {
           console.warn('Invalid date:', dateStr);
           return;
@@ -167,9 +167,9 @@ const handleDownloadCSV = () => {
         transactionDate: trx.transactionDate,
         type: trx.transactionType,
         detail: trx.partyName,
-        amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
-        jenisTransaksi: trx.debit_credit === "D" ? "Pengeluaran" : "Pemasukan",
-        debit_credit: trx.debit_credit,
+        amount: (trx.debitCredit === "C" ? "+" : "-") + trx.amount,
+        jenisTransaksi: trx.debitCredit === "D" ? "Pengeluaran" : "Pemasukan",
+        debit_credit: trx.debitCredit,
         partyName: trx.partyName,
         partyDetail: trx.partyDetail,
       });
