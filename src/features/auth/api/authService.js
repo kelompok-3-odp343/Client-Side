@@ -164,3 +164,29 @@ export async function postForgotPasswordReset({
     };
   }
 }
+
+export async function postLogout() {
+  try {
+    const token = sessionStorage.getItem("token") || sessionStorage.getItem("sessionID");
+
+    const res = await api.post(
+      `/api/auth/logout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { ok: true, data: res.data };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Logout failed. Please try again.",
+    };
+  }
+}

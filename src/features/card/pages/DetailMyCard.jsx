@@ -52,9 +52,9 @@ export default function DetailMyCard() {
         detail: trx.partyName,
         partyName: trx.partyName,
         partyDetail: trx.partyDetail,
-        amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
-        debit_credit: trx.debit_credit,
-        jenisTransaksi: trx.debit_credit === "D" ? "Pengeluaran" : "Pemasukan",
+        amount: (trx.debitCredit === "C" ? "+" : "-") + trx.amount,
+        debitCredit: trx.debitCredit,
+        jenisTransaksi: trx.debitCredit === "D" ? "Pengeluaran" : "Pemasukan",
         split_bill_id: trx.split_bill_id ?? null,
       });
     });
@@ -254,11 +254,11 @@ export default function DetailMyCard() {
                 style={{
                   height: `${chartData.income
                     ? Math.max(
-                        10,
-                        (chartData.income /
-                          Math.max(chartData.income, chartData.expense || 1)) *
-                          100
-                      )
+                      10,
+                      (chartData.income /
+                        Math.max(chartData.income, chartData.expense || 1)) *
+                      100
+                    )
                     : 8}%`,
                 }}
               />
@@ -267,11 +267,11 @@ export default function DetailMyCard() {
                 style={{
                   height: `${chartData.expense
                     ? Math.max(
-                        6,
-                        (chartData.expense /
-                          Math.max(chartData.income || 1, chartData.expense)) *
-                          100
-                      )
+                      6,
+                      (chartData.expense /
+                        Math.max(chartData.income || 1, chartData.expense)) *
+                      100
+                    )
                     : 6}%`,
                 }}
               />
@@ -291,7 +291,7 @@ export default function DetailMyCard() {
                   key={m.month + "-" + m.year}
                   className={
                     m.month === selectedMonth?.month &&
-                    m.year === selectedMonth?.year
+                      m.year === selectedMonth?.year
                       ? "active"
                       : ""
                   }
@@ -325,9 +325,8 @@ export default function DetailMyCard() {
 
                         <div className="transaction-amount-modern">
                           <span
-                            className={`amount ${
-                              item.amount.startsWith("+") ? "credit" : "debit"
-                            }`}
+                            className={`amount ${item.amount.startsWith("+") ? "credit" : "debit"
+                              }`}
                           >
                             {item.amount}
                           </span>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../styles/profile.css";
 import Navbar from "../../../shared/components/Navbar";
 import { getUserProfile } from "../api/profileService";
+import { postLogout } from "../../auth/api/authService";
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -37,7 +38,6 @@ export default function Profile() {
     getProfile();
   }, []);
 
-  // ===== Timer logic =====
   useEffect(() => {
     if (!timerActive || resendTimer <= 0) return;
     const interval = setInterval(() => {
@@ -58,13 +58,30 @@ export default function Profile() {
   const fullName = [profile.firstName, profile.middleName, profile.lastName]
     .filter(Boolean)
     .join(" ");
+
   const formattedDOB = new Date(profile.dob).toLocaleDateString("id-ID", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   });
 
-  // ===== Modal Handlers =====
+  const handleLogout = async () => {
+    try {
+      const resp = await postLogout();
+      sessionStorage.clear();
+
+      if (!resp.ok) {
+        console.warn("Logout API failed:", resp.message);
+      }
+
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Logout error:", err);
+      sessionStorage.clear();
+      window.location.href = "/";
+    }
+  };
+
   const handleSendOtp = () => {
     setShowOtpConfirm(false);
     setShowOtpModal(true);
@@ -203,9 +220,6 @@ export default function Profile() {
           </div>
 
           <div className="bottom-buttons flex justify-end">
-            {/* <button className="update-pass-btn" onClick={() => setShowOtpConfirm(true)}>
-              Update Password
-            </button> */}
             <button className="signout-btn" onClick={() => setShowLogoutConfirm(true)}>
               Sign Out
             </button>
@@ -213,7 +227,6 @@ export default function Profile() {
         </section>
       </main>
 
-      {/* ========== Modal: Confirm Send OTP ========== */}
       {showOtpConfirm && (
         <div className="modal-overlay">
           <div className="modal-card confirm-otp">
@@ -232,7 +245,6 @@ export default function Profile() {
         </div>
       )}
 
-      {/* ========== Modal: OTP Verification ========== */}
       {showOtpModal && (
         <div className="modal-overlay">
           <div className="modal-card otp-verification">
@@ -275,7 +287,6 @@ export default function Profile() {
         </div>
       )}
 
-      {/* ========== Modal: New Password ========== */}
       {showPasswordModal && (
         <div className="modal-overlay">
           <div className="modal-card password-modal">
@@ -322,7 +333,6 @@ export default function Profile() {
         </div>
       )}
 
-      {/* ========== Modal: Password Success ========== */}
       {showSuccessModal && (
         <div className="modal-overlay">
           <div className="modal-card success">
@@ -335,7 +345,6 @@ export default function Profile() {
         </div>
       )}
 
-      {/* ========== Modal: Sign Out Confirmation ========== */}
       {showLogoutConfirm && (
         <div className="modal-overlay">
           <div className="modal-card logout-confirm">
@@ -343,7 +352,7 @@ export default function Profile() {
             <h2>Confirm Sign Out</h2>
             <p>Are you sure you want to sign out from your account?</p>
             <div className="confirm-actions">
-              <button className="primary-btn" onClick={() => (window.location.href = "/")}>
+              <button className="primary-btn" onClick={handleLogout}>
                 Yes, Sign Out
               </button>
               <button className="cancel-btn" onClick={() => setShowLogoutConfirm(false)}>
