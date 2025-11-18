@@ -26,7 +26,7 @@ export default function SplitBill() {
     loadData();
   }, []);
 
-  const cardColors = ["#6dddd0", "#ffd367", "#9c7edc"];
+  const cardColors = ["#6dddd0", "#FFB500", "#9c7edc"];
 
   if (loading) return <div className="loading">Loading split bills...</div>;
 
