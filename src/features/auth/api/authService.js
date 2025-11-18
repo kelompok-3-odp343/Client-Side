@@ -62,13 +62,14 @@ export async function postVerifyOtp({ sessionID, otp_code }) {
       otpCode: otp_code,
     };
     const res = await api.post(`/api/auth/verify-otp`, payload);
+    console.log('cxxz', res)
     return { ok: true, data: res.data };
   } catch (error) {
     if (import.meta.env.MODE !== "production") {
       if (otp_code === "123456" || otp_code === "000000") {
         return {
           ok: true,
-          data: { status: true, message: "DEV: OTP Verified", token: "DEV_TOKEN" },
+          data: { status: true, message: "DEV: OTP Verified", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJQMDAzIiwiY2lmIjoiQ0lGMDAzIiwicm9sZSI6Ik5BU0FCQUgiLCJ1c2VybmFtZSI6IlAwMDMiLCJpYXQiOjE3NjMzOTIxNDksImV4cCI6MTc2MzM5NTc0OX0.Q49wJYYTQGjOszvJkfsM5itYzGbXZ9icnpQcDum7pmY" },
         };
       }
     }
