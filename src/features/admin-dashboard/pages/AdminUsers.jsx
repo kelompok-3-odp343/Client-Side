@@ -10,13 +10,7 @@ import StatusBadge from "../components/StatusBadge";
 import Pagination from "../components/Pagination";
 
 import "../styles/admin-users.css";
-import { fetchAdminUsers, fetchMenuAccess } from "../service/adminUsersService";
-
-import {
-	saveMenuAccessToSession,
-	getUserBlockRule,
-	getUserUnblockRule
-} from "../../../utils/menuAccessSession";
+import { fetchAdminUsers } from "../service/adminUsersService";
 
 export default function AdminUsers() {
 	const navigate = useNavigate();
@@ -54,26 +48,6 @@ export default function AdminUsers() {
 		};
 
 		load();
-		return () => (mounted = false);
-	}, []);
-
-	useEffect(() => {
-		let mounted = true;
-
-		const loadMenuAccess = async () => {
-			try {
-				const resp = await fetchMenuAccess();
-				if (!mounted) return;
-
-				saveMenuAccessToSession(resp.data);
-				sessionStorage.setItem('user_block', getUserBlockRule())
-				sessionStorage.setItem('user_unblock', getUserUnblockRule())
-			} catch (err) {
-				console.warn("Failed loading menu access.");
-			}
-		};
-
-		loadMenuAccess();
 		return () => (mounted = false);
 	}, []);
 
