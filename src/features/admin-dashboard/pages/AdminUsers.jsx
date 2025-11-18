@@ -10,7 +10,13 @@ import StatusBadge from "../components/StatusBadge";
 import Pagination from "../components/Pagination";
 
 import "../styles/admin-users.css";
-import { fetchAdminUsers } from "../service/adminUsersService";
+import { fetchAdminUsers, fetchMenuAccess } from "../service/adminUsersService";
+
+import {
+	saveMenuAccessToSession,
+	getUserBlockRule,
+	getUserUnblockRule
+} from "../../../utils/menuAccessSession";
 
 export default function AdminUsers() {
 	const navigate = useNavigate();
@@ -34,6 +40,7 @@ export default function AdminUsers() {
 		const load = async () => {
 			setLoading(true);
 			setLoadError(false);
+
 			try {
 				const resp = await fetchAdminUsers();
 				if (!mounted) return;
@@ -47,36 +54,55 @@ export default function AdminUsers() {
 		};
 
 		load();
-		return () => {
-			mounted = false;
+		return () => (mounted = false);
+	}, []);
+
+	useEffect(() => {
+		let mounted = true;
+
+		const loadMenuAccess = async () => {
+			try {
+				const resp = await fetchMenuAccess();
+				if (!mounted) return;
+
+				saveMenuAccessToSession(resp.data);
+				sessionStorage.setItem('user_block', getUserBlockRule())
+				sessionStorage.setItem('user_unblock', getUserUnblockRule())
+			} catch (err) {
+				console.warn("Failed loading menu access.");
+			}
 		};
+
+		loadMenuAccess();
+		return () => (mounted = false);
 	}, []);
 
 	const users = useMemo(() => {
 		if (!userData?.users) return [];
+
 		return userData.users.map((u, idx) => ({
 			id: u.userId || `user-${idx}`,
 			noIndex: idx + 1,
 			cif: u.customerId,
 			customerName: u.customerName,
 			status: u.isBlocked ? "Blocked" : "Active",
-			accountCount: u.countAccount,
-			raw: u,
+			accountCount: u.countAccount
 		}));
 	}, [userData]);
 
 	const filteredUsers = useMemo(() => {
 		const q = searchQuery.trim().toLowerCase();
+
 		return users.filter((u) => {
-			const matchesSearch =
+			const s1 =
 				!q ||
 				u.customerName.toLowerCase().includes(q) ||
 				(u.cif && u.cif.includes(q));
 
-			const matchesStatus =
+			const s2 =
 				filterStatus.length === 0 || filterStatus.includes(u.status);
 
-			return matchesSearch && matchesStatus;
+			return s1 && s2;
 		});
 	}, [users, searchQuery, filterStatus]);
 
@@ -90,8 +116,10 @@ export default function AdminUsers() {
 
 	const sortedUsers = useMemo(() => {
 		if (!sortConfig) return filteredUsers;
+
 		const { key, direction } = sortConfig;
 		const dir = direction === "asc" ? 1 : -1;
+
 		return [...filteredUsers].sort((a, b) => {
 			const va = a[key];
 			const vb = b[key];
@@ -100,9 +128,9 @@ export default function AdminUsers() {
 			if (va == null) return -1 * dir;
 			if (vb == null) return 1 * dir;
 
-			if (typeof va === "number" && typeof vb === "number") {
+			if (typeof va === "number" && typeof vb === "number")
 				return (va - vb) * dir;
-			}
+
 			return String(va).localeCompare(String(vb)) * dir;
 		});
 	}, [filteredUsers, sortConfig]);
@@ -128,7 +156,7 @@ export default function AdminUsers() {
 		{ key: "customerName", label: "Customer Name", sortable: true },
 		{ key: "status", label: "Customer Status", sortable: true, filterable: true },
 		{ key: "accountCount", label: "# of Accounts", sortable: true },
-		{ key: "action", label: "Action" },
+		{ key: "action", label: "Action" }
 	];
 
 	const renderColumnHeader = (column) => {
@@ -142,10 +170,11 @@ export default function AdminUsers() {
 						e.stopPropagation();
 						setShowStatusFilter((v) => !v);
 					}}
-					title="Filter"
 				>
 					<Filter size={16} />
-					{hasActiveFilters && <span className="filter-badge">{filterStatus.length}</span>}
+					{hasActiveFilters && (
+						<span className="filter-badge">{filterStatus.length}</span>
+					)}
 				</button>
 
 				{showStatusFilter && (
@@ -156,12 +185,13 @@ export default function AdminUsers() {
 						/>
 						<div className="filter-dropdown">
 							<div className="filter-dropdown-header">
-								<span className="filter-dropdown-title">{column.label}</span>
+								<span className="filter-dropdown-title">
+									{column.label}
+								</span>
 								{hasActiveFilters && (
 									<button
 										className="clear-filter-btn"
 										onClick={() => setFilterStatus([])}
-										title="Clear filter"
 									>
 										<X size={14} /> Clear
 									</button>
@@ -194,20 +224,21 @@ export default function AdminUsers() {
 	};
 
 	const renderCell = (row, column, index) => {
-		if (column.key === "noIndex") return (page - 1) * rowsPerPage + index + 1;
+		if (column.key === "noIndex")
+			return (page - 1) * rowsPerPage + index + 1;
 
-		if (column.key === "status") {
+		if (column.key === "status")
 			return <StatusBadge status={row.status} type="user" />;
-		}
 
 		if (column.key === "action") {
 			return (
 				<button
 					className="view-details-btn"
 					onClick={() =>
-						navigate(`/admin/users/detail`, { state: { userId: row.id } })
+						navigate(`/admin/users/detail`, {
+							state: { userId: row.id }
+						})
 					}
-					type="button"
 				>
 					<Eye size={24} />
 				</button>
@@ -260,7 +291,9 @@ export default function AdminUsers() {
 							</div>
 
 							<div className="stat-card stat-avg">
-								<h3 className="stat-label">Avg. # of Accounts per User</h3>
+								<h3 className="stat-label">
+									Avg. # of Accounts per User
+								</h3>
 								<hr />
 								<div className="stat-value">
 									{userData.avgAccountPerUser}

@@ -66,9 +66,9 @@ export default function DetailMyCard() {
         detail: trx.partyName,
         partyName: trx.partyName,
         partyDetail: trx.partyDetail,
-        amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
-        debit_credit: trx.debit_credit,
-        jenisTransaksi: trx.debit_credit === "D" ? "Pengeluaran" : "Pemasukan",
+        amount: (trx.debitCredit === "C" ? "+" : "-") + trx.amount,
+        debitCredit: trx.debitCredit,
+        jenisTransaksi: trx.debitCredit === "D" ? "Pengeluaran" : "Pemasukan",
         split_bill_id: trx.split_bill_id ?? null,
       });
     });

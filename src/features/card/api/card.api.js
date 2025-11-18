@@ -33,10 +33,15 @@ export async function fetchAllCards() {
 
 export async function fetchTransactionHistory({ month, year, accountNumber }) {
   try {
+    const payload = {
+      month,
+      year,
+      accountNumber,
+      productType: 'SVG'
+    }
+
     const token = sessionStorage.getItem("token");
-    const resp = await api.post("/api/v1/trx-history", {
-      month, year, accountNumber, productType: 'SVG'
-    }, {
+    const resp = await api.post("/api/v1/trx-history", payload, {
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -44,7 +49,7 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
       },
     });
 
-    const trx = resp?.data?.transactions || resp?.data?.transaction;
+    const trx = resp?.data?.transaction;
 
     if (Array.isArray(trx) && trx.length > 0) {
       return { transactions: trx };
