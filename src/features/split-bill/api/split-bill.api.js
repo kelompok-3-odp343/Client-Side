@@ -23,7 +23,6 @@ function normalizeBill(b) {
       Number(b.total_bill || b.totalBill || b.totalAmount || 0) || 0,
     ref_id: b.ref_id || b.refId || b.transactionId || null,
     created_time: b.created_time || b.createdTime || b.created_at || new Date().toISOString(),
-    // normalize members to { member_id?, member_name, amount, status, hasPaid? }
     members: (b.members || b.billMembers || b.splitBillMemberDetail || []).map((m) => {
       const amountRaw = m.amount ?? m.amountShare ?? m.totalBillAmount ?? 0;
       const amount = typeof amountRaw === "string"
@@ -76,13 +75,13 @@ export async function fetchSplitBills() {
       };
     }
 
-    return { status: true, data: [] };
+    return { status: true, data: DUMMY_STORAGE.map(normalizeBill) };
 
   } catch (error) {
     console.error("Gagal memuat Split Bill:", error?.message || error);
     return {
       status: true,
-      data: [],
+      data: DUMMY_STORAGE.map(normalizeBill)
     };
   }
 }

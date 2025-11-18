@@ -15,7 +15,6 @@ const mapAccountToKey = (accountNumber) => {
   if (num.includes("gad")) return "gadget";
   if (num.includes("veh")) return "vehicles";
 
-  // fallback default
   return "education";
 };
 
