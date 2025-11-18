@@ -52,8 +52,8 @@ export default function OtpLogin() {
 			return;
 		}
 
-		const token = sessionStorage.setItem("token", resp.data.token);
-		const userData = decodeJwtToken(token);
+		sessionStorage.setItem("token", resp.data.token);
+		const userData = decodeJwtToken(resp.data.token);
 		if (userData) {
 			sessionStorage.setItem("user_id", userData.userId);
 			sessionStorage.setItem("username", userData.username);

@@ -41,17 +41,18 @@ export default function Login() {
 		}
 
 		const token = respLogin.data.sessionIdOrToken;
+		console.log('token', token)
 
-		let decoded = {};
-		if (respLogin.data.role !== "NASABAH") {
-			try {
-				decoded = decodeJwtToken(token);
-			} catch (err) {
-				console.error("JWT decode error:", err);
-			}
-		}
+		// let decoded = {};
+		// if (respLogin.data.role !== "NASABAH") {
+		// 	try {
+		// 		decoded = decodeJwtToken(token);
+		// 	} catch (err) {
+		// 		console.error("JWT decode error:", err);
+		// 	}
+		// }
 
-		sessionStorage.setItem("sessionID", token);
+		sessionStorage.setItem("sessionID", respLogin.data.sessionIdOrToken);
 
 		setMessage(respLogin.data.message || "Login success");
 		setModalType("success");
