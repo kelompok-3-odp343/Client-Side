@@ -32,7 +32,7 @@ export async function postAuthLogin({ username, password }) {
           ok: true,
           data: {
             status: true,
-            sessionIdOrToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJQMDAzIiwicm9sZSI6Ik1BS0VSIiwiZW1haWwiOiJQMDAzQGV4YW1wbGUuY29tIiwidXNlcm5hbWUiOiJuYXRhbmFlbHdpcmEiLCJpYXQiOjE3NjMzNjg0MzQsImV4cCI6MTc2MzM3MjAzNH0.uSAlfA-KrsvEaCVImWPsa-sd8zSUdsK4GhInJ37eTK0",
+            sessionIdOrToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJQMDAzIiwiY2lmIjoiQ0lGMDAzIiwicm9sZSI6Ik5BU0FCQUgiLCJ1c2VybmFtZSI6IlAwMDMiLCJpYXQiOjE3NjMzOTIxNDksImV4cCI6MTc2MzM5NTc0OX0.Q49wJYYTQGjOszvJkfsM5itYzGbXZ9icnpQcDum7pmY",
             message: "DEV: User login success",
           },
         };
