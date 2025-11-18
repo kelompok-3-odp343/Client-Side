@@ -1,8 +1,6 @@
-// src/api/jwtHelper.js
 import { jwtDecode } from "jwt-decode";
 
 /**
- *
  * @param {string} token
  * @returns {object|null}
  */

@@ -92,7 +92,7 @@ export async function getSplitBillById(splitBillId) {
     const token = sessionStorage.getItem("token");
 
     const res = await api.post(
-      "/api/split-bill/detail",
+      "/api/v1/split-bill/detail",
       { splitBillId },
       {
         headers: {
@@ -133,7 +133,7 @@ export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
       })),
     };
 
-    const res = await api.post("/api/split-bill/update", payload, {
+    const res = await api.post("/api/v1/split-bill/update", payload, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -183,7 +183,7 @@ export async function createSplitBill(payload) {
   try {
     const token = sessionStorage.getItem("token");
 
-    const res = await api.post("/api/split-bill/add", newBill, {
+    const res = await api.post("/api/v1/split-bill/add", newBill, {
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
