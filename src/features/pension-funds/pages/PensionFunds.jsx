@@ -68,6 +68,49 @@ export default function PensionFunds() {
     }
   };
 
+const handleDownloadCSV = () => {
+    if (!transactions || transactions.length === 0) {
+      alert("No transactions to download");
+      return;
+    }
+
+    // Prepare CSV data
+    const csvData = [];
+    csvData.push(["Date", "Transaction Type", "Description", "Amount", "Type"]);
+
+    transactions.forEach((group) => {
+      group.items.forEach((item) => {
+        const type = item.debit_credit === "C" ? "Credit" : "Debit";
+        const amount = item.amount.replace(/[^\d]/g, "");
+        csvData.push([
+          item.transactionDate,
+          item.type,
+          item.detail,
+          amount,
+          type,
+        ]);
+      });
+    });
+
+    // Convert to CSV string
+    const csvContent = csvData.map((row) => row.join(",")).join("\n");
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `DPLK_Transactions_${selectedMonth?.label}_${selectedMonth?.year}.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const mapDPLKTransactions = (list) => {
     const groups = {};
 
@@ -102,12 +145,10 @@ export default function PensionFunds() {
   };
 
   const fetchDPLKTransactionsForMonth = async (m) => {
-    if (!selectedAccount) return;
-
     const data = await fetchDPLKTransactionHistory({
       month: m.month,
       year: m.year,
-      accountNumber: "",
+      accountNumber: selectedAccount || "",
     });
 
     const list = data.transactions || data.transaction || [];
@@ -189,7 +230,7 @@ export default function PensionFunds() {
             }}
             productType="DPLK"
             showDownloadButton={true}
-            onDownload={() => console.log("Download DPLK transactions")}
+            onDownload={handleDownloadCSV}
             emptyMessage="No transactions available"
           />
         </section>

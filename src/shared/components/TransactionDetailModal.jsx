@@ -20,7 +20,8 @@ export default function TransactionDetailModal({
 
   const isExpense =
     transaction.debit_credit === "D" ||
-    transaction.jenisTransaksi === "Pengeluaran";
+    transaction.jenisTransaksi === "Pengeluaran" ||
+    (typeof transaction.amount === "string" && transaction.amount.startsWith("-"));
 
   const canSplitBill = isExpense && productType === "SAV";
   const hasSplitBill = transaction.split_bill_id;
@@ -57,20 +58,24 @@ export default function TransactionDetailModal({
     return billPaymentIcon;
   };
 
-  const handleSplit = () => {
+  const handleSplit = (e) => {
+    e.stopPropagation();
     if (hasSplitBill) {
       navigate(`/splitbill/detail`, {
         state: { splitBillId: transaction.split_bill_id, color: "#6dddd0" },
       });
+      onClose();
     } else {
-      onSplitBill(transaction);
+      onClose();
+      if (onSplitBill) {
+        onSplitBill(transaction);
+      }
     }
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="trxv2-modal">
-
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="trxv2-modal" onClick={(e) => e.stopPropagation()}>
         <button className="trxv2-close" onClick={onClose}>
           <X size={20} />
         </button>
@@ -86,9 +91,7 @@ export default function TransactionDetailModal({
         </p>
 
         <p className="trxv2-sub">
-          {transaction.transactionId
-            ? `ID: ${transaction.transactionId}`
-            : ""}
+          {transaction.transactionId ? `ID: ${transaction.transactionId}` : ""}
         </p>
 
         <p

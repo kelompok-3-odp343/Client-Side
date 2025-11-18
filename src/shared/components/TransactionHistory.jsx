@@ -162,9 +162,10 @@ export default function TransactionHistory({
                               // Navigate to split bill detail
                               window.location.href = `/splitbill/detail?id=${item.split_bill_id}`;
                             } else {
-                              // Open split bill form
-                              if (item.onSplitBill) {
-                                item.onSplitBill(item);
+                              // Trigger parent to open split bill form
+                              if (onTransactionClick) {
+                                // First open detail modal, then user can click split bill there
+                                onTransactionClick(item);
                               }
                             }
                           }}

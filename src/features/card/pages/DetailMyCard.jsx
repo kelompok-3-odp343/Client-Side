@@ -1,4 +1,54 @@
-import React, { useState, useEffect } from "react";
+const handleDownloadCSV = () => {
+    if (!transactions || transactions.length === 0) {
+      alert("No transactions to download");
+      return;
+    }
+
+    // Prepare CSV data
+    const csvData = [];
+    csvData.push([
+      "Date",
+      "Transaction Type",
+      "Description",
+      "Amount",
+      "Type",
+      "Split Bill Status",
+    ]);
+
+    transactions.forEach((group) => {
+      group.items.forEach((item) => {
+        const type = item.debit_credit === "C" ? "Credit" : "Debit";
+        const amount = item.amount.replace(/[^\d]/g, "");
+        const splitStatus = item.split_bill_id ? "Split Bill Created" : "-";
+        csvData.push([
+          item.transactionDate,
+          item.type,
+          item.detail,
+          amount,
+          type,
+          splitStatus,
+        ]);
+      });
+    });
+
+    // Convert to CSV string
+    const csvContent = csvData.map((row) => row.join(",")).join("\n");
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `Savings_Transactions_${selectedCard?.account_number}_${selectedMonth?.label}_${selectedMonth?.year}.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };import React, { useState, useEffect } from "react";
 import SplitBillForm from "../../../shared/components/SplitBillForm";
 import TransactionDetailModal from "../../../shared/components/TransactionDetailModal";
 import TransactionHistory from "../../../shared/components/TransactionHistory";
@@ -66,9 +116,9 @@ export default function DetailMyCard() {
         detail: trx.partyName,
         partyName: trx.partyName,
         partyDetail: trx.partyDetail,
-        amount: (trx.debitCredit === "C" ? "+" : "-") + trx.amount,
-        debitCredit: trx.debitCredit,
-        jenisTransaksi: trx.debitCredit === "D" ? "Pengeluaran" : "Pemasukan",
+        amount: (trx.debit_credit === "C" ? "+" : "-") + trx.amount,
+        debit_credit: trx.debit_credit,
+        jenisTransaksi: trx.debit_credit === "D" ? "Pengeluaran" : "Pemasukan",
         split_bill_id: trx.split_bill_id ?? null,
       });
     });
@@ -315,10 +365,12 @@ export default function DetailMyCard() {
             months={months}
             selectedMonth={selectedMonth}
             onMonthChange={handleSelectedMonth}
-            themeColor="#6dddd0"
+            themeColor="#ffa96b"
             title="Transaction History"
             onTransactionClick={handleOpenDetail}
             productType="SAV"
+            showDownloadButton={true}
+            onDownload={handleDownloadCSV}
             emptyMessage="No transactions available"
           />
         </section>
