@@ -49,6 +49,9 @@ export default function Login() {
 
 		const token = respLogin.data.sessionIdOrToken;
 		sessionStorage.setItem("sessionID", respLogin.data.sessionIdOrToken);
+		if (!respLogin.data.role !== "NASABAH") {
+			sessionStorage.setItem('token', respLogin.data.sessionIdOrToken)
+		}
 
 		setMessage(respLogin.data.message || "Login success");
 		setModalType("success");
