@@ -77,7 +77,9 @@ export default function Login() {
 				}
 
 				sessionStorage.setItem("role", apiRole);
-				sessionStorage.setItem("npp", decoded.npp || "ADM001");
+				sessionStorage.setItem("npp", decoded.npp);
+				sessionStorage.setItem("userId", decoded.userId)
+				sessionStorage.setItem("email", decoded.email)
 
 				try {
 					const resp = await fetchMenuAccess();
@@ -92,7 +94,7 @@ export default function Login() {
 				navigate("/admin/home");
 				return;
 			}
-			navigate("/otpLogin");
+			// navigate("/otpLogin");
 		}, 800);
 	};
 
