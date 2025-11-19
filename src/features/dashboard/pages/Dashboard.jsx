@@ -241,7 +241,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   className="btn-add"
-                  onClick={() => handleNavigate("detailMyCard")}
+                  onClick={() => navigate("/detailmycard", { state: { cards } })}
                 >
                   + Add a New Bill
                 </button>
