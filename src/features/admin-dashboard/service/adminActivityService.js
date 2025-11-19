@@ -70,3 +70,35 @@ export const fetchAdminActivityDetail = async (activityId) => {
         return dummy;
     }
 };
+
+export const postAdminApproval = async ({ activityId, approverData, isApprove }) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const payload = {
+            activityId,
+            isApprove,
+            approverData
+        };
+
+        const resp = await api.post("/api/admin/approval", payload, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        return { ok: true, data: resp.data };
+
+    } catch (err) {
+        console.error("Approval API Error:", err);
+
+        return {
+            ok: false,
+            message:
+                err?.response?.data?.message ||
+                err?.message ||
+                "Approval failed (DEV fallback).",
+        };
+    }
+};

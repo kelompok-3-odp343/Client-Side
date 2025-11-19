@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
+import Swal from "sweetalert2";
+
 import { fetchAdminActivityDetail } from "../service/adminActivityService";
 import "../styles/admin-activity-detail.css";
+
+import { apiApproval } from "../service/adminApprovalService";
 
 export default function AdminActivityDetail() {
 	const location = useLocation();
 	const navigate = useNavigate();
+
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showApproveModal, setShowApproveModal] = useState(false);
@@ -20,13 +26,10 @@ export default function AdminActivityDetail() {
 
 	const [activityData, setActivityData] = useState(null);
 
-	const currentUserRole = sessionStorage.getItem("userRole") || "maker";
-
-	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+	const currentUserRole = sessionStorage.getItem("role") || "MAKER";
 
 	useEffect(() => {
 		let mounted = true;
-
 		const passedId = location.state?.activityId;
 
 		if (!passedId) {
@@ -50,29 +53,82 @@ export default function AdminActivityDetail() {
 		{ id: "ADM005", name: "Approver 2" },
 	];
 
-	const handleReject = () => setShowRejectModal(true);
-
 	const handleApprove = () => {
 		if (activityData.status === "PENDING_CHECKER") {
 			setShowApproveModal(true);
 			return;
 		}
 		if (activityData.status === "PENDING_APPROVER") {
-			confirmApproval();
+			confirmFinalApproval();
 		}
 	};
 
-	const buildSuccessDetails = (activity, label, timestamp) => {
-		if (!activity) return null;
+	const confirmCheckerApproval = async () => {
+		if (!selectedApprover) {
+			Swal.fire("Warning", "Please select an approver", "warning");
+			return;
+		}
 
-		return {
-			timestampLabel: label,
-			timestamp,
-			activityId: activity.activityId,
-			menu: activity.menu,
-			actionMenu: activity.menu_action,
+		const selected = approvers.find((a) => a.id === selectedApprover);
+
+		const payload = {
+			activityId: activityData.activityId,
+			isApprove: true,
+			approverData: {
+				userId: selected.id,
+				npp: "64889",
+				fullName: selected.name
+			}
 		};
+
+		setShowApproveModal(false);
+
+		const resp = await apiApproval(payload);
+
+		if (resp.ok) {
+			const timestamp = new Date(resp.data.updatedTime).toLocaleString("en-GB");
+
+			setSuccessMessage("Activity Checked");
+			setSuccessDetails({
+				timestampLabel: "Checked at",
+				timestamp,
+				activityId: activityData.activityId,
+				menu: activityData.menu,
+				actionMenu: activityData.menu_action
+			});
+			setShowSuccessModal(true);
+		} else {
+			Swal.fire("Error", "Failed to submit checking", "error");
+		}
 	};
+
+	const confirmFinalApproval = async () => {
+		const payload = {
+			activityId: activityData.activityId,
+			isApprove: true,
+			approverData: {}
+		};
+
+		const resp = await apiApproval(payload);
+
+		if (resp.ok) {
+			const timestamp = new Date(resp.data.updatedTime).toLocaleString("en-GB");
+
+			setSuccessMessage("Activity Approved");
+			setSuccessDetails({
+				timestampLabel: "Approved at",
+				timestamp,
+				activityId: activityData.activityId,
+				menu: activityData.menu,
+				actionMenu: activityData.menu_action
+			});
+			setShowSuccessModal(true);
+		} else {
+			Swal.fire("Error", "Approval failed", "error");
+		}
+	};
+
+	const handleReject = () => setShowRejectModal(true);
 
 	const confirmRejection = () => {
 		if (!rejectNotes.trim()) {
@@ -81,68 +137,18 @@ export default function AdminActivityDetail() {
 		}
 
 		const now = new Date();
-		const displayTime = now.toLocaleString("en-GB", {
-			day: "numeric",
-			month: "short",
-			year: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit",
-			hour12: false,
-		});
+		const displayTime = now.toLocaleString("en-GB");
 
 		setShowRejectModal(false);
 
 		setSuccessMessage("Activity Rejected");
-		setSuccessDetails(
-			buildSuccessDetails(activityData, "Rejected at", <strong>{displayTime}</strong>)
-		);
-		setShowSuccessModal(true);
-	};
-
-	const confirmCheckerApproval = () => {
-		if (!selectedApprover) {
-			alert("Please select an approver");
-			return;
-		}
-
-		const now = new Date();
-		const displayTime = now.toLocaleString("en-GB", {
-			day: "numeric",
-			month: "short",
-			year: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit",
-			hour12: false,
+		setSuccessDetails({
+			timestampLabel: "Rejected at",
+			timestamp: displayTime,
+			activityId: activityData.activityId,
+			menu: activityData.menu,
+			actionMenu: activityData.menu_action
 		});
-
-		setShowApproveModal(false);
-		setSelectedApprover("");
-
-		setSuccessMessage("Activity Checked");
-		setSuccessDetails(
-			buildSuccessDetails(activityData, "Checked at", <strong>{displayTime}</strong>)
-		);
-		setShowSuccessModal(true);
-	};
-
-	const confirmApproval = () => {
-		const now = new Date();
-		const displayTime = now.toLocaleString("en-GB", {
-			day: "numeric",
-			month: "short",
-			year: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit",
-			hour12: false,
-		});
-
-		setSuccessMessage("Activity Approved");
-		setSuccessDetails(
-			buildSuccessDetails(activityData, "Approved at", <strong>{displayTime}</strong>)
-		);
 		setShowSuccessModal(true);
 	};
 
@@ -173,25 +179,11 @@ export default function AdminActivityDetail() {
 		}
 	};
 
-	if (!activityData) {
-		return (
-			<div className="admin-container">
-				<AdminNavBar onMenuToggle={toggleSidebar} />
-				<AdminSideBar isOpen={isSidebarOpen} />
-				<main className="admin-activity-detail-main">
-					<div className="loading-state">Loading activity details...</div>
-				</main>
-			</div>
-		);
-	}
-
 	const workflowStep = getWorkflowStep();
 
 	const parseTimelineInfo = (raw) => {
 		if (!raw) return { dateTime: "-", actor: "" };
-
 		const d = new Date(raw.replace("TZ", "Z"));
-
 		if (!isNaN(d.getTime())) {
 			return {
 				dateTime: d.toLocaleString("en-GB", {
@@ -205,14 +197,13 @@ export default function AdminActivityDetail() {
 				actor: "",
 			};
 		}
-
 		return { dateTime: raw, actor: "" };
 	};
 
-	const createdInfo = parseTimelineInfo(activityData.created_time);
-	const checkedInfo = parseTimelineInfo(activityData.checker_updated_time);
-	const approvedInfo = parseTimelineInfo(activityData.approver_updated_time);
-	const rejectedInfo = parseTimelineInfo(activityData.checker_updated_time);
+	const createdInfo = parseTimelineInfo(activityData?.created_time);
+	const checkedInfo = parseTimelineInfo(activityData?.checker_updated_time);
+	const approvedInfo = parseTimelineInfo(activityData?.approver_updated_time);
+	const rejectedInfo = parseTimelineInfo(activityData?.checker_updated_time);
 
 	const canReject = () =>
 		activityData.status === "PENDING_CHECKER" ||
@@ -222,8 +213,17 @@ export default function AdminActivityDetail() {
 		activityData.status === "PENDING_CHECKER" ||
 		activityData.status === "PENDING_APPROVER";
 
-	const isRejectFormValid = rejectNotes.trim();
-	const isApproveFormValid = selectedApprover;
+	if (!activityData) {
+		return (
+			<div className="admin-container">
+				<AdminNavBar onMenuToggle={toggleSidebar} />
+				<AdminSideBar isOpen={isSidebarOpen} />
+				<main className="admin-activity-detail-main">
+					<div className="loading-state">Loading activity details...</div>
+				</main>
+			</div>
+		);
+	}
 
 	return (
 		<div className="admin-container">
@@ -233,7 +233,6 @@ export default function AdminActivityDetail() {
 			<main className="admin-activity-detail-main">
 				<div className="activity-detail-header">
 					<h2>{activityData.menu?.replace("_", " ")}</h2>
-
 					<p className="activity-action">
 						Action: {activityData.menu_action?.replace("_", " ")}
 					</p>
@@ -241,7 +240,6 @@ export default function AdminActivityDetail() {
 
 				<div className="activity-detail-card">
 					<div className="activity-detail-grid">
-
 						<div className="activity-detail-row">
 							<span className="activity-label">Activity ID</span>
 							<span className="activity-value">: {activityData.activityId}</span>
@@ -363,9 +361,9 @@ export default function AdminActivityDetail() {
 								Cancel
 							</button>
 							<button
-								className={`modal-btn modal-btn-submit ${!isRejectFormValid ? "disabled" : ""}`}
+								className={`modal-btn modal-btn-submit ${!rejectNotes.trim() ? "disabled" : ""}`}
 								onClick={confirmRejection}
-								disabled={!isRejectFormValid}
+								disabled={!rejectNotes.trim()}
 							>
 								Submit
 							</button>
@@ -399,9 +397,9 @@ export default function AdminActivityDetail() {
 								Cancel
 							</button>
 							<button
-								className={`modal-btn modal-btn-submit ${!isApproveFormValid ? "disabled" : ""}`}
+								className={`modal-btn modal-btn-submit ${!selectedApprover ? "disabled" : ""}`}
 								onClick={confirmCheckerApproval}
-								disabled={!isApproveFormValid}
+								disabled={!selectedApprover}
 							>
 								Submit
 							</button>
