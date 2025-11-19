@@ -4,10 +4,9 @@ import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import Swal from "sweetalert2";
 
-import { fetchAdminActivityDetail } from "../service/adminActivityService";
-import "../styles/admin-activity-detail.css";
+import { fetchAdminActivityDetail, postAdminApproval } from "../service/adminActivityService";
 
-import { apiApproval } from "../service/adminApprovalService";
+import "../styles/admin-activity-detail.css";
 
 export default function AdminActivityDetail() {
 	const location = useLocation();
@@ -33,7 +32,6 @@ export default function AdminActivityDetail() {
 		const passedId = location.state?.activityId;
 
 		if (!passedId) {
-			console.warn("No activityId passed — redirecting back.");
 			navigate("/admin/activity");
 			return;
 		}
@@ -47,10 +45,9 @@ export default function AdminActivityDetail() {
 		return () => (mounted = false);
 	}, [location.state]);
 
-
 	const approvers = [
-		{ id: "ADM003", name: "Wira Natanael Uli" },
-		{ id: "ADM005", name: "Approver 2" },
+		{ id: "ADM003", name: "Wira Natanael Uli", npp: "64888" },
+		{ id: "ADM005", name: "Approver 2", npp: "64877" }
 	];
 
 	const handleApprove = () => {
@@ -69,21 +66,21 @@ export default function AdminActivityDetail() {
 			return;
 		}
 
-		const selected = approvers.find((a) => a.id === selectedApprover);
+		const selected = approvers.find(a => a.id === selectedApprover);
 
 		const payload = {
 			activityId: activityData.activityId,
 			isApprove: true,
 			approverData: {
 				userId: selected.id,
-				npp: "64889",
+				npp: selected.npp,
 				fullName: selected.name
 			}
 		};
 
 		setShowApproveModal(false);
 
-		const resp = await apiApproval(payload);
+		const resp = await postAdminApproval(payload);
 
 		if (resp.ok) {
 			const timestamp = new Date(resp.data.updatedTime).toLocaleString("en-GB");
@@ -109,7 +106,7 @@ export default function AdminActivityDetail() {
 			approverData: {}
 		};
 
-		const resp = await apiApproval(payload);
+		const resp = await postAdminApproval(payload);
 
 		if (resp.ok) {
 			const timestamp = new Date(resp.data.updatedTime).toLocaleString("en-GB");
@@ -240,6 +237,7 @@ export default function AdminActivityDetail() {
 
 				<div className="activity-detail-card">
 					<div className="activity-detail-grid">
+
 						<div className="activity-detail-row">
 							<span className="activity-label">Activity ID</span>
 							<span className="activity-value">: {activityData.activityId}</span>
@@ -275,6 +273,7 @@ export default function AdminActivityDetail() {
 							<span className="activity-label">Rejection Notes</span>
 							<span className="activity-value">: -</span>
 						</div>
+
 					</div>
 
 					<div className="workflow-timeline">
@@ -313,14 +312,17 @@ export default function AdminActivityDetail() {
 								</div>
 							</>
 						) : (
-							<div className="workflow-step completed">
-								<div className="workflow-circle"></div>
-								<div className="workflow-info">
-									<div className="workflow-title">Rejected</div>
-									<div className="workflow-subtitle">{rejectedInfo.dateTime}</div>
+							<>
+								<div className="workflow-step completed">
+									<div className="workflow-circle"></div>
+									<div className="workflow-info">
+										<div className="workflow-title">Rejected</div>
+										<div className="workflow-subtitle">{rejectedInfo.dateTime}</div>
+									</div>
 								</div>
-							</div>
+							</>
 						)}
+
 					</div>
 				</div>
 
@@ -347,6 +349,7 @@ export default function AdminActivityDetail() {
 				<div className="modal-overlay">
 					<div className="modal-content modal-reject">
 						<h3 className="modal-title">Rejection Notes*</h3>
+
 						<textarea
 							className="modal-textarea"
 							placeholder="Type here ..."
@@ -354,6 +357,7 @@ export default function AdminActivityDetail() {
 							onChange={(e) => setRejectNotes(e.target.value)}
 							rows={5}
 						/>
+
 						<span className="modal-required">*required</span>
 
 						<div className="modal-actions">
@@ -385,7 +389,7 @@ export default function AdminActivityDetail() {
 							<option value="">Choose an approver</option>
 							{approvers.map((a) => (
 								<option key={a.id} value={a.id}>
-									{a.name} ({a.id})
+									{a.name} ({a.id}) — NPP: {a.npp}
 								</option>
 							))}
 						</select>
@@ -429,7 +433,9 @@ export default function AdminActivityDetail() {
 
 									<div className="activity-row">
 										<span className="activity-label">Menu</span>
-										<span className="activity-value">: {successDetails.menu}</span>
+										<span className="activity-value">
+											: {successDetails.menu}
+										</span>
 									</div>
 
 									<div className="activity-row">
@@ -460,6 +466,7 @@ export default function AdminActivityDetail() {
 					</div>
 				</div>
 			)}
+
 		</div>
 	);
 }
