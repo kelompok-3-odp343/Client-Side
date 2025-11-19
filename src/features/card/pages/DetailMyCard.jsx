@@ -7,27 +7,39 @@ import Navbar from "../../../shared/components/Navbar";
 import { EyeOff, Eye, RefreshCw } from "lucide-react";
 import { fetchAllCards, fetchTransactionHistory } from "../api/card.api";
 import { useNavigate, useLocation } from "react-router-dom";
-
-// Import Dummy Data sebagai fallback
-import { DUMMY_CARDS as dummyCards } from "../data/card.dummy"; 
+import { 
+  DUMMY_CARDS as dummyCards, 
+  DUMMY_TRX_HISTORY as dummyTrxHistory 
+} from "../data/card.dummy"; 
 
 export default function DetailMyCard() {
-  // --- Helper Functions ---
   const getLastMonths = () => {
     const now = new Date();
+    const currentYear = 2025; 
+    
     const arr = [];
     for (let i = 0; i < 12; i++) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      let m = now.getMonth() - i;
+      let y = currentYear;
+      
+      while (m < 0) {
+        m += 12;
+        y -= 1;
+      }
+
+      const d = new Date(y, m, 1);
       arr.push({
         label: d.toLocaleString("en-US", { month: "short" }),
-        month: d.getMonth() + 1,
-        year: d.getFullYear(),
+        month: m + 1,
+        year: y,
       });
     }
     return arr.reverse();
   };
 
   const mapTransactionsToGroups = (flat) => {
+    if (!Array.isArray(flat)) return [];
+
     const groups = {};
     flat.forEach((trx) => {
       let d;
@@ -69,7 +81,6 @@ export default function DetailMyCard() {
       .map(({ sortKey, ...rest }) => rest);
   };
 
-  // --- State & Hooks ---
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -77,10 +88,11 @@ export default function DetailMyCard() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
-  const [isUsingDummy, setIsUsingDummy] = useState(false); // Indikator pakai dummy
+  const [isUsingDummy, setIsUsingDummy] = useState(false);
 
   const [showBalance, setShowBalance] = useState(true);
   const [months] = useState(getLastMonths());
+  
   const [selectedMonth, setSelectedMonth] = useState(months[months.length - 1]);
 
   const [showSplitModal, setShowSplitModal] = useState(false);
@@ -90,44 +102,38 @@ export default function DetailMyCard() {
   const [transactions, setTransactions] = useState([]);
   const [chartData, setChartData] = useState({ income: 0, expense: 0 });
 
-  // --- Effect: Init Data Cards ---
   useEffect(() => {
     const initCards = async () => {
       setLoading(true);
       setErrorMsg("");
       setIsUsingDummy(false);
 
-      // Cek 1: Apakah data dikirim via navigasi? (Dari Dashboard/CardSection)
-      if (location.state?.cards && Array.isArray(location.state.cards) && location.state.cards.length > 0) {
-        setCards(location.state.cards);
-        setSelectedCard(location.state.cards[0]);
-        setLoading(false);
-        return;
-      }
+      let initialCards = [];
 
-      // Cek 2: Jika tidak ada state, fetch dari API
       try {
-        const response = await fetchAllCards();
-        
-        // Normalisasi: Handle response berupa array [...] atau object { data: [...] }
-        let validCards = [];
-        if (Array.isArray(response)) {
-          validCards = response;
-        } else if (response && Array.isArray(response.data)) {
-          validCards = response.data;
+        if (location.state?.cards && Array.isArray(location.state.cards) && location.state.cards.length > 0) {
+          initialCards = location.state.cards;
+        } 
+        else {
+          const response = await fetchAllCards();
+          if (Array.isArray(response)) {
+            initialCards = response;
+          } else if (response && Array.isArray(response.data)) {
+            initialCards = response.data;
+          }
         }
 
-        if (validCards.length > 0) {
-          setCards(validCards);
-          setSelectedCard(validCards[0]);
+        if (initialCards.length > 0) {
+          setCards(initialCards);
+          const targetCard = location.state?.selectedAccount 
+            ? initialCards.find(c => c.account_number === location.state.selectedAccount)
+            : initialCards[0];
+            
+          setSelectedCard(targetCard || initialCards[0]);
         } else {
-          // API return kosong -> Fallback ke Dummy
-          console.warn("API returned empty cards. Falling back to dummy data.");
-          fallbackToDummy();
+          throw new Error("No cards from API/State");
         }
       } catch (err) {
-        // API Error -> Fallback ke Dummy
-        console.error("Failed to fetch cards, using dummy fallback:", err);
         fallbackToDummy();
       } finally {
         setLoading(false);
@@ -147,18 +153,19 @@ export default function DetailMyCard() {
     initCards();
   }, [location.state]);
 
-  // --- Effect: Load Transactions when Card/Month changes ---
   useEffect(() => {
     if (!selectedCard) return;
     
     setTransactions([]); 
+
     const targetMonth = selectedMonth || months[months.length - 1];
-    setSelectedMonth(targetMonth);
+    if (selectedMonth !== targetMonth) {
+        setSelectedMonth(targetMonth);
+    }
     
     handleSelectedMonth(targetMonth, selectedCard);
   }, [selectedCard]);
 
-  // --- Effect: Calculate Chart Data ---
   useEffect(() => {
     const flatItems = transactions.flatMap((g) => g.items || []);
     const income = flatItems
@@ -170,7 +177,6 @@ export default function DetailMyCard() {
     setChartData({ income, expense });
   }, [transactions]);
 
-  // --- Handlers ---
   const handleChangeCard = (accountNumber) => {
     const found = cards.find((c) => c.account_number === accountNumber);
     if (found) {
@@ -184,8 +190,26 @@ export default function DetailMyCard() {
 
     setSelectedMonth(m);
 
-    // Jika sedang mode dummy cards, mungkin API transaksi juga akan gagal/kosong
-    // Idealnya di sini juga ada fallback dummy transaction, tapi kita coba fetch dulu
+    const loadDummyTrx = () => {
+        const accountHistory = dummyTrxHistory[card.account_number];
+        
+        if (accountHistory) {
+            const monthData = accountHistory.find(h => h.month == m.month && h.year == m.year);
+            
+            if (monthData && monthData.transaction) {
+                const grouped = mapTransactionsToGroups(monthData.transaction);
+                setTransactions(grouped);
+                return;
+            }
+        }
+        setTransactions([]);
+    };
+
+    if (isUsingDummy) {
+        loadDummyTrx();
+        return;
+    }
+
     try {
       const data = await fetchTransactionHistory({
         month: m.month,
@@ -193,15 +217,14 @@ export default function DetailMyCard() {
         accountNumber: card.account_number,
       });
 
-      if (data?.transactions) {
+      if (data?.transactions && data.transactions.length > 0) {
         const grouped = mapTransactionsToGroups(data.transactions);
         setTransactions(grouped);
       } else {
-        setTransactions([]);
+        loadDummyTrx();
       }
     } catch (error) {
-      console.error("Failed fetching history:", error);
-      setTransactions([]);
+      loadDummyTrx();
     }
   };
 
@@ -235,8 +258,6 @@ export default function DetailMyCard() {
     link.click();
     document.body.removeChild(link);
   };
-
-  // --- RENDER ---
 
   if (loading) {
     return (
@@ -297,7 +318,7 @@ export default function DetailMyCard() {
               >
                 {cards.map((c) => (
                   <option key={c.account_number} value={c.account_number}>
-                    {c.type} - {c.account_number} {isUsingDummy ? "(Dummy)" : ""}
+                    {c.type} - {c.account_number} {isUsingDummy ? "(Preview)" : ""}
                   </option>
                 ))}
               </select>
@@ -384,7 +405,6 @@ export default function DetailMyCard() {
         </section>
       </main>
 
-      {/* Modals */}
       {(showSplitModal || showDetailModal) && (
         <div className="modal-overlay">
           {showDetailModal && selectedTransaction && (
