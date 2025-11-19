@@ -4,7 +4,7 @@ import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
 import Swal from "sweetalert2";
 
-import { fetchAdminActivityDetail, postAdminApproval } from "../service/adminActivityService";
+import { fetchAdminActivityDetail, postAdminApproval, fetchApproverList } from "../service/adminActivityService";
 
 import "../styles/admin-activity-detail.css";
 
@@ -18,12 +18,14 @@ export default function AdminActivityDetail() {
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showApproveModal, setShowApproveModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
+
 	const [successMessage, setSuccessMessage] = useState("");
 	const [successDetails, setSuccessDetails] = useState(null);
 	const [rejectNotes, setRejectNotes] = useState("");
 	const [selectedApprover, setSelectedApprover] = useState("");
 
 	const [activityData, setActivityData] = useState(null);
+	const [approvers, setApprovers] = useState([]);
 
 	const currentUserRole = sessionStorage.getItem("role") || "MAKER";
 
@@ -45,10 +47,16 @@ export default function AdminActivityDetail() {
 		return () => (mounted = false);
 	}, [location.state]);
 
-	const approvers = [
-		{ id: "ADM003", name: "Wira Natanael Uli", npp: "64888" },
-		{ id: "ADM005", name: "Approver 2", npp: "64877" }
-	];
+	useEffect(() => {
+		const loadApprovers = async () => {
+			const resp = await fetchApproverList();
+			if (resp.ok) {
+				setApprovers(resp.data);
+			}
+		};
+
+		loadApprovers();
+	}, []);
 
 	const handleApprove = () => {
 		if (activityData.status === "PENDING_CHECKER") {
@@ -66,15 +74,15 @@ export default function AdminActivityDetail() {
 			return;
 		}
 
-		const selected = approvers.find(a => a.id === selectedApprover);
+		const selected = approvers.find(a => a.userId === selectedApprover);
 
 		const payload = {
 			activityId: activityData.activityId,
 			isApprove: true,
 			approverData: {
-				userId: selected.id,
+				userId: selected.userId,
 				npp: selected.npp,
-				fullName: selected.name
+				fullName: selected.fullName
 			}
 		};
 
@@ -95,7 +103,7 @@ export default function AdminActivityDetail() {
 			});
 			setShowSuccessModal(true);
 		} else {
-			Swal.fire("Error", "Failed to submit checking", "error");
+			Swal.fire("Error", resp.message || "Failed to submit checking", "error");
 		}
 	};
 
@@ -121,7 +129,7 @@ export default function AdminActivityDetail() {
 			});
 			setShowSuccessModal(true);
 		} else {
-			Swal.fire("Error", "Approval failed", "error");
+			Swal.fire("Error", resp.message || "Approval failed", "error");
 		}
 	};
 
@@ -277,7 +285,7 @@ export default function AdminActivityDetail() {
 					</div>
 
 					<div className="workflow-timeline">
-						<div className={`workflow-step ${workflowStep >= 1 || activityData.status === "REJECTED" ? "completed" : ""}`}>
+						<div className={`workflow-step ${workflowStep >= 1 ? "completed" : ""}`}>
 							<div className="workflow-circle"></div>
 							<div className="workflow-info">
 								<div className="workflow-title">Created</div>
@@ -287,7 +295,7 @@ export default function AdminActivityDetail() {
 
 						{activityData.status !== "REJECTED" ? (
 							<>
-								<div className={`workflow-step ${workflowStep >= 2 ? "completed" : ""} ${workflowStep === 1 ? "current" : ""}`}>
+								<div className={`workflow-step ${workflowStep >= 2 ? "completed" : ""}`}>
 									<div className="workflow-circle"></div>
 									<div className="workflow-info">
 										<div className="workflow-title">
@@ -299,7 +307,7 @@ export default function AdminActivityDetail() {
 									</div>
 								</div>
 
-								<div className={`workflow-step ${workflowStep >= 3 ? "completed" : ""} ${workflowStep === 2 ? "current" : ""}`}>
+								<div className={`workflow-step ${workflowStep >= 3 ? "completed" : ""}`}>
 									<div className="workflow-circle"></div>
 									<div className="workflow-info">
 										<div className="workflow-title">
@@ -312,17 +320,14 @@ export default function AdminActivityDetail() {
 								</div>
 							</>
 						) : (
-							<>
-								<div className="workflow-step completed">
-									<div className="workflow-circle"></div>
-									<div className="workflow-info">
-										<div className="workflow-title">Rejected</div>
-										<div className="workflow-subtitle">{rejectedInfo.dateTime}</div>
-									</div>
+							<div className="workflow-step completed">
+								<div className="workflow-circle"></div>
+								<div className="workflow-info">
+									<div className="workflow-title">Rejected</div>
+									<div className="workflow-subtitle">{rejectedInfo.dateTime}</div>
 								</div>
-							</>
+							</div>
 						)}
-
 					</div>
 				</div>
 
@@ -387,9 +392,10 @@ export default function AdminActivityDetail() {
 							onChange={(e) => setSelectedApprover(e.target.value)}
 						>
 							<option value="">Choose an approver</option>
+
 							{approvers.map((a) => (
-								<option key={a.id} value={a.id}>
-									{a.name} ({a.id}) — NPP: {a.npp}
+								<option key={a.userId} value={a.userId}>
+									{a.displayName}
 								</option>
 							))}
 						</select>

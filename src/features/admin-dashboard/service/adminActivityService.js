@@ -1,6 +1,7 @@
 import axios from "axios";
 import dummyActivityList from "../dummy/adminActivity.dummy";
 import dummyActivityDetailList from "../dummy/adminActivityDetail.dummy";
+import dummyApproverList from "../dummy/approverList.dummy";
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -100,5 +101,28 @@ export const postAdminApproval = async ({ activityId, approverData, isApprove })
                 err?.message ||
                 "Approval failed (DEV fallback).",
         };
+    }
+};
+
+export const fetchApproverList = async () => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const roleName = sessionStorage.getItem("role")?.toUpperCase() || "MAKER";
+
+        const resp = await api.post(
+            "/api/admin/approver/list",
+            { roleName },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        return { ok: true, data: resp.data.data };
+    } catch (err) {
+        console.error("Approver list error:", err);
+        return { ok: true, data: dummyApproverList };
     }
 };
