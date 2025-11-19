@@ -2,7 +2,6 @@ import axios from "axios";
 import SPLIT_BILL_DUMMY_DATA from "../data/split-bill.dummy";
 
 let DUMMY_STORAGE = [...SPLIT_BILL_DUMMY_DATA];
-let API_WORKED_BEFORE = false;
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -62,10 +61,11 @@ export async function fetchSplitBills() {
 
     if (Array.isArray(res?.data?.data)) {
       const bills = res.data.data;
+      
       if (bills.length === 0) {
         return {
           status: true,
-          data: [],
+          data: DUMMY_STORAGE.map(normalizeBill),
         };
       }
 
@@ -78,7 +78,6 @@ export async function fetchSplitBills() {
     return { status: true, data: DUMMY_STORAGE.map(normalizeBill) };
 
   } catch (error) {
-    console.error("Gagal memuat Split Bill:", error?.message || error);
     return {
       status: true,
       data: DUMMY_STORAGE.map(normalizeBill)
@@ -105,20 +104,23 @@ export async function getSplitBillById(splitBillId) {
 
     const data = res?.data?.data;
     if (!data) {
-      console.warn("API split bill detail tidak valid, menggunakan dummy");
-      const dummyBill = DUMMY_STORAGE.find((b) => b.split_bill_id === splitBillId || b.splitBillId === splitBillId);
-      return dummyBill ? normalizeBill(dummyBill) : null;
+        throw new Error("Data empty");
     }
 
     return normalizeBill(data);
   } catch (error) {
-    console.warn("API split bill detail gagal, menggunakan dummy:", error?.message || error);
-    const dummyBill = DUMMY_STORAGE.find((b) => b.split_bill_id === splitBillId || b.splitBillId === splitBillId);
+    const dummyBill = DUMMY_STORAGE.find((b) => 
+        String(b.split_bill_id) === String(splitBillId) || 
+        String(b.splitBillId) === String(splitBillId)
+    );
     return dummyBill ? normalizeBill(dummyBill) : null;
   }
 }
 
 export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
+  let successApi = false;
+  let apiData = null;
+
   try {
     const token = sessionStorage.getItem("token");
     const payload = {
@@ -142,14 +144,18 @@ export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
     });
 
     if (res.status >= 200 && res.status < 300) {
-      API_WORKED_BEFORE = true;
-      return normalizeBill(res.data?.data || res.data);
+      successApi = true;
+      apiData = normalizeBill(res.data?.data || res.data);
     }
   } catch (err) {
-    console.warn("⚠️ Gagal memanggil API update split bill:", err?.message || err);
+    // Silent catch
   }
 
-  const idx = DUMMY_STORAGE.findIndex((b) => b.split_bill_id === split_bill_id || b.splitBillId === split_bill_id);
+  const idx = DUMMY_STORAGE.findIndex((b) => 
+    String(b.split_bill_id) === String(split_bill_id) || 
+    String(b.splitBillId) === String(split_bill_id)
+  );
+
   if (idx !== -1) {
     DUMMY_STORAGE[idx].members = updatedMembers.map((m) => ({
       member_id: m.member_id,
@@ -162,11 +168,13 @@ export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
     DUMMY_STORAGE[idx].remaining_bill = DUMMY_STORAGE[idx].members
       .filter((m) => m.status !== "Paid")
       .reduce((s, m) => s + (Number(m.amount) || 0), 0);
-
-    return normalizeBill(DUMMY_STORAGE[idx]);
+      
+    if (!successApi) {
+        return normalizeBill(DUMMY_STORAGE[idx]);
+    }
   }
 
-  return null;
+  return apiData;
 }
 
 export async function createSplitBill(payload) {
@@ -178,6 +186,9 @@ export async function createSplitBill(payload) {
     totalAmount: payload.totalAmount,
     billMembers: payload.billMembers,
   };
+
+  let successApi = false;
+  let apiData = null;
 
   try {
     const token = sessionStorage.getItem("token");
@@ -192,20 +203,15 @@ export async function createSplitBill(payload) {
     });
 
     if (res.status >= 200 && res.status < 300) {
-      API_WORKED_BEFORE = true;
-      console.info("Split bill berhasil disimpan via API");
-      return normalizeBill(res.data?.data || res.data);
+      successApi = true;
+      apiData = normalizeBill(res.data?.data || res.data);
     }
   } catch (err) {
-    console.warn("Gagal API, fallback dummy:", err?.message || err);
-  }
-
-  if (API_WORKED_BEFORE) {
-    throw new Error("Server sedang maintance, silahkan coba beberapa saat lagi");
+    // Silent catch
   }
 
   const _dummyNew = {
-    split_bill_id: "SB" + String(DUMMY_STORAGE.length + 1).padStart(3, "0"),
+    split_bill_id: "SB" + String(Date.now()).slice(-6),
     split_bill_title: newBill.splitBillTitle,
     total_bill: newBill.totalAmount,
     created_time: new Date().toISOString(),
@@ -220,5 +226,6 @@ export async function createSplitBill(payload) {
   };
 
   DUMMY_STORAGE.unshift(_dummyNew);
-  return normalizeBill(_dummyNew);
+
+  return successApi ? apiData : normalizeBill(_dummyNew);
 }
