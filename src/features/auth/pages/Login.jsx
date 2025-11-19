@@ -48,8 +48,9 @@ export default function Login() {
 		}
 
 		const token = respLogin.data.sessionIdOrToken;
+
 		sessionStorage.setItem("sessionID", respLogin.data.sessionIdOrToken);
-		if (!respLogin.data.role !== "NASABAH") {
+		if (respLogin.data.role !== "NASABAH") {
 			sessionStorage.setItem('token', respLogin.data.sessionIdOrToken)
 		}
 
@@ -94,7 +95,7 @@ export default function Login() {
 				navigate("/admin/home");
 				return;
 			}
-			// navigate("/otpLogin");
+			navigate("/otpLogin");
 		}, 800);
 	};
 

@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Lock, Unlock } from "lucide-react";
+import Swal from "sweetalert2";
 
 import AdminNavBar from "../components/AdminNavBar";
 import AdminSideBar from "../components/AdminSideBar";
+import "../styles/admin-user-detail.css";
 
 import { fetchAdminUserDetail } from "../service/adminUserDetailService";
-import "../styles/admin-user-detail.css";
+import { fetchAdminBlock, fetchAdminUnBlock } from "../service/adminUsersService";
 
 export default function AdminUserDetail() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const userId = location.state?.userId || null;
 
+	const blockRule = sessionStorage.getItem("user_block");
+	const unblockRule = sessionStorage.getItem("user_unblock");
+
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 	const [userData, setUserData] = useState(null);
 	const [accounts, setAccounts] = useState([]);
-
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
@@ -45,7 +49,6 @@ export default function AdminUserDetail() {
 
 			try {
 				const resp = await fetchAdminUserDetail(userId);
-
 				setUserData(resp.data);
 				setAccounts(resp.data.accounts || []);
 			} catch (err) {
@@ -59,17 +62,67 @@ export default function AdminUserDetail() {
 	}, [userId]);
 
 	const isBlocked = userData?.isBlocked;
-	const isFormValid = selectedChecker && reason.trim();
+
+	const confirmDirectAction = async (type) => {
+		const label = type === "block" ? "Block" : "Unblock";
+
+		const result = await Swal.fire({
+			title: `${label} User?`,
+			text: `Are you sure to ${label.toLowerCase()} ${userData.customerName}?`,
+			icon: "warning",
+			showCancelButton: true
+		});
+
+		if (!result.isConfirmed) return;
+
+		const payload = {
+			userData: {
+				userId: userData.userId,
+				cif: userData.customerId,
+				customerName: userData.customerName
+			},
+			reason: `Direct ${label.toLowerCase()} (NO_APPROVAL rule)`,
+			checkerData: null
+		};
+
+		const apiCall = type === "block" ? fetchAdminBlock : fetchAdminUnBlock;
+		const resp = await apiCall(payload);
+
+		if (resp?.ok) {
+			Swal.fire(`${label}ed!`, `User successfully ${label.toLowerCase()}ed.`, "success");
+			window.location.reload();
+		} else {
+			Swal.fire("Failed", `${label} user failed.`, "error");
+		}
+	};
 
 	const handleBlock = () => {
-		setActionType("block");
-		setShowActionModal(true);
+		if (blockRule === "NO_APPROVAL") return confirmDirectAction("block");
+
+		if (blockRule === "CHECKER_AND_APPROVER") {
+			setActionType("block");
+			return setShowActionModal(true);
+		}
+
+		if (blockRule === "APPROVER_ONLY") {
+			return Swal.fire("Unauthorized", "You are not allowed to block this user.", "warning");
+		}
 	};
 
 	const handleUnblock = () => {
-		setActionType("unblock");
-		setShowActionModal(true);
+		if (unblockRule === "NO_APPROVAL") return confirmDirectAction("unblock");
+
+		if (unblockRule === "CHECKER_AND_APPROVER") {
+			setActionType("unblock");
+			return setShowActionModal(true);
+		}
+
+		if (unblockRule === "APPROVER_ONLY") {
+			return Swal.fire("Unauthorized", "You are not allowed to unblock this user.", "warning");
+		}
 	};
+
+	const isFormValid = selectedChecker && reason.trim();
 
 	const handleSubmitAction = () => {
 		if (!isFormValid) return;
@@ -120,9 +173,7 @@ export default function AdminUserDetail() {
 		setReason("");
 	};
 
-	const handleSuccessViewActivity = () => {
-		navigate("/admin/activity");
-	};
+	const handleSuccessViewActivity = () => navigate("/admin/activity");
 
 	const cancelAction = () => {
 		setShowActionModal(false);
@@ -138,7 +189,6 @@ export default function AdminUserDetail() {
 			<div className="admin-container">
 				<AdminNavBar onMenuToggle={toggleSidebar} />
 				<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
 				<main className="admin-user-detail-main">
 					<div className="loading-state">Loading user details...</div>
 				</main>
@@ -151,7 +201,6 @@ export default function AdminUserDetail() {
 			<div className="admin-container">
 				<AdminNavBar onMenuToggle={toggleSidebar} />
 				<AdminSideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
 				<main className="admin-user-detail-main">
 					<div className="error-state">{error || "User not found"}</div>
 				</main>
@@ -204,11 +253,7 @@ export default function AdminUserDetail() {
 
 				<div className="accounts-grid">
 					{accounts.map((acc, i) => (
-						<div
-							key={i}
-							className="account-card"
-							style={{ background: getCardColor(i) }}
-						>
+						<div key={i} className="account-card" style={{ background: getCardColor(i) }}>
 							<div className="account-card-content">
 								<div className="account-row">
 									<span className="account-label">Account Number</span>
@@ -279,8 +324,7 @@ export default function AdminUserDetail() {
 							</button>
 
 							<button
-								className={`modal-btn modal-btn-user-detail-submit ${!isFormValid ? "disabled" : ""
-									}`}
+								className={`modal-btn modal-btn-user-detail-submit ${!isFormValid ? "disabled" : ""}`}
 								disabled={!isFormValid}
 								onClick={handleSubmitAction}
 							>

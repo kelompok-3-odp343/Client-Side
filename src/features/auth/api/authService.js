@@ -20,6 +20,7 @@ export async function postAuthLogin({ username, password }) {
             status: true,
             sessionIdOrToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJQMDAzIiwicm9sZSI6Ik1BS0VSIiwiZW1haWwiOiJva3RhdmlhcS5hQGdtYWlsLmNvbSIsIm5wcCI6IjY0ODg5IiwiaWF0IjoxNzYzMzY1Nzk4LCJleHAiOjE3NjMzNjkzOTh9.Sh7mrZUbO5q1Mx9zODflUlp6bRNNGO71v4xMrjc03bw",
             message: "DEV: Admin login success",
+            role: 'ADMIN'
           },
         };
 
@@ -32,6 +33,7 @@ export async function postAuthLogin({ username, password }) {
             status: true,
             sessionIdOrToken: "01de79e5-3803-4013-ab6c-b1e1809b6b51",
             message: "DEV: User login success",
+            role: 'NASABAH'
           },
         };
       }
