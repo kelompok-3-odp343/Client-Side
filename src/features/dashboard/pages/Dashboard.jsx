@@ -4,6 +4,7 @@ import { ChartPie, Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { fetchDashboard } from "../api/dashboard.api.js";
+import { fetchAllCards } from "../../card/api/card.api.js"; // Import fetchAllCards
 import depositsIcon from "../../../assets/images/dashboard-deposits-icon.png";
 import savingsIcon from "../../../assets/images/dashboard-savings-icon.png";
 import lifeGoalsIcon from "../../../assets/images/dashboard-life-goals-icon.png";
@@ -18,55 +19,83 @@ export default function Dashboard() {
 
   useEffect(() => {
     const dataDashboards = async () => {
-      const raw = await fetchDashboard();
-      if (!raw) {
+      try {
+        // Fetch dashboard data
+        const raw = await fetchDashboard();
+        
+        // Fetch cards data separately
+        const cardsData = await fetchAllCards();
+        
+        if (!raw) {
+          setLoading(false);
+          return;
+        }
+
+        const d = raw.data;
+
+        const total = d.assetoverview?.totalAsset ?? 0;
+        const income = d.cashFlowOverview?.totalIncome ?? 0;
+        const expenses = d.cashFlowOverview?.totalExpense ?? 0;
+        const receivable = d.cashFlowOverview?.totalReceivable ?? 0;
+
+        const totalBill = d.splitBillOverview?.totalBillAmount ?? 0;
+        const remainingBill = d.splitBillOverview?.remainingBillAmount ?? 0;
+        const paidBill = totalBill - remainingBill;
+        const progress = totalBill > 0 ? Math.round((paidBill / totalBill) * 100) : 0;
+
+        const pf = d.portfolioOverview ?? [];
+        const amt = (name) =>
+          pf.find((p) => p.productName === name)?.totalAmount ?? 0;
+
+        setData({
+          assets_total: { total, extra_this_month: 0 },
+          earnings_overview: { income, expenses },
+          split: {
+            paid: paidBill,
+            remaining: remainingBill,
+            total: totalBill,
+            progress,
+            potential: receivable,
+            ongoing: d.splitBillOverview?.countSplitBill ?? 0,
+          },
+          time_deposits: { total_balance: amt("timeDeposit") },
+          savings: [{ total_balance: amt("accountSavings") }],
+          life_goals: [{ current_savings: amt("lifegoals") }],
+          pension_funds: [{ balance: amt("dplk") }],
+        });
+
+        // Map cards from fetchAllCards response
+        if (Array.isArray(cardsData) && cardsData.length > 0) {
+          const mappedCards = cardsData.map((item) => ({
+            account_id: item.account_id,
+            type: item.type,
+            account_number: item.account_number,
+            card_number: item.account_number, // Use account_number as card_number
+            account_holder_name: item.account_holder_name,
+            effective_balance: item.effective_balance,
+            is_main: item.is_main,
+            showCardNumber: false,
+          }));
+          setCards(mappedCards);
+        } else {
+          // Fallback to accountList from dashboard if cards fetch fails
+          const mappedCards = (d.accountList ?? []).map((item) => ({
+            type: item.account_product_name,
+            account_number: item.account_number,
+            card_number: item.debit_card_number || item.account_number,
+            account_holder_name: item.account_name,
+            effective_balance: 0, // Not available in accountList
+            is_main: false,
+            showCardNumber: false,
+          }));
+          setCards(mappedCards);
+        }
+        
         setLoading(false);
-        return;
+      } catch (error) {
+        console.error("Error loading dashboard:", error);
+        setLoading(false);
       }
-
-      const d = raw.data;
-
-      const total = d.assetoverview?.totalAsset ?? 0;
-      const income = d.cashFlowOverview?.totalIncome ?? 0;
-      const expenses = d.cashFlowOverview?.totalExpense ?? 0;
-      const receivable = d.cashFlowOverview?.totalReceivable ?? 0;
-
-      const totalBill = d.splitBillOverview?.totalBillAmount ?? 0;
-      const remainingBill = d.splitBillOverview?.remainingBillAmount ?? 0;
-      const paidBill = totalBill - remainingBill;
-      const progress = totalBill > 0 ? Math.round((paidBill / totalBill) * 100) : 0;
-
-      const pf = d.portfolioOverview ?? [];
-      const amt = (name) =>
-        pf.find((p) => p.productName === name)?.totalAmount ?? 0;
-
-      setData({
-        assets_total: { total, extra_this_month: 0 },
-        earnings_overview: { income, expenses },
-        split: {
-          paid: paidBill,
-          remaining: remainingBill,
-          total: totalBill,
-          progress,
-          potential: receivable,
-          ongoing: d.splitBillOverview?.countSplitBill ?? 0,
-        },
-        time_deposits: { total_balance: amt("timeDeposit") },
-        savings: [{ total_balance: amt("accountSavings") }],
-        life_goals: [{ current_savings: amt("lifegoals") }],
-        pension_funds: [{ balance: amt("dplk") }],
-      });
-
-      const mappedCards = (d.accountList ?? []).map((item) => ({
-        type: item.accountProductName,
-        account_number: item.accountNumber,
-        card_number: item.debit_card_number || item.accountNumber,
-        account_holder_name: item.accountName,
-        effective_balance: item.effectiveBalance,
-        showCardNumber: false,
-      }));
-      setCards(mappedCards);
-      setLoading(false);
     };
 
     dataDashboards();
@@ -87,6 +116,11 @@ export default function Dashboard() {
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % cards.length);
+  };
+
+  const handleCardClick = () => {
+    // Pass cards data to DetailMyCard
+    navigate("/detailmycard", { state: { cards } });
   };
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
@@ -313,7 +347,7 @@ export default function Dashboard() {
                     <div
                       key={cards[currentIndex]?.account_number}
                       className="bank-card slide-in"
-                      onClick={() => navigate("/detailmycard", { state: { cards } })}
+                      onClick={handleCardClick}
                     >
                       <div className="card-header">
                         <span className="bank-type">
