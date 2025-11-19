@@ -10,7 +10,11 @@ import StatusBadge from "../components/StatusBadge";
 import Pagination from "../components/Pagination";
 
 import "../styles/admin-users.css";
-import { fetchAdminUsers } from "../service/adminUsersService";
+import {
+	fetchAdminUsers,
+	fetchAdminBlock,
+	fetchAdminUnBlock
+} from "../service/adminUsersService";
 
 export default function AdminUsers() {
 	const navigate = useNavigate();
@@ -25,6 +29,7 @@ export default function AdminUsers() {
 	const [showStatusFilter, setShowStatusFilter] = useState(false);
 	const [page, setPage] = useState(1);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
+	const [actionLoadingId, setActionLoadingId] = useState(null);
 
 	const toggleSidebar = () => setIsSidebarOpen((v) => !v);
 
@@ -50,6 +55,15 @@ export default function AdminUsers() {
 		load();
 		return () => (mounted = false);
 	}, []);
+
+	const reloadUsers = async () => {
+		try {
+			const resp = await fetchAdminUsers();
+			setUserData(resp.data);
+		} catch (err) {
+			console.error("Failed to reload users", err);
+		}
+	};
 
 	const users = useMemo(() => {
 		if (!userData?.users) return [];
@@ -159,9 +173,7 @@ export default function AdminUsers() {
 						/>
 						<div className="filter-dropdown">
 							<div className="filter-dropdown-header">
-								<span className="filter-dropdown-title">
-									{column.label}
-								</span>
+								<span className="filter-dropdown-title">{column.label}</span>
 								{hasActiveFilters && (
 									<button
 										className="clear-filter-btn"
@@ -197,6 +209,136 @@ export default function AdminUsers() {
 		);
 	};
 
+	const handleBlockUser = async (user) => {
+		const result = await Swal.fire({
+			title: "Block User?",
+			html: `
+					<div style="font-size:14px">
+					<b>${user.customerName}</b><br/>
+					CIF: <b>${user.cif}</b>
+					</div>
+				`,
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Ya, Block",
+			cancelButtonText: "Batal",
+			confirmButtonColor: "#e74c3c",
+			cancelButtonColor: "#7f8c8d",
+		});
+		if (!result.isConfirmed) return;
+
+		setActionLoadingId(user.id);
+
+		try {
+			const payload = {
+				userData: {
+					userId: user.id,
+					cif: user.cif,
+					customerName: user.customerName
+				},
+				reason: "Blocked by admin",
+				checkerData: {
+					nip: sessionStorage.getItem("nip") || "",
+					name: sessionStorage.getItem("checkerName") || ""
+				}
+			};
+
+			const resp = await fetchAdminBlock(payload);
+
+			if (resp && resp.ok) {
+				const msg =
+					resp.data?.message || "User berhasil di-block (BLOCK_USER).";
+				Swal.fire({
+					icon: "success",
+					title: "Berhasil",
+					text: msg,
+				});
+				await reloadUsers();
+			} else {
+				aleSwal.fire({
+					icon: "error",
+					title: "Gagal",
+					text: "Gagal meng-block user.",
+				});
+			}
+		} catch (err) {
+			console.error("Block user error:", err);
+			Swal.fire({
+				icon: "error",
+				title: "Gagal",
+				text: "Terjadi error saat block user.",
+			});
+		} finally {
+			setActionLoadingId(null);
+		}
+	};
+
+	const handleUnblockUser = async (user) => {
+		const result = await Swal.fire({
+			title: "Unblock User?",
+			html: `
+					<div style="font-size:14px">
+					<b>${user.customerName}</b><br/>
+					CIF: <b>${user.cif}</b>
+					</div>
+				`,
+			icon: "question",
+			showCancelButton: true,
+			confirmButtonText: "Ya, Unblock",
+			cancelButtonText: "Batal",
+			confirmButtonColor: "#27ae60",
+			cancelButtonColor: "#7f8c8d",
+		});
+		if (!result.isConfirmed) return;
+
+		setActionLoadingId(user.id);
+
+		try {
+			const payload = {
+				userData: {
+					userId: user.id,
+					cif: user.cif,
+					customerName: user.customerName
+				},
+				reason: "Unblocked by admin",
+				checkerData: {
+					nip: sessionStorage.getItem("nip") || "",
+					name: sessionStorage.getItem("checkerName") || ""
+				}
+			};
+
+			const resp = await fetchAdminUnBlock(payload);
+
+			if (resp && resp.ok) {
+				const msg =
+					resp.data?.message || "User berhasil di-unblock (BLOCK_USER).";
+				Swal.fire({
+					icon: "success",
+					title: "Berhasil",
+					text: msg,
+				});
+
+				await reloadUsers();
+			} else {
+				Swal.fire({
+					icon: "error",
+					title: "Gagal",
+					text: "Gagal meng-unblock user.",
+				});
+			}
+		} catch (err) {
+			console.error("Unblock user error:", err);
+			Swal.fire({
+				icon: "error",
+				title: "Gagal",
+				text: "Terjadi error saat unblock user.",
+			});
+
+		} finally {
+			setActionLoadingId(null);
+		}
+	};
+
 	const renderCell = (row, column, index) => {
 		if (column.key === "noIndex")
 			return (page - 1) * rowsPerPage + index + 1;
@@ -205,17 +347,40 @@ export default function AdminUsers() {
 			return <StatusBadge status={row.status} type="user" />;
 
 		if (column.key === "action") {
+			const isLoading = actionLoadingId === row.id;
+
 			return (
-				<button
-					className="view-details-btn"
-					onClick={() =>
-						navigate(`/admin/users/detail`, {
-							state: { userId: row.id }
-						})
-					}
-				>
-					<Eye size={24} />
-				</button>
+				<div className="action-buttons">
+					<button
+						className="view-details-btn"
+						onClick={() =>
+							navigate(`/admin/users/detail`, {
+								state: { userId: row.id }
+							})
+						}
+						disabled={isLoading}
+					>
+						<Eye size={22} />
+					</button>
+
+					{row.status === "Active" ? (
+						<button
+							className="block-btn"
+							onClick={() => handleBlockUser(row)}
+							disabled={isLoading}
+						>
+							{isLoading ? "..." : "Block"}
+						</button>
+					) : (
+						<button
+							className="unblock-btn"
+							onClick={() => handleUnblockUser(row)}
+							disabled={isLoading}
+						>
+							{isLoading ? "..." : "Unblock"}
+						</button>
+					)}
+				</div>
 			);
 		}
 

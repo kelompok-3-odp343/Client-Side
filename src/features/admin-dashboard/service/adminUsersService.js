@@ -45,3 +45,57 @@ export const fetchMenuAccess = async () => {
         };
     }
 };
+
+export const fetchAdminBlock = async ({ userData, reason, checkerData }) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const payload = {
+            userData,
+            reason,
+            checkerData,
+            actionMenu: "BLOCK_USER",
+            menu: "USER_MANAGEMENT"
+        };
+
+        const resp = await api.post("/api/admin/user/block", payload, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+        });
+
+        return { ok: true, data: resp.data };
+
+    } catch (error) {
+        console.error('Error admin Block', error);
+        return { ok: false, error };
+    }
+};
+
+export const fetchAdminUnBlock = async ({ userData, reason, checkerData }) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const payload = {
+            userData,
+            reason,
+            checkerData,
+            actionMenu: "UNBLOCK_USER",
+            menu: "USER_MANAGEMENT"
+        };
+
+        const resp = await api.post("/api/admin/user/unblock", payload, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+        });
+
+        return { ok: true, data: resp.data };
+
+    } catch (error) {
+        console.error('Error admin Unblock', error);
+        return { ok: false, error };
+    }
+};
