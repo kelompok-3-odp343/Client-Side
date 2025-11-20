@@ -61,7 +61,7 @@ export async function fetchSplitBills() {
 
     if (Array.isArray(res?.data?.data)) {
       const bills = res.data.data;
-      
+
       if (bills.length === 0) {
         return {
           status: true,
@@ -104,14 +104,14 @@ export async function getSplitBillById(splitBillId) {
 
     const data = res?.data?.data;
     if (!data) {
-        throw new Error("Data empty");
+      throw new Error("Data empty");
     }
 
     return normalizeBill(data);
   } catch (error) {
-    const dummyBill = DUMMY_STORAGE.find((b) => 
-        String(b.split_bill_id) === String(splitBillId) || 
-        String(b.splitBillId) === String(splitBillId)
+    const dummyBill = DUMMY_STORAGE.find((b) =>
+      String(b.split_bill_id) === String(splitBillId) ||
+      String(b.splitBillId) === String(splitBillId)
     );
     return dummyBill ? normalizeBill(dummyBill) : null;
   }
@@ -151,8 +151,8 @@ export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
     // Silent catch
   }
 
-  const idx = DUMMY_STORAGE.findIndex((b) => 
-    String(b.split_bill_id) === String(split_bill_id) || 
+  const idx = DUMMY_STORAGE.findIndex((b) =>
+    String(b.split_bill_id) === String(split_bill_id) ||
     String(b.splitBillId) === String(split_bill_id)
   );
 
@@ -168,9 +168,9 @@ export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
     DUMMY_STORAGE[idx].remaining_bill = DUMMY_STORAGE[idx].members
       .filter((m) => m.status !== "Paid")
       .reduce((s, m) => s + (Number(m.amount) || 0), 0);
-      
+
     if (!successApi) {
-        return normalizeBill(DUMMY_STORAGE[idx]);
+      return normalizeBill(DUMMY_STORAGE[idx]);
     }
   }
 
@@ -228,4 +228,38 @@ export async function createSplitBill(payload) {
   DUMMY_STORAGE.unshift(_dummyNew);
 
   return successApi ? apiData : normalizeBill(_dummyNew);
+}
+
+export async function editSplitBill(split_bill_id, bill, members) {
+  try {
+    const token = sessionStorage.getItem("token");
+
+    const payload = {
+      splitBillId: split_bill_id,
+      transactionId: bill.ref_id,
+      splitBillTitle: bill.split_bill_title,
+      totalAmount: Number(bill.total_bill),
+      billMembers: members.map((m) => ({
+        memberId: m.member_id,
+        memberName: m.member_name,
+        amountShare: Number(m.amount) || 0,
+        hasPaid: m.status === "Paid" || m.hasPaid === true,
+      })),
+    };
+
+    const res = await api.post("/api/v1/split-bill/edit", payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+      timeout: 5000,
+    });
+
+    return normalizeBill(res.data?.data || res.data);
+
+  } catch (err) {
+    console.error("EDIT SPLIT BILL ERROR:", err.response?.data || err);
+    throw err.response?.data || err;
+  }
 }

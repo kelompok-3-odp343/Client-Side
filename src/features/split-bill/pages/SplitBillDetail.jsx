@@ -9,6 +9,7 @@ import "../styles/split-bill-detail.css";
 import {
   getSplitBillById,
   updateSplitBillStatus,
+  editSplitBill,
 } from "../api/split-bill.api";
 
 export default function SplitBillDetail() {
@@ -22,7 +23,6 @@ export default function SplitBillDetail() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  /* ----------------------- FETCH ----------------------- */
   useEffect(() => {
     async function fetchDetail() {
       if (!state?.splitBillId) {
@@ -78,7 +78,6 @@ export default function SplitBillDetail() {
       </div>
     );
 
-  /* ----------------------- TOTALS ----------------------- */
   const totalPaid = members
     .filter((m) => m.status === "Paid" || m.hasPaid)
     .reduce((s, m) => s + Number(m.amount || 0), 0);
@@ -86,20 +85,12 @@ export default function SplitBillDetail() {
   const totalUnpaid = Math.max(0, bill.total_bill - totalPaid);
   const progressPercent = (totalPaid / bill.total_bill) * 100;
 
-  const totalParticipantsAmount = members.reduce(
-    (s, m) => s + Number(m.amount || 0),
-    0
-  );
   const isAddParticipantDisabled =
-    totalParticipantsAmount === bill.total_bill;
-
-  /* ----------------------- EDITING ----------------------- */
+    members.reduce((s, m) => s + Number(m.amount || 0), 0) === bill.total_bill;
 
   const handleChangeName = (i, v) => {
     setMembers((prev) =>
-      prev.map((m, idx) =>
-        idx === i ? { ...m, member_name: v } : m
-      )
+      prev.map((m, idx) => (idx === i ? { ...m, member_name: v } : m))
     );
   };
 
@@ -128,12 +119,10 @@ export default function SplitBillDetail() {
     ]);
   };
 
-  const handleRemoveMember = (index) => {
+  const handleRemoveMember = (i) => {
     if (members.length === 1) return;
-    setMembers((prev) => prev.filter((_, i) => i !== index));
+    setMembers((prev) => prev.filter((_, idx) => idx !== i));
   };
-
-  /* ----------------------- TOGGLE STATUS ----------------------- */
 
   const handleToggleStatus = async (index) => {
     const target = members[index];
@@ -157,7 +146,6 @@ export default function SplitBillDetail() {
       return;
     }
 
-    // outside edit → update server
     const updatedMembers = members.map((m, i) =>
       i === index ? { ...m, status: "Paid", hasPaid: true } : m
     );
@@ -169,8 +157,8 @@ export default function SplitBillDetail() {
         bill.split_bill_id,
         updatedMembers
       );
-      setMembers(updatedBill.members.map((m) => ({ ...m, isNew: false })));
       setBill(updatedBill);
+      setMembers(updatedBill.members.map((m) => ({ ...m, isNew: false })));
     } catch {
       Swal.fire({
         icon: "error",
@@ -179,8 +167,6 @@ export default function SplitBillDetail() {
       });
     }
   };
-
-  /* ----------------------- CANCEL & SAVE ----------------------- */
 
   const handleCancelEdit = () => {
     setMembers(bill.members.map((m) => ({ ...m, isNew: false })));
@@ -199,8 +185,9 @@ export default function SplitBillDetail() {
       return setError("Total amount must match the bill total.");
 
     try {
-      const updatedBill = await updateSplitBillStatus(
+      const updatedBill = await editSplitBill(
         bill.split_bill_id,
+        bill,
         members
       );
 
@@ -214,31 +201,23 @@ export default function SplitBillDetail() {
         timer: 1400,
         showConfirmButton: false,
       });
-    } catch {
+    } catch (err) {
       setError("Failed saving changes.");
     }
   };
 
-  /* ----------------------- PDF ----------------------- */
-
   const handleDownloadPDF = () => {
     const preview = window.open("", "_blank");
-
     const doc = generateSplitBillPDF(bill, members, color);
     const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-
-    preview.location.href = url;
+    preview.location.href = URL.createObjectURL(blob);
   };
-
-  /* ----------------------- RENDER ----------------------- */
 
   return (
     <div className="sb-detail-container" style={{ "--theme": color }}>
       <Navbar />
 
       <main className="sb-detail-main">
-        {/* Header */}
         <div className="sb-top-row">
           <button className="back-btn" onClick={() => navigate("/splitbill")}>
             <ChevronLeft size={24} className="back-icon" />
@@ -248,15 +227,18 @@ export default function SplitBillDetail() {
           <div className="title-wrap">
             <h1 className="bill-title">{bill.split_bill_title}</h1>
             <p className="bill-meta">
-              Ref ID: {bill.ref_id}
-              <br />
+              Ref ID: {bill.ref_id} <br />
               Created:{" "}
               {(() => {
                 const d = new Date(bill.created_time);
                 const day = d.getDate();
                 const month = d.toLocaleString("en-US", { month: "long" });
                 const year = d.getFullYear();
-                const time = d.toLocaleString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+                const time = d.toLocaleString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                });
                 return `${day} ${month} ${year}, ${time}`;
               })()}
             </p>
@@ -288,8 +270,6 @@ export default function SplitBillDetail() {
         </div>
 
         <section className="bill-summary">
-
-          {/* Baris 1: Bill Total */}
           <div className="summary-row">
             <div className="summary-label total-label">Bill Total</div>
             <div className="summary-value total-value">
@@ -297,7 +277,6 @@ export default function SplitBillDetail() {
             </div>
           </div>
 
-          {/* Baris 2: Progress Bar (full width) */}
           <div className="summary-progress-row">
             <div className="progress-track">
               <div
@@ -307,7 +286,6 @@ export default function SplitBillDetail() {
             </div>
           </div>
 
-          {/* Baris 3: Paid */}
           <div className="summary-row">
             <div className="summary-label paid-label">Paid Amount</div>
             <div className="summary-value paid-value">
@@ -315,29 +293,24 @@ export default function SplitBillDetail() {
             </div>
           </div>
 
-          {/* Baris 4: Unpaid */}
           <div className="summary-row">
             <div className="summary-label unpaid-label">Unpaid Amount</div>
             <div className="summary-value unpaid-value">
               Rp{Number(totalUnpaid).toLocaleString("id-ID")}
             </div>
           </div>
-
         </section>
 
-        {/* Tables */}
         <div className="table-card">
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th style={{ width: "6%" }}>No</th>
-                  <th style={{ width: "32%" }}>Bill Member</th>
-                  <th style={{ width: "25%" }}>Amount</th>
-                  <th style={{ width: "25%" }}>Payment Status</th>
-
-                  {/* Kolom Action hanya tampil saat TIDAK edit */}
-                  {!isEditing && <th style={{ width: "17%" }}>Action</th>}
+                  <th>No</th>
+                  <th>Bill Member</th>
+                  <th>Amount</th>
+                  <th>Payment Status</th>
+                  {!isEditing && <th>Action</th>}
                 </tr>
               </thead>
 
@@ -368,6 +341,7 @@ export default function SplitBillDetail() {
                       <td>
                         <div className="amount-input-wrap">
                           <span className="rp-prefix">Rp</span>
+
                           {isEditing ? (
                             <input
                               type="text"
@@ -387,7 +361,6 @@ export default function SplitBillDetail() {
                         </div>
                       </td>
 
-                      {/* PAYMENT STATUS + DELETE BUTTON (HANYA EDIT MODE) */}
                       <td>
                         <div className="status-edit-combo">
                           <span
@@ -407,7 +380,6 @@ export default function SplitBillDetail() {
                         </div>
                       </td>
 
-                      {/* ACTION HANYA DI LUAR EDIT */}
                       {!isEditing && (
                         <td>
                           <div className="action-wrapper">
@@ -442,7 +414,7 @@ export default function SplitBillDetail() {
               </button>
 
               <div className="right-actions">
-                Participants Total Amount:{" "}
+                Total:{" "}
                 <strong>
                   Rp
                   {members
