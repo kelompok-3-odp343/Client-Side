@@ -9,6 +9,7 @@ import {
   fetchLifeGoalTransactions,
   fetchLifeGoalDetail,
 } from "../api/life-goals.api";
+import { ChevronLeft } from "lucide-react";
 
 export default function LifeGoalDetail() {
   const navigate = useNavigate();
@@ -85,8 +86,8 @@ export default function LifeGoalDetail() {
                   amount: item.amount,
                   debit_credit: String(item.amount).startsWith("-") ? "D" : "C",
                   jenisTransaksi: String(item.amount).startsWith("-")
-                    ? "Pengeluaran"
-                    : "Pemasukan",
+                    ? "Expense"
+                    : "Income",
                 })),
               });
             });
@@ -134,9 +135,9 @@ export default function LifeGoalDetail() {
     <div
       className="lg-container"
       style={{
-        "--theme": goal.color || "#71d9d0",
+        "--theme": goal.color || "#6dddd0",
         "--accent-gradient": `linear-gradient(135deg, ${
-          goal.color || "#71d9d0"
+          goal.color || "#6dddd0"
         } 0%, #ffffff 100%)`,
       }}
     >
@@ -148,7 +149,8 @@ export default function LifeGoalDetail() {
             onClick={() => navigate(-1)}
             onMouseMove={handleMouseMove}
           >
-            ← Back to Life Goals
+            <ChevronLeft size={24} className="back-icon" />
+            Back to Life Goals
           </button>
         </header>
 
@@ -186,58 +188,64 @@ export default function LifeGoalDetail() {
 
           {/* RIGHT COLUMN */}
           <aside className="info-column glass-card">
-            <h3 className="info-title">Life Goal Details</h3>
-            <div className="info-grid">
-              <div className="label">Account Number</div>
-              <div className="value">{goalDetail.accountNumber}</div>
+            <div className="lg-info-grid">
+              <h3 className="info-title">Life Goal Details</h3>
+              <div className="divider" />
+              <div className="lg-label">Account Number</div>
+              <div className="lg-value">{goalDetail.accountNumber}</div>
 
-              <div className="label">Estimated Accumulated Funds</div>
-              <div className="value">
+              <div className="lg-label">Estimated Accumulated Funds</div>
+              <div className="lg-value">
                 Rp
                 {Number(
                   goalDetail.estimatedAccumulatedBalance || 0
                 ).toLocaleString("id-ID")}
               </div>
 
-              <div className="label">Initial Deposit</div>
-              <div className="value">
+              <div className="lg-label">Initial Deposit</div>
+              <div className="lg-value">
                 Rp
                 {Number(goalDetail.initalDeposit || 0).toLocaleString("id-ID")}
               </div>
 
-              <div className="label">Annual Interest Rate</div>
-              <div className="value">
+              <div className="lg-label">Annual Interest Rate</div>
+              <div className="lg-value">
                 {(Number(goalDetail.interestRate || 0) * 100)
                   .toFixed(2)
                   .replace(/\.00$/, "")}
                 %
               </div>
 
-              <div className="label">Duration</div>
-              <div className="value">{goalDetail.lifegoalsDuration} years</div>
+              <div className="lg-label">Duration</div>
+              <div className="lg-value">{goalDetail.lifegoalsDuration} years</div>
 
-              <div className="label">Created On</div>
-              <div className="value">
-                {toDate(goalDetail.createdTime).toLocaleDateString("id-ID", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
+              <div className="lg-label">Created On</div>
+              <div className="lg-value">
+                {(() => {
+                  const d = toDate(goalDetail.createdTime);
+                  const day = d.getDate();
+                  const month = d.toLocaleString("en-US", { month: "long" });
+                  const year = d.getFullYear();
+                  return `${day} ${month} ${year}`;
+                })()}
               </div>
 
+              <h3 className="info-title">Disbursement Details</h3>
               <div className="divider" />
 
-              <div className="label">Maturity Date</div>
-              <div className="value">
-                {toDate(goalDetail.maturityDate).toLocaleDateString("id-ID", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
+              <div className="lg-label">Maturity Date</div>
+              <div className="lg-value">
+                {(() => {
+                  const d = toDate(goalDetail.maturityDate);
+                  const day = d.getDate();
+                  const month = d.toLocaleString("en-US", { month: "long" });
+                  const year = d.getFullYear();
+                  return `${day} ${month} ${year}`;
+                })()}
               </div>
 
-              <div className="label">Disbursement Account</div>
-              <div className="value">
+              <div className="lg-label">Disbursement Account</div>
+              <div className="lg-value">
                 {goalDetail.disbursementAccountNumber}
               </div>
             </div>
