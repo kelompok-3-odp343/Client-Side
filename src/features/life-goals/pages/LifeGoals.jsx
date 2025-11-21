@@ -65,7 +65,7 @@ export default function LifeGoals() {
         <h2 className="section-title-lg">Life Goals Information</h2>
         <p className="section-subtitle">Small saves fuel big dreams</p>
         <div className="category-separator" />
-        
+
         {Object.entries(goals).map(([cat, data], i) => {
           const color = colorByIndex(i);
           const prog = percent(data.currentBalance, data.totalTarget);
@@ -79,7 +79,7 @@ export default function LifeGoals() {
                   <p className="category-subtitle">
                     Invest in your brightest future
                   </p>
-                </div>                
+                </div>
               </div>
 
               <div className="big-progress">
@@ -95,37 +95,22 @@ export default function LifeGoals() {
                   {format(data.currentBalance)} / {format(data.totalTarget)}
                 </div>
               </div>
-              
-              <div className="subcards-grid">
-                {data.lifeGoalsList.map((g) => {
-                  const p = percent(g.currentBalance, g.targetBalance);
 
-                  return (
-                    <div
-                      key={g.accountNumber}
-                      className="lg-subcard"
-                      style={{
-                        "--gradient-color": `linear-gradient(to bottom, ${color} 0%, #ffffff 68%)`,
-                      }}
-                      onClick={() =>
-                        navigate(`/lifegoal/${g.accountNumber}`, {
-                          state: {
-                            accountNumber: g.accountNumber,
-                            goal: {
-                              title: g.lifegoalsTitle,
-                              desc: g.lifegoalsSubtitle,
-                              current: g.currentBalance,
-                              target: g.targetBalance,
-                              progress: p,
-                              color,
-                            },
-                          },
-                        })
-                      }
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
+              <div className="subcards-grid">
+                {data.lifeGoalsList.length === 0 ? (
+                  <div className="lg-empty">No Life Goals found</div>
+                ) : (
+                  data.lifeGoalsList.map((g) => {
+                    const p = percent(g.currentBalance, g.targetBalance);
+
+                    return (
+                      <div
+                        key={g.accountNumber}
+                        className="lg-subcard"
+                        style={{
+                          "--gradient-color": `linear-gradient(to bottom, ${color} 0%, #ffffff 50%)`,
+                        }}
+                        onClick={() =>
                           navigate(`/lifegoal/${g.accountNumber}`, {
                             state: {
                               accountNumber: g.accountNumber,
@@ -138,39 +123,58 @@ export default function LifeGoals() {
                                 color,
                               },
                             },
-                          });
+                          })
                         }
-                      }}
-                      aria-label={`Open details for ${g.lifegoalsTitle}`}
-                    >
-                      <div className="lg-subcard-body">
-                        <h4 className="lg-subcard-title">{g.lifegoalsTitle}</h4>
-                        <p className="lg-subcard-subtitle">{g.lifegoalsSubtitle}</p>
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            navigate(`/lifegoal/${g.accountNumber}`, {
+                              state: {
+                                accountNumber: g.accountNumber,
+                                goal: {
+                                  title: g.lifegoalsTitle,
+                                  desc: g.lifegoalsSubtitle,
+                                  current: g.currentBalance,
+                                  target: g.targetBalance,
+                                  progress: p,
+                                  color,
+                                },
+                              },
+                            });
+                          }
+                        }}
+                        aria-label={`Open details for ${g.lifegoalsTitle}`}
+                      >
+                        <div className="lg-subcard-body">
+                          <h4 className="lg-subcard-title">{g.lifegoalsTitle}</h4>
+                          <p className="lg-subcard-subtitle">{g.lifegoalsSubtitle}</p>
 
-                        <div className="lg-progress-wrap">
-                          <div className="lg-progress-labels">
-                            <span>Current Savings</span>
-                            <span>Target</span>
-                          </div>
-
-                          <div className="lg-mini-progress">
-                            <div
-                              className="lg-mini-progress-fill"
-                              style={{ width: `${p}%`, background: color }}
-                            >
-                              <span className="lg-progress-text">{p}%</span>
+                          <div className="lg-progress-wrap">
+                            <div className="lg-progress-labels">
+                              <span>Current Savings</span>
+                              <span>Target</span>
                             </div>
-                          </div>
 
-                          <div className="lg-progress-values">
-                            <span>{format(g.currentBalance)}</span>
-                            <span>{format(g.targetBalance)}</span>
+                            <div className="lg-mini-progress">
+                              <div
+                                className="lg-mini-progress-fill"
+                                style={{ width: `${p}%`, background: color }}
+                              >
+                                <span className="lg-progress-text">{p}%</span>
+                              </div>
+                            </div>
+
+                            <div className="lg-progress-values">
+                              <span>{format(g.currentBalance)}</span>
+                              <span>{format(g.targetBalance)}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
 
               {/* <div className="category-separator" /> */}
