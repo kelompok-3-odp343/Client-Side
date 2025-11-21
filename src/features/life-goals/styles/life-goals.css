@@ -120,9 +120,9 @@
 .subcards-grid {
   margin-top: 0.7rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, 25.25rem);
-  gap: 1rem;
-  justify-content: flex-start;
+  grid-template-columns: repeat(auto-fill, 26rem);
+  gap: 1.3rem;
+  justify-content: center;
 }
 
 .category-separator {
@@ -141,7 +141,7 @@
   overflow: hidden;
   position: relative;
   /* min-height: 240px; */
-  width: 25.25rem;
+  width: 26rem;
   transition: all 0.25s ease;
   cursor: pointer;
 }
