@@ -105,7 +105,7 @@ export default function LifeGoals() {
                       key={g.accountNumber}
                       className="lg-subcard"
                       style={{
-                        "--gradient-color": `linear-gradient(to bottom, ${color} 0%, #ffffff 50%)`,
+                        "--gradient-color": `linear-gradient(to bottom, ${color} 0%, #ffffff 68%)`,
                       }}
                       onClick={() =>
                         navigate(`/lifegoal/${g.accountNumber}`, {
