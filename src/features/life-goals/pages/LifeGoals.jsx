@@ -10,7 +10,7 @@ export default function LifeGoals() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const COLORS = ["#71d9d0", "#ffd367", "#9c7edc"];
+  const COLORS = ["#6dddd0", "#ffd367", "#9c7edc"];
 
   useEffect(() => {
     const loadData = async () => {
@@ -44,10 +44,10 @@ export default function LifeGoals() {
       <div className="life-goals-page">
         <Navbar />
         <div className="content-wrap">
-          <h2 className="section-title">Life Goals Information</h2>
+          <h2 className="section-title-lg">Life Goals Information</h2>
           <p className="section-subtitle">Small saves fuel big dreams</p>
 
-          <p className="no-life-goals" style={{ fontSize: "24px", fontWeight: "600" }}>
+          <p className="no-life-goals" style={{ fontSize: "0.85rem", fontWeight: "600" }}>
             No life goals available.
           </p>
         </div>
@@ -62,37 +62,40 @@ export default function LifeGoals() {
       <Navbar />
       <div className="content-wrap">
 
-        <h2 className="section-title">Life Goals Information</h2>
+        <h2 className="section-title-lg">Life Goals Information</h2>
         <p className="section-subtitle">Small saves fuel big dreams</p>
-
+        <div className="category-separator" />
+        
         {Object.entries(goals).map(([cat, data], i) => {
           const color = colorByIndex(i);
           const prog = percent(data.currentBalance, data.totalTarget);
 
           return (
             <section key={cat} className="category-block">
+              {/* <div className="category-separator" /> */}
               <div className="category-header">
                 <div>
                   <h3 className="category-title">{cat}</h3>
                   <p className="category-subtitle">
                     Invest in your brightest future
                   </p>
-                </div>
+                </div>                
+              </div>
 
+              <div className="big-progress">
+                <div className="big-progress-bar">
+                  <div
+                    className="big-progress-fill"
+                    style={{ width: `${prog}%`, background: color }}
+                  >
+                    <span className="big-progress-meta">{prog}%</span>
+                  </div>
+                </div>
                 <div className="category-total">
                   {format(data.currentBalance)} / {format(data.totalTarget)}
                 </div>
               </div>
-
-              <div className="big-progress">
-                <div
-                  className="big-progress-fill"
-                  style={{ width: `${prog}%`, background: color }}
-                />
-              </div>
-
-              <p className="big-progress-meta">{prog}% achieved</p>
-
+              
               <div className="subcards-grid">
                 {data.lifeGoalsList.map((g) => {
                   const p = percent(g.currentBalance, g.targetBalance);
@@ -102,7 +105,7 @@ export default function LifeGoals() {
                       key={g.accountNumber}
                       className="lg-subcard"
                       style={{
-                        "--gradient-color": `linear-gradient(to bottom, ${color} 0%, #ffffff 100%)`,
+                        "--gradient-color": `linear-gradient(to bottom, ${color} 0%, #ffffff 50%)`,
                       }}
                       onClick={() =>
                         navigate(`/lifegoal/${g.accountNumber}`, {
@@ -145,6 +148,11 @@ export default function LifeGoals() {
                         <p className="lg-subcard-subtitle">{g.lifegoalsSubtitle}</p>
 
                         <div className="lg-progress-wrap">
+                          <div className="lg-progress-labels">
+                            <span>Current Savings</span>
+                            <span>Target</span>
+                          </div>
+
                           <div className="lg-mini-progress">
                             <div
                               className="lg-mini-progress-fill"
@@ -152,11 +160,6 @@ export default function LifeGoals() {
                             >
                               <span className="lg-progress-text">{p}%</span>
                             </div>
-                          </div>
-
-                          <div className="lg-progress-labels">
-                            <span>Current Savings</span>
-                            <span>Target</span>
                           </div>
 
                           <div className="lg-progress-values">
@@ -170,7 +173,7 @@ export default function LifeGoals() {
                 })}
               </div>
 
-              <div className="category-separator" />
+              {/* <div className="category-separator" /> */}
             </section>
           );
         })}
