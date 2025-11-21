@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "../styles/life-goals-card.css";
 
 export default function LifeGoalsCard({ goal, onClick }) {
-  const accent = goal.color || "#71d9d0";
+  const accent = goal.color || "#6dddd0";
   const percent =
     goal.target && goal.target > 0
       ? Math.round((goal.current / goal.target) * 100)
@@ -19,7 +19,7 @@ export default function LifeGoalsCard({ goal, onClick }) {
       role="button"
       tabIndex={0}
       style={{
-        "--gradient-color": `linear-gradient(to bottom, ${accent} 0%, #ffffff 100%)`,
+        "--gradient-color": `linear-gradient(to bottom, ${accent} 0%, #ffffff 68%)`,
       }}
     >
       <div className="lg-subcard-body">
@@ -35,6 +35,11 @@ export default function LifeGoalsCard({ goal, onClick }) {
         </div>
 
         <div className="lg-progress-container">
+          <div className="lg-progress-labels">
+            <span>Current Savings</span>
+            <span>Target</span>
+          </div>
+
           <div className="lg-mini-progress">
             <div
               className="lg-mini-progress-fill"
@@ -42,11 +47,6 @@ export default function LifeGoalsCard({ goal, onClick }) {
             >
               <span className="lg-progress-text">{percent}%</span>
             </div>
-          </div>
-
-          <div className="lg-progress-labels">
-            <span>Current Savings</span>
-            <span>Target</span>
           </div>
 
           <div className="lg-progress-values">
