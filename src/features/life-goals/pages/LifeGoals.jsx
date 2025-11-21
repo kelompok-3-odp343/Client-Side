@@ -97,10 +97,10 @@ export default function LifeGoals() {
               </div>
 
               <div className="subcards-grid">
-                {data.lifeGoalsList.length === 0 ? (
+                {!data?.lifegoalslist ? (
                   <div className="lg-empty">No Life Goals found</div>
                 ) : (
-                  data.lifeGoalsList.map((g) => {
+                  data.lifegoalslist.map((g) => {
                     const p = percent(g.currentBalance, g.targetBalance);
 
                     return (
