@@ -17,6 +17,7 @@ export async function fetchAllCards() {
     });
 
     const result = res?.data?.data;
+    console.log('xcxcz', result)
 
     if (Array.isArray(result) && result.length > 0) {
       return result;

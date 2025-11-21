@@ -38,7 +38,9 @@ export async function fetchLifeGoals(userId = "USER001") {
 export async function fetchLifeGoalDetail(accountNumber) {
   try {
     const token = sessionStorage.getItem("token");
-    const res = await api.get(`/api/v1/lifegoals-detail/${accountNumber}`, {
+    const res = await api.get(`/api/v1/lifegoals-detail`, {
+      accountNumber
+    }, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

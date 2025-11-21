@@ -22,10 +22,10 @@ export default function Dashboard() {
       try {
         // Fetch dashboard data
         const raw = await fetchDashboard();
-        
+
         // Fetch cards data separately
         const cardsData = await fetchAllCards();
-        
+
         if (!raw) {
           setLoading(false);
           return;
@@ -69,10 +69,10 @@ export default function Dashboard() {
           const mappedCards = cardsData.map((item) => ({
             account_id: item.account_id,
             type: item.type,
-            account_number: item.account_number,
-            card_number: item.account_number, // Use account_number as card_number
-            account_holder_name: item.account_holder_name,
-            effective_balance: item.effective_balance,
+            account_number: item.accountNumber,
+            card_number: item.accountNumber, // Use account_number as card_number
+            account_holder_name: item.accountName,
+            effective_balance: item.effectiveBalance,
             is_main: item.is_main,
             showCardNumber: false,
           }));
@@ -80,17 +80,17 @@ export default function Dashboard() {
         } else {
           // Fallback to accountList from dashboard if cards fetch fails
           const mappedCards = (d.accountList ?? []).map((item) => ({
-            type: item.account_product_name,
-            account_number: item.account_number,
-            card_number: item.debit_card_number || item.account_number,
-            account_holder_name: item.account_name,
-            effective_balance: 0, // Not available in accountList
+            type: item.account_product_name || "ACCOUNT NUMBER",
+            account_number: item.accountNumber,
+            card_number: item.debit_card_number || item.accountNumber,
+            account_holder_name: item.accountName,
+            effective_balance: item.effectiveBalance,
             is_main: false,
             showCardNumber: false,
           }));
           setCards(mappedCards);
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error("Error loading dashboard:", error);

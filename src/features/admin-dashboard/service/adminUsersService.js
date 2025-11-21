@@ -10,7 +10,7 @@ export const fetchAdminUsers = async () => {
     try {
         const token = sessionStorage.getItem("token");
 
-        const resp = await api.get("/api/admin/user/list", {
+        const resp = await api.get("/api/admin/users-list", {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
