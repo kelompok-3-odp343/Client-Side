@@ -18,8 +18,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('sd', sessionStorage.getItem('token'));
-
     const dataDashboards = async () => {
       try {
         // Fetch dashboard data
