@@ -36,22 +36,25 @@ import useAutoLogout from "../shared/hooks/useAutoLogout";
 
 // === Routes ===
 import PrivateRoute from "./PrivateRoute";
+import AuthRoute from "./AuthRoute";
 
 export default function AppRoutes() {
   const location = useLocation();
 
-  useAutoLogout(60, 30);
+  useAutoLogout(5, 30);
 
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        <Route element={<AuthRoute />}>
 
-        <Route path="/" element={<Login />} />
-        <Route path="/otpLogin" element={<OtpLogin />} />
-        <Route path="/popupblock" element={<PopupBlock />} />
-        <Route path="/forgot" element={<ForgotPasswordRequest />} />
-        <Route path="/forgot/otp" element={<ForgotPasswordOtp />} />
-        <Route path="/forgot/reset" element={<ForgotPasswordReset />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/otpLogin" element={<OtpLogin />} />
+          <Route path="/popupblock" element={<PopupBlock />} />
+          <Route path="/forgot" element={<ForgotPasswordRequest />} />
+          <Route path="/forgot/otp" element={<ForgotPasswordOtp />} />
+          <Route path="/forgot/reset" element={<ForgotPasswordReset />} />
+        </Route>
 
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />

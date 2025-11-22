@@ -67,7 +67,7 @@ export default function OtpLogin() {
 
 		setTimeout(() => {
 			setShowModal(false);
-			navigate("/dashboard");
+			navigate("/dashboard", { replace: true });
 		}, 800);
 	};
 

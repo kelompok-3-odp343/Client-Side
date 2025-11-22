@@ -50,7 +50,7 @@ export default function ForgotPasswordOtp() {
         setLoading(true);
         try {
             const res = await postForgotPasswordVerifyOtp({
-                sessionId: state.sessionIdOrToken,
+                sessionId: sessionStorage.getItem('sessionID'),
                 otpCode,
             });
 

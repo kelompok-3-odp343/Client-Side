@@ -65,7 +65,7 @@ export default function Login() {
 			const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVER"];
 
 			if (apiRole === "NASABAH") {
-				navigate("/otpLogin");
+				navigate("/otpLogin", { replace: true });
 				return;
 			}
 
@@ -92,7 +92,7 @@ export default function Login() {
 					console.warn("Failed to load menu access.", err);
 				}
 
-				navigate("/admin/home");
+				navigate("/admin/home", { replace: true });
 				return;
 			}
 			navigate("/otpLogin");

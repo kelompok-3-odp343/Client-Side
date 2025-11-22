@@ -8,7 +8,7 @@ export default function PrivateRoute() {
 
   if (!token) return <Navigate to="/" replace />;
 
-  const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVAL"];
+  const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVER"];
 
   const isAdminPage = location.pathname.startsWith("/admin");
   const isUserPage = !isAdminPage;
