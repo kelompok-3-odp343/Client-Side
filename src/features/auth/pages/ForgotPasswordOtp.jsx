@@ -20,6 +20,12 @@ export default function ForgotPasswordOtp() {
     const inputsRef = useRef([]);
 
     useEffect(() => {
+        if (state?.username) {
+            sessionStorage.setItem("fp_username_temp", state.username);
+        }
+    }, [state]);
+
+    useEffect(() => {
         let interval;
         if (!canResend && timer > 0) {
             interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
@@ -29,6 +35,12 @@ export default function ForgotPasswordOtp() {
         }
         return () => clearInterval(interval);
     }, [timer, canResend]);
+
+    useEffect(() => {
+        if (otp.every((digit) => digit !== "")) {
+            handleSubmit();
+        }
+    }, [otp]);
 
     const handleChange = (value, index) => {
         if (!/^[0-9]?$/.test(value)) return;
@@ -40,15 +52,23 @@ export default function ForgotPasswordOtp() {
         if (value && index < 5) {
             inputsRef.current[index + 1].focus();
         }
+    };
 
-        if (!value && index > 0) {
-            inputsRef.current[index - 1].focus();
+    const handleKeyDown = (e, index) => {
+        if (e.key === "Backspace") {
+            if (!otp[index] && index > 0) {
+                e.preventDefault();
+                const updatedOtp = [...otp];
+                updatedOtp[index - 1] = ""; 
+                setOtp(updatedOtp);
+                inputsRef.current[index - 1].focus(); 
+            }
         }
     };
 
-
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
+
         const otpCode = otp.join("");
         if (otpCode.length !== 6)
             return Swal.fire({
@@ -65,6 +85,8 @@ export default function ForgotPasswordOtp() {
             });
 
             if (res.ok && res.data.status) {
+                sessionStorage.removeItem("fp_username_temp");
+                
                 Swal.fire({
                     icon: "success",
                     title: "OTP Verified",
@@ -82,6 +104,8 @@ export default function ForgotPasswordOtp() {
                     title: "Failed",
                     text: res.message || "OTP salah",
                 });
+                setOtp(["", "", "", "", "", ""]);
+                if(inputsRef.current[0]) inputsRef.current[0].focus();
             }
         } catch (err) {
             Swal.fire({
@@ -97,9 +121,22 @@ export default function ForgotPasswordOtp() {
     const handleResendOtp = async () => {
         if (!canResend) return;
 
+        const usernameTarget = state?.username || sessionStorage.getItem("fp_username_temp");
+
+        if (!usernameTarget) {
+            Swal.fire({
+                icon: "error",
+                title: "Session Expired",
+                text: "Data pengguna tidak ditemukan. Silakan ulangi proses lupa password.",
+            }).then(() => {
+                navigate("/forgot-password"); 
+            });
+            return;
+        }
+
         setResendLoading(true);
         try {
-            const res = await postForgotPasswordRequestOtp({ username: state?.username });
+            const res = await postForgotPasswordRequestOtp({ username: usernameTarget });
 
             if (res.ok && res.data.status) {
                 sessionStorage.setItem("fp_session", res.data.sessionIdOrToken);
@@ -112,6 +149,7 @@ export default function ForgotPasswordOtp() {
                 setTimer(30);
                 setCanResend(false);
                 setOtp(["", "", "", "", "", ""]);
+                if(inputsRef.current[0]) inputsRef.current[0].focus();
             } else {
                 Swal.fire({
                     icon: "error",
@@ -147,6 +185,7 @@ export default function ForgotPasswordOtp() {
                                 value={val}
                                 ref={(el) => (inputsRef.current[i] = el)}
                                 onChange={(e) => handleChange(e.target.value, i)}
+                                onKeyDown={(e) => handleKeyDown(e, i)} 
                             />
                         ))}
                     </div>
@@ -164,6 +203,7 @@ export default function ForgotPasswordOtp() {
                     ) : (
                         <span
                             className={`otp-resend-link ${resendLoading ? "disabled" : ""}`}
+                            style={{ cursor: "pointer" }}
                             onClick={handleResendOtp}
                         >
                             {resendLoading ? "Resending..." : "Click to resend OTP"}
