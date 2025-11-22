@@ -4,7 +4,7 @@ import { ChartPie, Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { fetchDashboard } from "../api/dashboard.api.js";
-import { fetchAllCards } from "../../card/api/card.api.js"; // Import fetchAllCards
+import { fetchAllCards } from "../../card/api/card.api.js";
 import depositsIcon from "../../../assets/images/dashboard-deposits-icon.png";
 import savingsIcon from "../../../assets/images/dashboard-savings-icon.png";
 import lifeGoalsIcon from "../../../assets/images/dashboard-life-goals-icon.png";
@@ -20,10 +20,7 @@ export default function Dashboard() {
   useEffect(() => {
     const dataDashboards = async () => {
       try {
-        // Fetch dashboard data
         const raw = await fetchDashboard();
-
-        // Fetch cards data separately
         const cardsData = await fetchAllCards();
 
         if (!raw) {
@@ -32,7 +29,6 @@ export default function Dashboard() {
         }
 
         const d = raw.data;
-
         const total = d.assetoverview?.totalAsset ?? 0;
         const income = d.cashFlowOverview?.totalIncome ?? 0;
         const expenses = d.cashFlowOverview?.totalExpense ?? 0;
@@ -64,17 +60,18 @@ export default function Dashboard() {
           pension_funds: [{ balance: amt("dplk") }],
         });
 
-        // Map cards from fetchAllCards response
+        // Map cards data (handle camelCase vs snake_case mismatch from BE/Dummy)
         if (Array.isArray(cardsData) && cardsData.length > 0) {
           const mappedCards = cardsData.map((item) => ({
             account_id: item.account_id,
-            type: item.type,
-            account_number: item.accountNumber,
-            card_number: item.accountNumber, // Use account_number as card_number
-            account_holder_name: item.accountName,
-            effective_balance: item.effectiveBalance,
+            type: item.type || item.productName || "Tabungan",
+            // Handle potential different key names
+            account_number: item.accountNumber || item.account_number,
+            card_number: item.accountNumber || item.account_number,
+            account_holder_name: item.accountName || item.account_holder_name,
+            effective_balance: item.effectiveBalance !== undefined ? item.effectiveBalance : item.effective_balance,
             is_main: item.is_main,
-            showCardNumber: false,
+            showBalance: false, 
           }));
           setCards(mappedCards);
         } else {
@@ -86,7 +83,7 @@ export default function Dashboard() {
             account_holder_name: item.accountName,
             effective_balance: item.effectiveBalance,
             is_main: false,
-            showCardNumber: false,
+            showBalance: false,
           }));
           setCards(mappedCards);
         }
@@ -105,7 +102,7 @@ export default function Dashboard() {
     if (cards.length > 1) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % cards.length);
-      }, 4000);
+      }, 5000); // Increased slightly for better UX
       return () => clearInterval(interval);
     }
   }, [cards]);
@@ -119,8 +116,7 @@ export default function Dashboard() {
   };
 
   const handleCardClick = () => {
-    // Pass cards data to DetailMyCard
-    navigate("/detailmycard", { state: { cards } });
+    navigate("/detailmycard", { state: { cards, selectedAccount: cards[currentIndex]?.account_number } });
   };
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
@@ -143,6 +139,8 @@ export default function Dashboard() {
 
   const fmt = (v) => Number(v).toLocaleString("id-ID");
   const handleNavigate = (section) => navigate(`/${section}`);
+
+  const currentCard = cards[currentIndex];
 
   return (
     <div className="dashboard-page">
@@ -344,52 +342,49 @@ export default function Dashboard() {
                       <ChevronLeft size={28} />
                     </button>
 
+                    {/* RESTRUCTURED CARD TO MATCH DETAIL MY CARD */}
                     <div
-                      key={cards[currentIndex]?.account_number}
+                      key={currentCard?.account_number}
                       className="bank-card slide-in"
                       onClick={handleCardClick}
                     >
-                      <div className="card-header">
-                        <span className="bank-type">
-                          {cards[currentIndex]?.type} –{" "}
-                          {cards[currentIndex]?.account_number}
-                        </span>
+                      <div className="bank-card-header">
+                        <div className="bank-card-details">
+                          <h4 className="bank-card-type">{currentCard?.type}</h4>
+                          <p className="bank-card-number">{currentCard?.account_number}</p>
+                          <p className="bank-card-name">{currentCard?.account_holder_name}</p>
+                        </div>
+                        {currentCard?.is_main && (
+                          <div className="bank-card-badge">
+                            <span>Main Account</span>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="card-body">
-                        <div className="card-number-row">
-                          <p className="card-number">
-                            {cards[currentIndex]?.showCardNumber
-                              ? (cards[currentIndex]?.card_number ?? "").replace(
-                                /(\d{4})(?=\d)/g,
-                                "$1 "
-                              )
-                              : "**** **** **** " +
-                              String(
-                                cards[currentIndex]?.card_number ?? ""
-                              ).slice(-4)}
-                          </p>
+                      <div className="bank-card-footer">
+                        <p className="bank-card-label">Effective Balance</p>
+                        <div className="bank-card-balance-row">
+                          <h3>
+                            {currentCard?.showBalance
+                              ? `Rp ${fmt(currentCard?.effective_balance ?? 0)}`
+                              : "Rp •••••••••"}
+                          </h3>
                           <span
                             className="eye-icon"
                             onClick={(e) => {
                               e.stopPropagation();
                               const updated = [...cards];
-                              updated[currentIndex].showCardNumber =
-                                !updated[currentIndex].showCardNumber;
+                              updated[currentIndex].showBalance = !updated[currentIndex].showBalance;
                               setCards(updated);
                             }}
                           >
-                            {cards[currentIndex]?.showCardNumber ? (
-                              <EyeOff size={18} strokeWidth={2.5} />
+                            {currentCard?.showBalance ? (
+                              <EyeOff size={20} />
                             ) : (
-                              <Eye size={18} strokeWidth={2.5} />
+                              <Eye size={20} />
                             )}
                           </span>
                         </div>
-
-                        <p className="card-holder">
-                          {cards[currentIndex]?.account_holder_name ?? ""}
-                        </p>
                       </div>
                     </div>
 
