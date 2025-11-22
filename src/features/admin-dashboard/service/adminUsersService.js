@@ -46,7 +46,7 @@ export const fetchMenuAccess = async () => {
     }
 };
 
-export const fetchAdminBlock = async ({ userData, reason, checkerData }) => {
+export const fetchAdminBlock = async ({ userData, reason, checkerData, menuData, approverData }) => {
     try {
         const token = sessionStorage.getItem("token");
 
@@ -54,8 +54,8 @@ export const fetchAdminBlock = async ({ userData, reason, checkerData }) => {
             userData,
             reason,
             checkerData,
-            actionMenu: "BLOCK_USER",
-            menu: "USER_MANAGEMENT"
+            menuData,
+            approverData
         };
 
         const resp = await api.post("/api/admin/user/block", payload, {
@@ -73,7 +73,7 @@ export const fetchAdminBlock = async ({ userData, reason, checkerData }) => {
     }
 };
 
-export const fetchAdminUnBlock = async ({ userData, reason, checkerData }) => {
+export const fetchAdminUnBlock = async ({ userData, reason, checkerData, menuData, approverData }) => {
     try {
         const token = sessionStorage.getItem("token");
 
@@ -81,8 +81,8 @@ export const fetchAdminUnBlock = async ({ userData, reason, checkerData }) => {
             userData,
             reason,
             checkerData,
-            actionMenu: "UNBLOCK_USER",
-            menu: "USER_MANAGEMENT"
+            menuData,
+            approverData
         };
 
         const resp = await api.post("/api/admin/user/unblock", payload, {
@@ -99,3 +99,23 @@ export const fetchAdminUnBlock = async ({ userData, reason, checkerData }) => {
         return { ok: false, error };
     }
 };
+
+export async function fetchApproverList(roleName = "CHECKER") {
+    try {
+        const response = await api.post(
+            "/api/admin/approver-list",
+            { roleName },
+            {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        return response.data?.data || [];
+    } catch (err) {
+        console.error("Error fetchApproverList:", err);
+        return [];
+    }
+}

@@ -41,6 +41,7 @@ export const fetchAdminActivityDetail = async (activityId) => {
             { headers: { Authorization: `Bearer ${token}` } }
         );
 
+
         return resp.data;
 
     } catch (err) {
@@ -82,7 +83,7 @@ export const postAdminApproval = async ({ activityId, approverData, isApprove })
             approverData
         };
 
-        const resp = await api.post("/api/admin/approval", payload, {
+        const resp = await api.post("/api/admin/user/approval", payload, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json"
@@ -107,10 +108,10 @@ export const postAdminApproval = async ({ activityId, approverData, isApprove })
 export const fetchApproverList = async () => {
     try {
         const token = sessionStorage.getItem("token");
-        const roleName = sessionStorage.getItem("role")?.toUpperCase() || "MAKER";
+        const roleName = 'APPROVER';
 
         const resp = await api.post(
-            "/api/admin/approver/list",
+            "/api/admin/approver-list",
             { roleName },
             {
                 headers: {
