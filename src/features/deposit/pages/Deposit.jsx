@@ -11,6 +11,7 @@ export default function Deposits() {
   const [transactions, setTransactions] = useState([]);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const getLastMonths = () => {
     const now = new Date();
@@ -68,6 +69,7 @@ export default function Deposits() {
 
   const handleSelectedMonth = async (m) => {
     setSelectedMonth(m);
+    setLoading(true);
 
     try {
       const accountNumber = depositsData?.deposits?.[0]?.account_number;
@@ -75,7 +77,7 @@ export default function Deposits() {
       const data = await getTimeDepositTransactions({
         month: m.month,
         year: m.year,
-        accountNumber: "",
+        accountNumber: accountNumber || "",
       });
 
       if (!data?.transactions) {
@@ -88,47 +90,32 @@ export default function Deposits() {
     } catch (err) {
       console.error("Gagal fetch transaksi deposit:", err);
       setTransactions([]);
+    } finally {
+        setLoading(false);
     }
   };
 
+  // ... (Logic Download CSV sama seperti sebelumnya)
   const handleDownloadCSV = () => {
     if (!transactions || transactions.length === 0) {
       alert("No transactions to download");
       return;
     }
-
-    // Prepare CSV data
     const csvData = [];
     csvData.push(["Date", "Transaction Type", "Description", "Amount", "Type"]);
-
     transactions.forEach((group) => {
       group.items.forEach((item) => {
         const type = item.debit_credit === "C" ? "Credit" : "Debit";
-        const amount = item.amount.replace(/[^\d]/g, "");
-        csvData.push([
-          item.transactionDate,
-          item.type,
-          item.detail,
-          amount,
-          type,
-        ]);
+        const amount = String(item.amount).replace(/[^\d]/g, "");
+        csvData.push([item.transactionDate, item.type, item.detail, amount, type]);
       });
     });
-
-    // Convert to CSV string
     const csvContent = csvData.map((row) => row.join(",")).join("\n");
-
-    // Create blob and download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-
     link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `Time_Deposits_Transactions_${selectedMonth?.label}_${selectedMonth?.year}.csv`
-    );
-    link.style.visibility = "hidden";
+    link.setAttribute("download", `Time_Deposits_Transactions_${selectedMonth?.label}_${selectedMonth?.year}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -141,15 +128,9 @@ export default function Deposits() {
       try {
         const dateStr = trx.transactionDate;
         if (!dateStr) return;
-
         d = new Date(dateStr);
-
-        if (isNaN(d.getTime())) {
-          console.warn('Invalid date:', dateStr);
-          return;
-        }
+        if (isNaN(d.getTime())) return;
       } catch (e) {
-        console.warn('Error parsing date:', trx.transactionDate, e);
         return;
       }
 
@@ -238,6 +219,7 @@ export default function Deposits() {
             onMonthChange={handleSelectedMonth}
             themeColor="#FFE8B0"
             title="Transaction History"
+            loading={loading}
             onTransactionClick={(item) => {
               setSelectedTransaction(item);
               setShowDetailModal(true);
@@ -271,8 +253,7 @@ function DepositCard({ title, balance, date, interest, opening, period }) {
     <div className="deposit-card">
       <h4 className="deposit-title">{title}</h4>
       <p className="deposit-balance">
-        Balance:
-        <br />
+        Balance:<br />
         <strong>Rp{balance.toLocaleString()}</strong>
       </p>
 
@@ -288,18 +269,9 @@ function DepositCard({ title, balance, date, interest, opening, period }) {
 
       <hr />
       <div className="deposit-info">
-        <p>
-          <span>Interest</span>
-          <span>{interest}</span>
-        </p>
-        <p>
-          <span>Opening date</span>
-          <span>{opening}</span>
-        </p>
-        <p>
-          <span>Period</span>
-          <span>{period}</span>
-        </p>
+        <p><span>Interest</span><span>{interest}</span></p>
+        <p><span>Opening date</span><span>{opening}</span></p>
+        <p><span>Period</span><span>{period}</span></p>
       </div>
     </div>
   );

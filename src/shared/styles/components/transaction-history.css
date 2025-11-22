@@ -234,6 +234,59 @@
   font-size: 1rem;
 }
 
+/* Wrapper agar posisi overlay bisa relative terhadap list */
+.trx-history-list-container {
+  position: relative;
+  min-height: 200px; 
+  transition: all 0.3s ease;
+}
+
+/* Efek transisi pada list saat opacity berubah */
+.trx-history-list {
+  transition: opacity 0.3s ease-in-out;
+  padding-bottom: 1rem;
+}
+
+/* Overlay Loading: Muncul di atas list */
+.trx-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.6); /* Putih transparan */
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; 
+  padding-top: 3rem;
+  backdrop-filter: blur(1px); 
+  border-radius: 8px;
+}
+
+/* Spinner Animation */
+.trx-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3; 
+  border-top: 3px solid var(--theme-color, #6dddd0); 
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.trx-history-container {
+  /* ... style container lama ... */
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  /* shadow dll */
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .trx-history-title {

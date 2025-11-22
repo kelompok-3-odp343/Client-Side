@@ -4,7 +4,6 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-// Dummy data untuk deposit
 const DUMMY_DEPOSITS = {
     total_balance: 125000000,
     count_accounts: 3,
@@ -39,38 +38,41 @@ const DUMMY_DEPOSITS = {
     ]
 };
 
-// Dummy transaction history
-const DUMMY_DEPOSIT_TRX = {
-    transactions: [
+const generateDummyTransactions = (month, year) => {
+    const m = String(month).padStart(2, '0');
+    const isOdd = month % 2 !== 0;
+    
+    const items = [
         {
-            transactionId: "TRX-DEP-001",
-            transactionDate: "2025-11-01T08:00:00",
+            transactionId: `TRX-DEP-${year}${m}-01`,
+            transactionDate: `${year}-${m}-01T08:00:00`,
+            transactionType: "Interest",
+            debit_credit: "C",
+            partyName: "Monthly Interest",
+            partyDetail: "Interest Credit",
+            amount: isOdd ? 187500 : 190000, 
+        }
+    ];
+
+    if (month === 11) {
+        items.push({
+            transactionId: `TRX-DEP-${year}${m}-00`,
+            transactionDate: `${year}-${m}-10T09:00:00`,
             transactionType: "Placement",
             debit_credit: "D",
             partyName: "Initial Deposit",
             partyDetail: "Time Deposit Opening",
             amount: 50000000,
-        },
-        {
-            transactionId: "TRX-DEP-002",
-            transactionDate: "2025-11-10T09:00:00",
-            transactionType: "Interest",
-            debit_credit: "C",
-            partyName: "Monthly Interest",
-            partyDetail: "Interest Credit",
-            amount: 187500,
-        }
-    ]
+        });
+    }
+
+    return items;
 };
 
 export const getTimeDeposits = async () => {
     try {
         const token = sessionStorage.getItem("token");
-
-        if (!token) {
-            console.warn("⚠️ No token found, using dummy data");
-            return { data: DUMMY_DEPOSITS };
-        }
+        if (!token) return { data: DUMMY_DEPOSITS };
 
         const response = await api.get(`/api/v1/detail-deposit`, {
             headers: {
@@ -80,14 +82,9 @@ export const getTimeDeposits = async () => {
             },
         });
 
-        if (response.data && response.data.status === true) {
-            return response.data;
-        } else {
-            console.warn("⚠️ API returned invalid data, using dummy");
-            return { data: DUMMY_DEPOSITS };
-        }
+        if (response.data?.status) return response.data;
+        return { data: DUMMY_DEPOSITS };
     } catch (error) {
-        console.warn("⚠️ API unavailable, using dummy data:", error.message);
         return { data: DUMMY_DEPOSITS };
     }
 };
@@ -95,38 +92,23 @@ export const getTimeDeposits = async () => {
 export const getTimeDepositTransactions = async ({ month, year, accountNumber }) => {
     try {
         const token = sessionStorage.getItem("token");
+        const payload = { month, year, accountNumber, productType: 'DEP' };
 
-        if (!token) {
-            console.warn("⚠️ No token found, using dummy transactions");
-            return { transactions: DUMMY_DEPOSIT_TRX.transactions };
+        if (token) {
+            const response = await api.post(`/api/v1/trx-history`, payload, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true",
+                },
+            });
+
+            if (response.data?.transactions?.length) return response.data;
+            if (response.data?.transaction?.length) return { transactions: response.data.transaction };
         }
 
-        const payload = {
-            month,
-            year,
-            accountNumber,
-            productType: 'DEP'
-        };
-
-        const response = await api.post(`/api/v1/trx-history`, payload, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "true",
-            },
-        });
-
-        if (response.data?.transactions?.length) {
-            return response.data;
-        }
-        if (response.data?.transaction?.length) {
-            return { transactions: response.data.transaction };
-        }
-
-        console.warn("⚠️ No transactions from API, using dummy");
-        return { transactions: DUMMY_DEPOSIT_TRX.transactions };
+        return { transactions: generateDummyTransactions(month, year) };
     } catch (error) {
-        console.warn("⚠️ Transaction API failed, using dummy:", error.message);
-        return { transactions: DUMMY_DEPOSIT_TRX.transactions };
+        return { transactions: generateDummyTransactions(month, year) };
     }
 };

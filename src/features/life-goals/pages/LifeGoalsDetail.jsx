@@ -17,109 +17,93 @@ export default function LifeGoalDetail() {
   const goal = state?.goal || {};
   const accountNumber = state?.accountNumber;
 
+  const getLastMonths = () => {
+    const now = new Date();
+    const arr = [];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      arr.push({
+        label: d.toLocaleString("en-US", { month: "short" }),
+        month: d.getMonth() + 1,
+        year: d.getFullYear(),
+      });
+    }
+    return arr.reverse();
+  };
+
+  const [months] = useState(getLastMonths());
+  const [selectedMonth, setSelectedMonth] = useState(months[months.length - 1]);
+
   const [transactions, setTransactions] = useState([]);
   const [goalDetail, setGoalDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
-  const months = [
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sept",
-    "Oct",
-    "Nov",
-    "Dec",
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-  ];
-
-  const [selectedMonth, setSelectedMonth] = useState("May");
-
-  // Convert months array to format compatible with TransactionHistory
-  const monthsData = months.map((label, index) => {
-    const now = new Date();
-    const monthIndex = months.indexOf(label);
-    const yearOffset = monthIndex < 4 ? 1 : 0; // Jan-Apr are next year
+  const mapTransactions = (txData) => {
+    if (!Array.isArray(txData)) return [];
     
-    return {
-      label,
-      month: monthIndex + 1,
-      year: now.getFullYear() + yearOffset,
-    };
-  });
-
-  const selectedMonthData = monthsData.find((m) => m.label === selectedMonth);
+    return txData.map(group => ({
+      date: new Date(group.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+      items: group.items.map((item, idx) => ({
+        transactionId: item.transactionId || `LFG-${idx}`,
+        transactionDate: group.date,
+        type: item.type,
+        transactionType: item.type,
+        detail: item.desc,
+        partyName: item.type,
+        amount: item.amount,
+        debit_credit: String(item.amount).startsWith("-") ? "D" : "C",
+        jenisTransaksi: String(item.amount).startsWith("-") ? "Expense" : "Income",
+      }))
+    }));
+  };
 
   useEffect(() => {
     async function loadData() {
+      if (!accountNumber) return;
       setLoading(true);
+      
       try {
-        const [txRes, detailRes] = await Promise.all([
-          fetchLifeGoalTransactions(accountNumber),
-          fetchLifeGoalDetail(accountNumber),
-        ]);
-        
-        // Convert transaction format to groups
-        const txData = txRes || {};
-        const allTransactions = [];
-
-        months.forEach((month) => {
-          const monthData = txData[month];
-          if (Array.isArray(monthData) && monthData.length > 0) {
-            monthData.forEach((group) => {
-              allTransactions.push({
-                date: group.date,
-                month: month,
-                items: group.items.map((item) => ({
-                  transactionId: `LFG-${month}-${item.type}-${item.desc}`,
-                  transactionDate: group.date,
-                  type: item.type,
-                  transactionType: item.type,
-                  detail: item.desc,
-                  partyName: item.type,
-                  partyDetail: item.desc,
-                  amount: item.amount,
-                  debit_credit: String(item.amount).startsWith("-") ? "D" : "C",
-                  jenisTransaksi: String(item.amount).startsWith("-")
-                    ? "Expense"
-                    : "Income",
-                })),
-              });
-            });
-          }
-        });
-
-        setTransactions(allTransactions);
+        const detailRes = await fetchLifeGoalDetail(accountNumber);
         setGoalDetail(detailRes?.data || null);
-      } catch {
+
+        await handleMonthChange(selectedMonth);
+      } catch (error) {
+        console.error(error);
         setTransactions([]);
-        setGoalDetail(null);
       } finally {
         setLoading(false);
       }
     }
-    if (accountNumber) loadData();
+    loadData();
   }, [accountNumber]);
 
-  // Filter transactions by selected month
-  const filteredTransactions = transactions.filter(
-    (group) => group.month === selectedMonth
-  );
+  // Handle perubahan bulan
+  const handleMonthChange = async (monthObj) => {
+    setSelectedMonth(monthObj);
+    setLoading(true);
+    try {
+        const txRes = await fetchLifeGoalTransactions(
+            accountNumber, 
+            monthObj.month, 
+            monthObj.year
+        );
+        setTransactions(mapTransactions(txRes));
+    } catch (err) {
+        setTransactions([]);
+    } finally {
+        setLoading(false);
+    }
+  };
 
-  if (loading || !goalDetail)
-    return <div className="loading">Loading...</div>;
+  if (!goalDetail) return <div className="loading">Loading...</div>;
 
   const toDate = (str) => {
     if (!str) return "";
-    const [d, m, rest] = str.split("-");
-    const y = (rest || "").split("T")[0];
-    if (!y) return str;
-    return new Date(`${y}-${m}-${d}`);
+    const d = new Date(str);
+    if (isNaN(d.getTime())) return str;
+    return d;
   };
 
   const handleMouseMove = (e) => {
@@ -170,12 +154,13 @@ export default function LifeGoalDetail() {
 
             <div className="history-panel glass-card">
               <TransactionHistory
-                transactions={filteredTransactions}
-                months={monthsData}
-                selectedMonth={selectedMonthData}
-                onMonthChange={(m) => setSelectedMonth(m.label)}
+                transactions={transactions} 
+                months={months}
+                selectedMonth={selectedMonth}
+                onMonthChange={handleMonthChange} 
                 themeColor={goal.color || "#71d9d0"}
                 title="Transaction History"
+                loading={loading}
                 onTransactionClick={(item) => {
                   setSelectedTransaction(item);
                   setShowDetailModal(true);
@@ -197,9 +182,7 @@ export default function LifeGoalDetail() {
               <div className="lg-label">Estimated Accumulated Funds</div>
               <div className="lg-value">
                 Rp
-                {Number(
-                  goalDetail.estimatedAccumulatedBalance || 0
-                ).toLocaleString("id-ID")}
+                {Number(goalDetail.estimatedAccumulatedBalance || 0).toLocaleString("id-ID")}
               </div>
 
               <div className="lg-label">Initial Deposit</div>
@@ -210,10 +193,7 @@ export default function LifeGoalDetail() {
 
               <div className="lg-label">Annual Interest Rate</div>
               <div className="lg-value">
-                {(Number(goalDetail.interestRate || 0) * 100)
-                  .toFixed(2)
-                  .replace(/\.00$/, "")}
-                %
+                {(Number(goalDetail.interestRate || 0) * 100).toFixed(2).replace(/\.00$/, "")}%
               </div>
 
               <div className="lg-label">Duration</div>
@@ -223,10 +203,7 @@ export default function LifeGoalDetail() {
               <div className="lg-value">
                 {(() => {
                   const d = toDate(goalDetail.createdTime);
-                  const day = d.getDate();
-                  const month = d.toLocaleString("en-US", { month: "long" });
-                  const year = d.getFullYear();
-                  return `${day} ${month} ${year}`;
+                  return d instanceof Date ? d.toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
                 })()}
               </div>
 
@@ -236,11 +213,8 @@ export default function LifeGoalDetail() {
               <div className="lg-label">Maturity Date</div>
               <div className="lg-value">
                 {(() => {
-                  const d = toDate(goalDetail.maturityDate);
-                  const day = d.getDate();
-                  const month = d.toLocaleString("en-US", { month: "long" });
-                  const year = d.getFullYear();
-                  return `${day} ${month} ${year}`;
+                   const d = toDate(goalDetail.maturityDate);
+                   return d instanceof Date ? d.toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
                 })()}
               </div>
 
