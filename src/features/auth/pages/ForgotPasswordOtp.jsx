@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/auth-forgot.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
@@ -17,6 +17,7 @@ export default function ForgotPasswordOtp() {
     const [resendLoading, setResendLoading] = useState(false);
     const [timer, setTimer] = useState(30);
     const [canResend, setCanResend] = useState(false);
+    const inputsRef = useRef([]);
 
     useEffect(() => {
         let interval;
@@ -30,12 +31,21 @@ export default function ForgotPasswordOtp() {
     }, [timer, canResend]);
 
     const handleChange = (value, index) => {
-        if (/^[0-9]*$/.test(value)) {
-            const updatedOtp = [...otp];
-            updatedOtp[index] = value;
-            setOtp(updatedOtp);
+        if (!/^[0-9]?$/.test(value)) return;
+
+        const updatedOtp = [...otp];
+        updatedOtp[index] = value;
+        setOtp(updatedOtp);
+
+        if (value && index < 5) {
+            inputsRef.current[index + 1].focus();
+        }
+
+        if (!value && index > 0) {
+            inputsRef.current[index - 1].focus();
         }
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -135,6 +145,7 @@ export default function ForgotPasswordOtp() {
                                 type="text"
                                 maxLength="1"
                                 value={val}
+                                ref={(el) => (inputsRef.current[i] = el)}
                                 onChange={(e) => handleChange(e.target.value, i)}
                             />
                         ))}
