@@ -22,6 +22,9 @@ export default function ForgotPasswordReset() {
         hasSpecial: /[@$!%*?&]/.test(newPassword),
     };
 
+    const isMatch = newPassword === confirmPassword;
+    const shouldShowMatchMessage = confirmPassword.length > 0;
+
     const handleReset = async (e) => {
         e.preventDefault();
         
@@ -43,7 +46,7 @@ export default function ForgotPasswordReset() {
             });
         }
 
-        if (newPassword !== confirmPassword) {
+        if (!isMatch) {
              return Swal.fire({
                 icon: "error",
                 title: "Password Mismatch",
@@ -115,7 +118,7 @@ export default function ForgotPasswordReset() {
                     <div className="input-field">
                         <i className="fas fa-lock"></i>
                         <input
-                            type={showNewPassword ? "text" : "password"} 
+                            type={showNewPassword ? "text" : "password"}
                             placeholder="New Password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
@@ -126,19 +129,34 @@ export default function ForgotPasswordReset() {
                         ></i>
                     </div>
 
-                    <div className="input-field">
+                    <div className="input-field" style={{ marginBottom: shouldShowMatchMessage ? "0.5rem" : "1.25rem" }}>
                         <i className="fas fa-lock"></i>
                         <input
-                            type={showConfirmPassword ? "text" : "password"} 
+                            type={showConfirmPassword ? "text" : "password"}
                             placeholder="Confirm New Password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
+                            style={{ borderColor: shouldShowMatchMessage && !isMatch ? "#d9534f" : "" }}
                         />
                         <i 
                             className={`fas ${showConfirmPassword ? "fa-eye" : "fa-eye-slash"} toggle-eye`}
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         ></i>
                     </div>
+
+                    {shouldShowMatchMessage && (
+                        <div style={{ textAlign: "left", marginBottom: "1rem", paddingLeft: "0.5rem" }}>
+                            {isMatch ? (
+                                <span className="success-text" style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "0.85rem", marginTop: 0 }}>
+                                    <i className="fas fa-check-circle"></i> Passwords match
+                                </span>
+                            ) : (
+                                <span className="error-text" style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "0.85rem", marginTop: 0 }}>
+                                    <i className="fas fa-exclamation-circle"></i> Passwords do not match
+                                </span>
+                            )}
+                        </div>
+                    )}
 
                     <button type="submit" className="login-btn" disabled={loading}>
                         {loading ? "Saving..." : "Save"}
