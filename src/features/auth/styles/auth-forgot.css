@@ -151,10 +151,30 @@
     padding: 1rem;
     border: 0.125rem dashed var(--border-light);
     margin-bottom: 1rem;
+    list-style: none; 
 }
 
 .password-rules li {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    color: #777; 
+}
+
+.password-rules li i {
+    font-size: 0.8rem;
+    transition: color 0.3s ease;
+}
+
+.password-rules li.valid {
+    color: #2e7d32; 
+    font-weight: 600;
+}
+
+.password-rules li.valid i {
+    color: #2e7d32; 
 }
 
 .error-text {
