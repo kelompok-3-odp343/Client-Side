@@ -74,7 +74,7 @@ export default function ForgotPasswordOtp() {
             return Swal.fire({
                 icon: "warning",
                 title: "Invalid OTP",
-                text: "OTP harus 6 digit",
+                text: "OTP must have 6 digits",
             });
 
         setLoading(true);
@@ -102,7 +102,7 @@ export default function ForgotPasswordOtp() {
                 Swal.fire({
                     icon: "error",
                     title: "Failed",
-                    text: res.message || "OTP salah",
+                    text: res.message || "Wrong OTP",
                 });
                 setOtp(["", "", "", "", "", ""]);
                 if(inputsRef.current[0]) inputsRef.current[0].focus();
@@ -111,7 +111,7 @@ export default function ForgotPasswordOtp() {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: err.message || "Gagal verifikasi OTP",
+                text: err.message || "OTP verification failed",
             });
         } finally {
             setLoading(false);
@@ -127,7 +127,7 @@ export default function ForgotPasswordOtp() {
             Swal.fire({
                 icon: "error",
                 title: "Session Expired",
-                text: "Data pengguna tidak ditemukan. Silakan ulangi proses lupa password.",
+                text: "user data not found. Please repeat the forgot-password process.",
             }).then(() => {
                 navigate("/forgot-password"); 
             });
@@ -143,7 +143,7 @@ export default function ForgotPasswordOtp() {
                 Swal.fire({
                     icon: "success",
                     title: "OTP Resent",
-                    text: "Kode OTP baru telah dikirim ke email Anda.",
+                    text: "New OTP has been sent to your email.",
                     confirmButtonColor: "#00bfa6",
                 });
                 setTimer(30);
@@ -154,14 +154,14 @@ export default function ForgotPasswordOtp() {
                 Swal.fire({
                     icon: "error",
                     title: "Failed",
-                    text: res.message || "Gagal mengirim ulang OTP",
+                    text: res.message || "Failed to resend OTP",
                 });
             }
         } catch (err) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: err.message || "Terjadi kesalahan server",
+                text: err.message || "Server error occured",
             });
         } finally {
             setResendLoading(false);

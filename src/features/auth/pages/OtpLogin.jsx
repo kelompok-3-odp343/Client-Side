@@ -155,7 +155,7 @@ export default function OtpLogin() {
                 Swal.fire({
                     icon: "error",
                     title: "Gagal",
-                    text: resp.message || "Gagal mengirim ulang OTP",
+                    text: resp.message || "Failed to resend OTP",
                 });
                 return;
             }
@@ -170,7 +170,7 @@ export default function OtpLogin() {
             Swal.fire({
                 icon: "success",
                 title: "OTP Resent",
-                text: resp.data.message || "Kode OTP baru telah dikirim ke email Anda.",
+                text: resp.data.message || "New OTP has been sent to your email.",
                 confirmButtonColor: "#00bfa6",
             });
 
@@ -178,7 +178,7 @@ export default function OtpLogin() {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: "Gagal menghubungi server.",
+                text: "Failed to connect to the server.",
             });
         }
     };
