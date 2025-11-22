@@ -12,13 +12,42 @@ export default function ForgotPasswordReset() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const validations = {
+        minLength: newPassword.length >= 8,
+        mixedCase: /[a-z]/.test(newPassword) && /[A-Z]/.test(newPassword),
+        hasNumber: /\d/.test(newPassword),
+        hasSpecial: /[@$!%*?&]/.test(newPassword),
+    };
+
     const handleReset = async (e) => {
         e.preventDefault();
+        
+        const allValid = Object.values(validations).every(Boolean);
+
         if (!newPassword || !confirmPassword) {
             return Swal.fire({
                 icon: "warning",
                 title: "Incomplete Fields",
                 text: "Please fill both password fields",
+            });
+        }
+
+        if (!allValid) {
+            return Swal.fire({
+                icon: "warning",
+                title: "Weak Password",
+                text: "Please ensure your password meets all requirements.",
+            });
+        }
+
+        if (newPassword !== confirmPassword) {
+             return Swal.fire({
+                icon: "error",
+                title: "Password Mismatch",
+                text: "New password and confirmation do not match.",
             });
         }
 
@@ -64,31 +93,51 @@ export default function ForgotPasswordReset() {
                 <h3>Create A New Password</h3>
 
                 <ul className="password-rules">
-                    <li>Min 8 characters</li>
-                    <li>At least 1 uppercase and 1 lowercase</li>
-                    <li>At least 1 number</li>
-                    <li>At least 1 special character (@, $, !, %, *, ?, &)</li>
+                    <li className={validations.minLength ? "valid" : ""}>
+                        <i className={`fas ${validations.minLength ? "fa-check-circle" : "fa-circle"}`}></i>
+                        Min 8 characters
+                    </li>
+                    <li className={validations.mixedCase ? "valid" : ""}>
+                        <i className={`fas ${validations.mixedCase ? "fa-check-circle" : "fa-circle"}`}></i>
+                        At least 1 uppercase and 1 lowercase
+                    </li>
+                    <li className={validations.hasNumber ? "valid" : ""}>
+                        <i className={`fas ${validations.hasNumber ? "fa-check-circle" : "fa-circle"}`}></i>
+                        At least 1 number
+                    </li>
+                    <li className={validations.hasSpecial ? "valid" : ""}>
+                        <i className={`fas ${validations.hasSpecial ? "fa-check-circle" : "fa-circle"}`}></i>
+                        At least 1 special character (@, $, !, %, *, ?, &)
+                    </li>
                 </ul>
 
                 <form onSubmit={handleReset}>
                     <div className="input-field">
                         <i className="fas fa-lock"></i>
                         <input
-                            type="password"
+                            type={showNewPassword ? "text" : "password"} 
                             placeholder="New Password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                         />
+                        <i 
+                            className={`fas ${showNewPassword ? "fa-eye" : "fa-eye-slash"} toggle-eye`}
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                        ></i>
                     </div>
 
                     <div className="input-field">
                         <i className="fas fa-lock"></i>
                         <input
-                            type="password"
+                            type={showConfirmPassword ? "text" : "password"} 
                             placeholder="Confirm New Password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         />
+                        <i 
+                            className={`fas ${showConfirmPassword ? "fa-eye" : "fa-eye-slash"} toggle-eye`}
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        ></i>
                     </div>
 
                     <button type="submit" className="login-btn" disabled={loading}>
