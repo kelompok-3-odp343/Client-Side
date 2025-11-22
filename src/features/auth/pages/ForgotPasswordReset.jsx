@@ -75,14 +75,14 @@ export default function ForgotPasswordReset() {
                 Swal.fire({
                     icon: "error",
                     title: "Failed",
-                    text: res.message || "Gagal memperbarui password",
+                    text: res.message || "Failed to update password",
                 });
             }
         } catch (err) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: err.message || "Terjadi kesalahan server",
+                text: err.message || "Server error occured",
             });
         } finally {
             setLoading(false);
