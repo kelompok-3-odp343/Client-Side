@@ -6,7 +6,7 @@
   --accent-cyan: #2cb1ff;
   --soft-shadow: 0 10px 30px rgba(16, 24, 40, 0.06);
   --pill-shadow: 0 8px 28px rgba(16, 24, 40, 0.06);
-  --card-accent: #ffa96b; 
+  --card-accent: #ffa96b;
   font-family: "Poppins", sans-serif;
 }
 
@@ -434,15 +434,15 @@ body {
 /* CARD STYLE (Updated to match DetailMyCard) */
 .bank-card {
   width: 420px;
-  height: 220px; /* Slightly taller to accommodate detail view layout */
-  border-radius: 14px; /* Same as --radius approx */
+  height: 220px; 
+  border-radius: 14px; 
   padding: 1.5rem;
   background: linear-gradient(to bottom, var(--card-accent) 0%, #ffffff 100%);
   color: #111;
   box-shadow: 0 6px 18px rgba(255, 140, 75, 0.2);
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Space between header and footer */
+  justify-content: space-between; 
   cursor: pointer;
   transition: transform 0.4s ease, box-shadow 0.4s ease;
   text-decoration: none;
@@ -481,28 +481,22 @@ body {
   text-align: left;
 }
 
+/* --- CARD TYPOGRAPHY (REVISED) --- */
 .bank-card-type {
-  font-size: 1.1rem; /* larger type */
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 400;
   margin: 0 0 4px 0;
+  text-transform: uppercase;
   color: #111;
 }
 
 .bank-card-number {
-  font-size: 0.95rem;
+  font-size: 22px;
   font-weight: 700;
-  margin: 0 0 8px 0;
-  color: #000;
+  margin: 4px 0 8px 0;
   font-family: "Courier New", monospace;
-  letter-spacing: 1px;
-}
-
-.bank-card-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin: 0;
-  color: #222;
-  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #000;
 }
 
 .bank-card-badge {
