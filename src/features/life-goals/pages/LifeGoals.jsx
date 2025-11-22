@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 export default function LifeGoals() {
   const [goals, setGoals] = useState({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const COLORS = ["#6dddd0", "#ffd367", "#9c7edc"];
@@ -15,12 +16,17 @@ export default function LifeGoals() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const res = await fetchLifeGoalsRevamp();
         setGoals(res?.data || {});
-      } catch {
+      } catch (err) {
+        console.error("Error loading life goals:", err);
+        setError(err.message || "Failed to load life goals");
         setGoals({});
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     loadData();
   }, []);
@@ -33,7 +39,27 @@ export default function LifeGoals() {
       <div className="life-goals-page">
         <Navbar />
         <div className="content-wrap">
-          <div className="loading">Loading...</div>
+          <div className="loading" style={{ textAlign: 'center', padding: '3rem' }}>
+            Loading...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="life-goals-page">
+        <Navbar />
+        <div className="content-wrap">
+          <h2 className="section-title-lg">Life Goals Information</h2>
+          <p className="section-subtitle">Small saves fuel big dreams</p>
+          
+          <div style={{ textAlign: 'center', padding: '3rem' }}>
+            <h3>Unable to Load Life Goals</h3>
+            <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
         </div>
       </div>
     );
@@ -47,7 +73,7 @@ export default function LifeGoals() {
           <h2 className="section-title-lg">Life Goals Information</h2>
           <p className="section-subtitle">Small saves fuel big dreams</p>
 
-          <p className="no-life-goals" style={{ fontSize: "0.85rem", fontWeight: "600" }}>
+          <p className="no-life-goals" style={{ fontSize: "0.85rem", fontWeight: "600", textAlign: 'center', padding: '2rem' }}>
             No life goals available.
           </p>
         </div>
@@ -72,7 +98,6 @@ export default function LifeGoals() {
 
           return (
             <section key={cat} className="category-block">
-              {/* <div className="category-separator" /> */}
               <div className="category-header">
                 <div>
                   <h3 className="category-title">{cat}</h3>
@@ -97,7 +122,7 @@ export default function LifeGoals() {
               </div>
 
               <div className="subcards-grid">
-                {!data?.lifegoalslist ? (
+                {!data?.lifegoalslist || data.lifegoalslist.length === 0 ? (
                   <div className="lg-empty">No Life Goals found</div>
                 ) : (
                   data.lifegoalslist.map((g) => {
@@ -176,8 +201,6 @@ export default function LifeGoals() {
                   })
                 )}
               </div>
-
-              {/* <div className="category-separator" /> */}
             </section>
           );
         })}

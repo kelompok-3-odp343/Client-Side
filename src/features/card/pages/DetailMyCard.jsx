@@ -7,10 +7,6 @@ import Navbar from "../../../shared/components/Navbar";
 import { EyeOff, Eye, RefreshCw } from "lucide-react";
 import { fetchAllCards, fetchTransactionHistory } from "../api/card.api";
 import { useNavigate, useLocation } from "react-router-dom";
-import { 
-  DUMMY_CARDS as dummyCards, 
-  DUMMY_TRX_HISTORY as dummyTrxHistory 
-} from "../data/card.dummy"; 
 
 export default function DetailMyCard() {
   const getLastMonths = () => {
@@ -88,7 +84,6 @@ export default function DetailMyCard() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
-  const [isUsingDummy, setIsUsingDummy] = useState(false);
 
   const [showBalance, setShowBalance] = useState(true);
   const [months] = useState(getLastMonths());
@@ -106,47 +101,33 @@ export default function DetailMyCard() {
     const initCards = async () => {
       setLoading(true);
       setErrorMsg("");
-      setIsUsingDummy(false);
-
-      let initialCards = [];
 
       try {
+        let initialCards = [];
+
         if (location.state?.cards && Array.isArray(location.state.cards) && location.state.cards.length > 0) {
           initialCards = location.state.cards;
-        } 
-        else {
+        } else {
           const response = await fetchAllCards();
-          if (Array.isArray(response)) {
+          if (Array.isArray(response) && response.length > 0) {
             initialCards = response;
-          } else if (response && Array.isArray(response.data)) {
-            initialCards = response.data;
+          } else {
+            throw new Error("No cards found");
           }
         }
 
-        if (initialCards.length > 0) {
-          setCards(initialCards);
-          const targetCard = location.state?.selectedAccount 
-            ? initialCards.find(c => c.account_number === location.state.selectedAccount)
-            : initialCards[0];
-            
-          setSelectedCard(targetCard || initialCards[0]);
-        } else {
-          throw new Error("No cards from API/State");
-        }
+        setCards(initialCards);
+        const targetCard = location.state?.selectedAccount 
+          ? initialCards.find(c => c.account_number === location.state.selectedAccount)
+          : initialCards[0];
+          
+        setSelectedCard(targetCard || initialCards[0]);
       } catch (err) {
-        fallbackToDummy();
+        console.error("Error loading cards:", err);
+        setErrorMsg(err.message || "Failed to load card information");
+        setCards([]);
       } finally {
         setLoading(false);
-      }
-    };
-
-    const fallbackToDummy = () => {
-      if (dummyCards && dummyCards.length > 0) {
-        setCards(dummyCards);
-        setSelectedCard(dummyCards[0]);
-        setIsUsingDummy(true);
-      } else {
-        setErrorMsg("No cards found (API failed & no dummy data).");
       }
     };
 
@@ -190,26 +171,6 @@ export default function DetailMyCard() {
 
     setSelectedMonth(m);
 
-    const loadDummyTrx = () => {
-        const accountHistory = dummyTrxHistory[card.account_number];
-        
-        if (accountHistory) {
-            const monthData = accountHistory.find(h => h.month == m.month && h.year == m.year);
-            
-            if (monthData && monthData.transaction) {
-                const grouped = mapTransactionsToGroups(monthData.transaction);
-                setTransactions(grouped);
-                return;
-            }
-        }
-        setTransactions([]);
-    };
-
-    if (isUsingDummy) {
-        loadDummyTrx();
-        return;
-    }
-
     try {
       const data = await fetchTransactionHistory({
         month: m.month,
@@ -221,10 +182,11 @@ export default function DetailMyCard() {
         const grouped = mapTransactionsToGroups(data.transactions);
         setTransactions(grouped);
       } else {
-        loadDummyTrx();
+        setTransactions([]);
       }
     } catch (error) {
-      loadDummyTrx();
+      console.error("Error loading transactions:", error);
+      setTransactions([]);
     }
   };
 
@@ -273,14 +235,14 @@ export default function DetailMyCard() {
     );
   }
 
-  if (!selectedCard) {
+  if (errorMsg || !selectedCard) {
     return (
       <div className="detail-mycard">
         <Navbar />
         <main className="main" style={{ padding: "4rem 2rem", textAlign: "center" }}>
-          <h2>No Cards Found</h2>
+          <h2>Unable to Load Cards</h2>
           <p style={{ color: "#777", margin: "1rem 0" }}>
-            {errorMsg || "You don't have any cards linked to your account."}
+            {errorMsg || "No card information available"}
           </p>
           <button 
             onClick={() => window.location.reload()} 
@@ -318,7 +280,7 @@ export default function DetailMyCard() {
               >
                 {cards.map((c) => (
                   <option key={c.account_number} value={c.account_number}>
-                    {c.type} - {c.account_number} {isUsingDummy ? "(Preview)" : ""}
+                    {c.type} - {c.account_number}
                   </option>
                 ))}
               </select>
@@ -350,12 +312,6 @@ export default function DetailMyCard() {
                 </span>
               </div>
             </div>
-
-            {isUsingDummy && (
-              <div style={{ marginTop: '1rem', padding: '0.5rem', background: '#fff3cd', color: '#856404', borderRadius: '4px', fontSize: '0.9rem' }}>
-                ⚠️ Showing preview data (Live data unavailable)
-              </div>
-            )}
 
             <div className="warning-box">
               ⚠️ Do not share card number, expiration date, or CVV/CVC code with anyone.

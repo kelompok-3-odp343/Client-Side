@@ -1,7 +1,4 @@
 import axios from "axios";
-import SPLIT_BILL_DUMMY_DATA from "../data/split-bill.dummy";
-
-let DUMMY_STORAGE = [...SPLIT_BILL_DUMMY_DATA];
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -16,7 +13,6 @@ function normalizeBill(b) {
       b.split_bill_title ||
       b.splitBillTitle ||
       b.title ||
-      b.splitBillTitle ||
       "Untitled Bill",
     total_bill:
       Number(b.total_bill || b.totalBill || b.totalAmount || 0) || 0,
@@ -49,6 +45,10 @@ function normalizeBill(b) {
 export async function fetchSplitBills() {
   try {
     const token = sessionStorage.getItem("token");
+    
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
 
     const res = await api.get("/api/v1/split-bill", {
       headers: {
@@ -59,28 +59,22 @@ export async function fetchSplitBills() {
       timeout: 5000,
     });
 
-    if (Array.isArray(res?.data?.data)) {
-      const bills = res.data.data;
-
-      if (bills.length === 0) {
-        return {
-          status: true,
-          data: DUMMY_STORAGE.map(normalizeBill),
-        };
-      }
-
+    if (!Array.isArray(res?.data?.data)) {
       return {
         status: true,
-        data: bills.map(normalizeBill),
+        data: []
       };
     }
 
-    return { status: true, data: DUMMY_STORAGE.map(normalizeBill) };
-
-  } catch (error) {
     return {
       status: true,
-      data: DUMMY_STORAGE.map(normalizeBill)
+      data: res.data.data.map(normalizeBill),
+    };
+  } catch (error) {
+    console.error("Failed to fetch split bills:", error?.message);
+    return {
+      status: false,
+      data: []
     };
   }
 }
@@ -88,6 +82,10 @@ export async function fetchSplitBills() {
 export async function getSplitBillById(splitBillId) {
   try {
     const token = sessionStorage.getItem("token");
+    
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
 
     const res = await api.post(
       "/api/v1/split-bill/detail",
@@ -104,25 +102,24 @@ export async function getSplitBillById(splitBillId) {
 
     const data = res?.data?.data;
     if (!data) {
-      throw new Error("Data empty");
+      throw new Error("No data returned from API");
     }
 
     return normalizeBill(data);
   } catch (error) {
-    const dummyBill = DUMMY_STORAGE.find((b) =>
-      String(b.split_bill_id) === String(splitBillId) ||
-      String(b.splitBillId) === String(splitBillId)
-    );
-    return dummyBill ? normalizeBill(dummyBill) : null;
+    console.error("Failed to fetch split bill detail:", error?.message);
+    throw error;
   }
 }
 
 export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
-  let successApi = false;
-  let apiData = null;
-
   try {
     const token = sessionStorage.getItem("token");
+    
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
     const payload = {
       splitBillId: split_bill_id,
       members: updatedMembers.map((m) => ({
@@ -144,54 +141,32 @@ export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
     });
 
     if (res.status >= 200 && res.status < 300) {
-      successApi = true;
-      apiData = normalizeBill(res.data?.data || res.data);
+      return normalizeBill(res.data?.data || res.data);
     }
-  } catch (err) {
-    // Silent catch
+
+    throw new Error("Failed to update split bill status");
+  } catch (error) {
+    console.error("Failed to update split bill status:", error?.message);
+    throw error;
   }
-
-  const idx = DUMMY_STORAGE.findIndex((b) =>
-    String(b.split_bill_id) === String(split_bill_id) ||
-    String(b.splitBillId) === String(split_bill_id)
-  );
-
-  if (idx !== -1) {
-    DUMMY_STORAGE[idx].members = updatedMembers.map((m) => ({
-      member_id: m.member_id,
-      member_name: m.member_name,
-      amount: Number(m.amount) || 0,
-      status: m.status || (m.hasPaid ? "Paid" : "Unpaid"),
-      hasPaid: m.status === "Paid" || m.hasPaid === true,
-    }));
-
-    DUMMY_STORAGE[idx].remaining_bill = DUMMY_STORAGE[idx].members
-      .filter((m) => m.status !== "Paid")
-      .reduce((s, m) => s + (Number(m.amount) || 0), 0);
-
-    if (!successApi) {
-      return normalizeBill(DUMMY_STORAGE[idx]);
-    }
-  }
-
-  return apiData;
 }
 
 export async function createSplitBill(payload) {
-  const newBill = {
-    accountNumber: payload.accountNumber,
-    transactionId: payload.transactionId,
-    splitBillTitle: payload.splitBillTitle,
-    currency: payload.currency || "IDR",
-    totalAmount: payload.totalAmount,
-    billMembers: payload.billMembers,
-  };
-
-  let successApi = false;
-  let apiData = null;
-
   try {
     const token = sessionStorage.getItem("token");
+    
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const newBill = {
+      accountNumber: payload.accountNumber,
+      transactionId: payload.transactionId,
+      splitBillTitle: payload.splitBillTitle,
+      currency: payload.currency || "IDR",
+      totalAmount: payload.totalAmount,
+      billMembers: payload.billMembers,
+    };
 
     const res = await api.post("/api/v1/split-bill/add", newBill, {
       headers: {
@@ -203,36 +178,23 @@ export async function createSplitBill(payload) {
     });
 
     if (res.status >= 200 && res.status < 300) {
-      successApi = true;
-      apiData = normalizeBill(res.data?.data || res.data);
+      return normalizeBill(res.data?.data || res.data);
     }
-  } catch (err) {
-    // Silent catch
+
+    throw new Error("Failed to create split bill");
+  } catch (error) {
+    console.error("Failed to create split bill:", error?.message);
+    throw error;
   }
-
-  const _dummyNew = {
-    split_bill_id: "SB" + String(Date.now()).slice(-6),
-    split_bill_title: newBill.splitBillTitle,
-    total_bill: newBill.totalAmount,
-    created_time: new Date().toISOString(),
-    ref_id: newBill.transactionId,
-    members: (newBill.billMembers || []).map((m) => ({
-      member_id: null,
-      member_name: m.memberName,
-      amount: m.amountShare ?? m.amount ?? 0,
-      status: "Unpaid",
-      hasPaid: false,
-    })),
-  };
-
-  DUMMY_STORAGE.unshift(_dummyNew);
-
-  return successApi ? apiData : normalizeBill(_dummyNew);
 }
 
 export async function editSplitBill(split_bill_id, bill, members) {
   try {
     const token = sessionStorage.getItem("token");
+    
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
 
     const payload = {
       splitBillId: split_bill_id,
@@ -257,9 +219,8 @@ export async function editSplitBill(split_bill_id, bill, members) {
     });
 
     return normalizeBill(res.data?.data || res.data);
-
-  } catch (err) {
-    console.error("EDIT SPLIT BILL ERROR:", err.response?.data || err);
-    throw err.response?.data || err;
+  } catch (error) {
+    console.error("Failed to edit split bill:", error?.message);
+    throw error;
   }
 }

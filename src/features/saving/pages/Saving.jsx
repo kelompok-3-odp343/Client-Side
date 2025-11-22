@@ -32,6 +32,8 @@ const renderCustomLabel = ({ cx, cy, midAngle, outerRadius, percent, name }) => 
 export default function SavingsDashboard() {
   const [leftData, setLeftData] = useState(null);
   const [rightData, setRightData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const loadSavingsOverview = async () => {
     try {
@@ -57,7 +59,8 @@ export default function SavingsDashboard() {
         })),
       });
     } catch (err) {
-      console.error("Error getSavingsOverview:", err);
+      console.error("Error loading savings overview:", err);
+      throw err;
     }
   };
 
@@ -76,13 +79,26 @@ export default function SavingsDashboard() {
           })) || [],
       });
     } catch (err) {
-      console.error("Error getSavingsDetail:", err);
+      console.error("Error loading savings detail:", err);
+      throw err;
     }
   };
 
   useEffect(() => {
-    loadSavingsOverview();
-    loadSavingsDetail();
+    const loadAllData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        await loadSavingsOverview();
+        await loadSavingsDetail();
+      } catch (err) {
+        setError(err.message || "Failed to load savings information");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAllData();
   }, []);
 
   const chartData =
@@ -92,6 +108,32 @@ export default function SavingsDashboard() {
       amount: c.amount,
       color: "#" + Math.floor(Math.random() * 16777215).toString(16),
     })) || [];
+
+  if (loading) {
+    return (
+      <div className="savings-page-revamp">
+        <Navbar />
+        <main className="savings-main-container">
+          <div style={{ textAlign: 'center', padding: '3rem' }}>Loading...</div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="savings-page-revamp">
+        <Navbar />
+        <main className="savings-main-container">
+          <div style={{ textAlign: 'center', padding: '3rem' }}>
+            <h2>Unable to Load Savings</h2>
+            <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="savings-page-revamp">
@@ -175,7 +217,6 @@ export default function SavingsDashboard() {
 
               <div className="category-display-grid">
 
-                {/* Category List */}
                 <div className="category-items-box">
                   {rightData?.categories?.map((cat, idx) => (
                     <div key={idx} className="category-row">

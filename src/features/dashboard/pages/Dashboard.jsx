@@ -13,6 +13,7 @@ import dplkIcon from "../../../assets/images/dashboard-dplk-icon.png";
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [cards, setCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
@@ -20,13 +21,11 @@ export default function Dashboard() {
   useEffect(() => {
     const dataDashboards = async () => {
       try {
+        setLoading(true);
+        setError(null);
+
         const raw = await fetchDashboard();
         const cardsData = await fetchAllCards();
-
-        if (!raw) {
-          setLoading(false);
-          return;
-        }
 
         const d = raw.data;
         const total = d.assetoverview?.totalAsset ?? 0;
@@ -72,20 +71,12 @@ export default function Dashboard() {
           }));
           setCards(mappedCards);
         } else {
-          const mappedCards = (d.accountList ?? []).map((item) => ({
-            type: item.accountProductName || "Tabungan",
-            account_number: item.accountNumber,
-            account_holder_name: item.accountName,
-            effective_balance: item.effectiveBalance,
-            is_main: false,
-            showBalance: false,
-          }));
-          setCards(mappedCards);
+          setCards([]);
         }
-
-        setLoading(false);
       } catch (error) {
         console.error("Error loading dashboard:", error);
+        setError(error.message || "Failed to load dashboard data");
+      } finally {
         setLoading(false);
       }
     };
@@ -115,7 +106,27 @@ export default function Dashboard() {
   };
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
-  if (!data) return <div className="empty">No data found</div>;
+  
+  if (error) return (
+    <div className="dashboard-page">
+      <Navbar />
+      <div className="error-container" style={{ textAlign: 'center', padding: '3rem' }}>
+        <h2>Failed to Load Dashboard</h2>
+        <p>{error}</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
+      </div>
+    </div>
+  );
+
+  if (!data) return (
+    <div className="dashboard-page">
+      <Navbar />
+      <div className="empty" style={{ textAlign: 'center', padding: '3rem' }}>
+        <h2>No Data Available</h2>
+        <p>Unable to load dashboard information</p>
+      </div>
+    </div>
+  );
 
   const { assets_total, earnings_overview, split, time_deposits, savings, pension_funds, life_goals } = data;
   const income = earnings_overview?.income ?? 0;
@@ -224,7 +235,6 @@ export default function Dashboard() {
                   <>
                     <button className="nav-arrow left-arrow" onClick={handlePrev} aria-label="Previous Card"><ChevronLeft size={28} /></button>
 
-                    {/* === CARD DISPLAY === */}
                     <div
                       key={currentIndex}
                       className="bank-card slide-in"
@@ -232,17 +242,14 @@ export default function Dashboard() {
                     >
                       <div className="bank-card-header">
                         <div className="bank-card-details">
-                          
                           <p className="bank-card-type">
                             {currentCard?.type || "Tabungan"}
                           </p>
-
                           <p className="bank-card-number">
                             {currentCard?.account_number 
                               ? String(currentCard.account_number).replace(/(.{4})/g, "$1 ").trim() 
                               : "---- ---- ----"}
                           </p>
-                          
                         </div>
                         
                         {currentCard?.is_main && (
@@ -252,7 +259,6 @@ export default function Dashboard() {
                         )}
                       </div>
 
-                      {/* SALDO */}
                       <div className="bank-card-footer">
                         <p className="bank-card-label">Effective Balance</p>
                         <div className="bank-card-balance-row">
@@ -275,7 +281,6 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
-                    {/* === END CARD === */}
 
                     <button className="nav-arrow right-arrow" onClick={handleNext} aria-label="Next Card"><ChevronRight size={28} /></button>
                     <div className="dots">

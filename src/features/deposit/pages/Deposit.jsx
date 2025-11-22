@@ -12,6 +12,7 @@ export default function Deposits() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const getLastMonths = () => {
     const now = new Date();
@@ -34,6 +35,9 @@ export default function Deposits() {
 
   const fetchDeposits = async () => {
     try {
+      setLoading(true);
+      setError(null);
+
       const responseData = await getTimeDeposits();
       const resApi = responseData.data;
 
@@ -63,7 +67,10 @@ export default function Deposits() {
 
       setDepositsData(formattedData);
     } catch (err) {
-      console.error("❌ Error get deposits:", err);
+      console.error("Error loading deposits:", err);
+      setError(err.message || "Failed to load deposit information");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,14 +95,13 @@ export default function Deposits() {
       const grouped = mapTransactionsToGroups(data.transactions);
       setTransactions(grouped);
     } catch (err) {
-      console.error("Gagal fetch transaksi deposit:", err);
+      console.error("Error loading deposit transactions:", err);
       setTransactions([]);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
-  // ... (Logic Download CSV sama seperti sebelumnya)
   const handleDownloadCSV = () => {
     if (!transactions || transactions.length === 0) {
       alert("No transactions to download");
@@ -171,12 +177,24 @@ export default function Deposits() {
     }
   }, [depositsData]);
 
+  if (error) {
+    return (
+      <div className="deposit-page">
+        <Navbar />
+        <main className="deposit-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
+          <h2>Unable to Load Deposits</h2>
+          <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="deposit-page">
       <Navbar />
 
       <main className="deposit-container">
-        {/* LEFT PANEL */}
         <section className="deposit-left">
           <div className="section-header">
             <h2 className="lg-title">Deposits Information</h2>
@@ -193,11 +211,11 @@ export default function Deposits() {
               <h3 className="summary-title">Time Deposits</h3>
               <p className="summary-label">Total Balance</p>
               <p className="summary-balance">
-                Rp{depositsData?.totalBalance?.toLocaleString()}
+                {depositsData ? `Rp${depositsData.totalBalance?.toLocaleString()}` : 'Loading...'}
               </p>
               <div className="summary-divider" />
               <p className="summary-sub">
-                You have {depositsData?.totalCount} Time Deposits
+                You have {depositsData?.totalCount || 0} Time Deposits
               </p>
             </div>
           </div>
@@ -210,7 +228,6 @@ export default function Deposits() {
           </div>
         </section>
 
-        {/* RIGHT PANEL */}
         <section className="deposit-right">
           <TransactionHistory
             transactions={transactions}
@@ -246,7 +263,6 @@ export default function Deposits() {
   );
 }
 
-/* Deposit Card */
 function DepositCard({ title, balance, date, interest, opening, period }) {
   const [day, month, year] = date.split(" ");
   return (

@@ -32,9 +32,13 @@ export default function PensionFunds() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const pension = async () => {
     try {
+      setLoading(true);
+      setError(null);
+
       const response = await getPensionFunds();
       const funds = Array.isArray(response.data) ? response.data : [];
 
@@ -59,13 +63,16 @@ export default function PensionFunds() {
       if (pensionFunds.length) {
         setSelectedAccount(pensionFunds[0].accountNumber);
       }
-    } catch (error) {
-      console.error("error", error);
+    } catch (err) {
+      console.error("Error loading pension funds:", err);
+      setError(err.message || "Failed to load pension funds");
       setPensionFundsData({
         totalBalance: 0,
         totalCount: 0,
         pensionFunds: [],
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -119,6 +126,9 @@ export default function PensionFunds() {
           const grouped = mapDPLKTransactions(list);
           setTransactions(grouped);
         }
+    } catch (err) {
+      console.error("Error loading DPLK transactions:", err);
+      setTransactions([]);
     } finally {
         setLoading(false);
     }
@@ -134,7 +144,6 @@ export default function PensionFunds() {
     }
   }, [selectedMonth, selectedAccount]);
 
-  // ... (sisa kode sama seperti download CSV dsb)
   const handleDownloadCSV = () => {
     if (!transactions || transactions.length === 0) {
       alert("No transactions to download");
@@ -160,12 +169,24 @@ export default function PensionFunds() {
     document.body.removeChild(link);
   };
 
+  if (error) {
+    return (
+      <div className="pension-fund-page">
+        <Navbar />
+        <main className="pension-fund-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
+          <h2>Unable to Load Pension Funds</h2>
+          <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="pension-fund-page">
       <Navbar />
 
       <main className="pension-fund-container">
-        {/* LEFT PANEL */}
         <section className="pension-fund-left">
           <div className="section-header">
             <h2 className="lg-title">Pension Funds Information</h2>
@@ -182,7 +203,7 @@ export default function PensionFunds() {
               <h3 className="summary-title">Total Pension Funds</h3>
               <p className="summary-label">Total Balance</p>
               <p className="summary-balance">
-                Rp{(pensionFundsData?.totalBalance || 0).toLocaleString()}
+                {pensionFundsData ? `Rp${pensionFundsData.totalBalance.toLocaleString()}` : 'Loading...'}
               </p>
               <div className="summary-divider" />
               <p className="summary-sub">
@@ -201,7 +222,6 @@ export default function PensionFunds() {
           </div>
         </section>
 
-        {/* RIGHT PANEL */}
         <section className="pension-fund-right">
           <TransactionHistory
             transactions={transactions}

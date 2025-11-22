@@ -1,5 +1,4 @@
 import axios from "axios";
-import { DASHBOARD_DUMMY } from "../data/dashboard.dummy.js";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -10,8 +9,7 @@ export async function fetchDashboard() {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      console.warn("⚠️ No token found, using dummy dashboard");
-      return { data: DASHBOARD_DUMMY };
+      throw new Error("No authentication token found");
     }
 
     const resp = await api.get(`/api/v1/fetch-dashboard`, {
@@ -23,14 +21,13 @@ export async function fetchDashboard() {
       },
     });
 
-    if (resp?.data) {
-      return resp;
+    if (!resp?.data) {
+      throw new Error("Invalid response from API");
     }
 
-    console.warn("⚠️ API returned invalid data, using dummy dashboard");
-    return { data: DASHBOARD_DUMMY };
+    return resp;
   } catch (error) {
-    console.warn("⚠️ Dashboard API failed, using dummy:", error?.message);
-    return { data: DASHBOARD_DUMMY };
+    console.error("Failed to fetch dashboard data:", error?.message);
+    throw error;
   }
 }

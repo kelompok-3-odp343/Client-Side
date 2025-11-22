@@ -37,6 +37,7 @@ export default function LifeGoalDetail() {
   const [transactions, setTransactions] = useState([]);
   const [goalDetail, setGoalDetail] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
@@ -61,17 +62,23 @@ export default function LifeGoalDetail() {
 
   useEffect(() => {
     async function loadData() {
-      if (!accountNumber) return;
+      if (!accountNumber) {
+        setError("Account number not provided");
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
+      setError(null);
       
       try {
         const detailRes = await fetchLifeGoalDetail(accountNumber);
         setGoalDetail(detailRes?.data || null);
 
         await handleMonthChange(selectedMonth);
-      } catch (error) {
-        console.error(error);
-        setTransactions([]);
+      } catch (err) {
+        console.error("Error loading life goal detail:", err);
+        setError(err.message || "Failed to load life goal details");
       } finally {
         setLoading(false);
       }
@@ -79,7 +86,6 @@ export default function LifeGoalDetail() {
     loadData();
   }, [accountNumber]);
 
-  // Handle perubahan bulan
   const handleMonthChange = async (monthObj) => {
     setSelectedMonth(monthObj);
     setLoading(true);
@@ -91,13 +97,29 @@ export default function LifeGoalDetail() {
         );
         setTransactions(mapTransactions(txRes));
     } catch (err) {
+        console.error("Error loading transactions:", err);
         setTransactions([]);
     } finally {
         setLoading(false);
     }
   };
 
-  if (!goalDetail) return <div className="loading">Loading...</div>;
+  if (loading && !goalDetail) return <div className="loading" style={{ textAlign: 'center', padding: '3rem' }}>Loading...</div>;
+
+  if (error) {
+    return (
+      <div className="lg-container">
+        <Navbar />
+        <main className="lg-main" style={{ textAlign: 'center', padding: '3rem' }}>
+          <h2>Unable to Load Life Goal</h2>
+          <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+          <button onClick={() => navigate(-1)}>Go Back</button>
+        </main>
+      </div>
+    );
+  }
+
+  if (!goalDetail) return <div className="loading" style={{ textAlign: 'center', padding: '3rem' }}>No data available</div>;
 
   const toDate = (str) => {
     if (!str) return "";
@@ -139,7 +161,6 @@ export default function LifeGoalDetail() {
         </header>
 
         <div className="lg-grid">
-          {/* LEFT COLUMN */}
           <section className="left-column">
             <LifeGoalsCard
               goal={{
@@ -171,7 +192,6 @@ export default function LifeGoalDetail() {
             </div>
           </section>
 
-          {/* RIGHT COLUMN */}
           <aside className="info-column glass-card">
             <div className="lg-info-grid">
               <h3 className="info-title">Life Goal Details</h3>
