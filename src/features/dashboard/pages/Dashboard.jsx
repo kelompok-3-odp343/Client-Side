@@ -18,6 +18,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('sd', sessionStorage.getItem('token'));
+
     const dataDashboards = async () => {
       try {
         // Fetch dashboard data
@@ -80,7 +82,7 @@ export default function Dashboard() {
         } else {
           // Fallback to accountList from dashboard if cards fetch fails
           const mappedCards = (d.accountList ?? []).map((item) => ({
-            type: item.account_product_name || "ACCOUNT NUMBER",
+            type: item.accountProductName || "ACCOUNT NUMBER",
             account_number: item.accountNumber,
             card_number: item.debit_card_number || item.accountNumber,
             account_holder_name: item.accountName,

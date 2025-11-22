@@ -25,7 +25,7 @@ export default function ForgotPasswordReset() {
         setLoading(true);
         try {
             const res = await postForgotPasswordReset({
-                verifiedSession: state.verifiedSession,
+                verifiedSession: sessionStorage.getItem('fp_verified'),
                 newPassword,
                 confirmPassword,
             });

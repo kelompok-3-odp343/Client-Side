@@ -53,18 +53,13 @@ const DUMMY_SAVINGS_DETAIL = {
 export const getSavingsOverview = async () => {
     const token = sessionStorage.getItem("token");
     try {
-        const response = await api.get(`/api/v1/savings`, {
+        const response = await api.post(`/api/v1/savings`, {}, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json",
                 "ngrok-skip-browser-warning": "true",
             },
         });
-
-        if (!response.data || !response.data.data) {
-            console.warn("⚠️ API returned invalid data, using dummy");
-            return DUMMY_SAVINGS_OVERVIEW;
-        }
 
         return response.data;
     } catch (error) {
@@ -76,13 +71,15 @@ export const getSavingsOverview = async () => {
 export const getSavingsDetail = async () => {
     const token = sessionStorage.getItem("token");
     try {
-        const response = await api.get(`/api/v1/savings/detail`, {
+        const response = await api.post(`/api/v1/savings/detail`, {}, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
                 "ngrok-skip-browser-warning": "true",
             },
         });
+
+
 
         if (!response.data || !response.data.summary) {
             console.warn("⚠️ API returned invalid data, using dummy");

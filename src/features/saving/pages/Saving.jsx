@@ -36,7 +36,7 @@ export default function SavingsDashboard() {
   const loadSavingsOverview = async () => {
     try {
       const overview = await getSavingsOverview();
-      const d = overview.data;
+      const d = overview;
 
       if (!d) {
         throw new Error("Invalid overview data structure");
@@ -229,7 +229,7 @@ function SavingsAccountCard({ title, norekening, balance, name, status }) {
   return (
     <div className="account-item-card">
       <h4 className="account-item-title">{title}</h4>
-      <p className="account-item-number">{norekening}</p>
+      <p className="account-item-number">{norekening} - {name}</p>
       <p className="account-item-balance">
         Effective balance: <strong>Rp{balance.toLocaleString("id-ID")}</strong>
       </p>
