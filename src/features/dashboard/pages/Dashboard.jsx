@@ -233,19 +233,16 @@ export default function Dashboard() {
                       <div className="bank-card-header">
                         <div className="bank-card-details">
                           
-                          {/* JENIS REKENING (Kecil, Tidak Bold) */}
                           <p className="bank-card-type">
                             {currentCard?.type || "Tabungan"}
                           </p>
 
-                          {/* NOMOR REKENING (Besar, Bold) */}
                           <p className="bank-card-number">
                             {currentCard?.account_number 
                               ? String(currentCard.account_number).replace(/(.{4})/g, "$1 ").trim() 
                               : "---- ---- ----"}
                           </p>
                           
-                          {/* NAMA NASABAH DIHAPUS */}
                         </div>
                         
                         {currentCard?.is_main && (
