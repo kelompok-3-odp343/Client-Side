@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import "../styles/auth.css";
 import "../styles/auth-otp.css";
 import logo from "../../../assets/images/wandoor-logo-2.png";
@@ -8,13 +9,26 @@ import { decodeJwtToken } from "../api/jwtHelper";
 
 export default function OtpLogin() {
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-    const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    const [resendTimer, setResendTimer] = useState(0);
-    const [showModal, setShowModal] = useState(false);
+    
+    // Timer state: inisialisasi 30 agar langsung jalan saat halaman dimuat
+    const [resendTimer, setResendTimer] = useState(30); 
+    
     const inputsRef = useRef([]);
     const navigate = useNavigate();
 
+    // 1. Logic Timer: Jalan otomatis jika resendTimer > 0
+    useEffect(() => {
+        let interval;
+        if (resendTimer > 0) {
+            interval = setInterval(() => {
+                setResendTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [resendTimer]);
+
+    // 2. Auto Submit jika OTP penuh
     useEffect(() => {
         if (otp.every((digit) => digit !== "")) {
             handleVerify();
@@ -50,89 +64,123 @@ export default function OtpLogin() {
         const otp_code = otp.join("");
         if (otp_code.length !== 6) {
             if (!loading) {
-                setMessage("Enter 6-digit OTP");
-                setShowModal(true);
+                // Gunakan Toast atau Swal kecil untuk validasi input ringan
+                Swal.fire({
+                    icon: "warning",
+                    title: "Invalid Input",
+                    text: "Enter 6-digit OTP",
+                    confirmButtonColor: "#00bfa6",
+                });
             }
             return;
         }
 
         const sessionID = sessionStorage.getItem("sessionID");
         if (!sessionID) {
-            setMessage("Session expired. Please log in again.");
-            setShowModal(true);
-            setTimeout(() => navigate("/"), 2000);
+            Swal.fire({
+                icon: "error",
+                title: "Session Expired",
+                text: "Please log in again.",
+                confirmButtonColor: "#00bfa6",
+            }).then(() => navigate("/"));
             return;
         }
 
         setLoading(true);
-        const resp = await postVerifyOtp({ sessionID, otp_code });
-        setLoading(false);
+        try {
+            const resp = await postVerifyOtp({ sessionID, otp_code });
+            
+            if (!resp.ok || !resp.data?.status) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Verification Failed",
+                    text: resp.message || "Invalid OTP",
+                    confirmButtonColor: "#d33",
+                });
+                setOtp(["", "", "", "", "", ""]);
+                if (inputsRef.current[0]) inputsRef.current[0].focus();
+                return;
+            }
 
-        if (!resp.ok || !resp.data?.status) {
-            setMessage(resp.message || "Invalid OTP");
-            setShowModal(true);
-            setOtp(["", "", "", "", "", ""]);
-            if (inputsRef.current[0]) inputsRef.current[0].focus();
-            return;
+            sessionStorage.setItem("token", resp.data.token);
+            const userData = decodeJwtToken(resp.data.token);
+            if (userData) {
+                sessionStorage.setItem("user_id", userData.userId);
+                sessionStorage.setItem("username", userData.username);
+                sessionStorage.setItem("role", userData.role);
+                sessionStorage.setItem("cif", userData.cif);
+            }
+            sessionStorage.setItem("attempt", resp.data.attemptCount);
+
+            Swal.fire({
+                icon: "success",
+                title: "OTP Verified",
+                text: "Login successful!",
+                confirmButtonColor: "#00bfa6",
+                timer: 1500, // Opsional: auto close sukses dalam 1.5s
+                showConfirmButton: false
+            }).then(() => {
+                navigate("/dashboard", { replace: true });
+            });
+
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
         }
-
-        sessionStorage.setItem("token", resp.data.token);
-        const userData = decodeJwtToken(resp.data.token);
-        if (userData) {
-            sessionStorage.setItem("user_id", userData.userId);
-            sessionStorage.setItem("username", userData.username);
-            sessionStorage.setItem("role", userData.role);
-            sessionStorage.setItem("cif", userData.cif);
-        }
-        sessionStorage.setItem("attempt", resp.data.attemptCount);
-
-        setMessage("✅ OTP Verified");
-        setShowModal(true);
-
-        setTimeout(() => {
-            setShowModal(false);
-            navigate("/dashboard", { replace: true });
-        }, 800);
     };
 
     const handleResend = async () => {
-        const sessionID = sessionStorage.getItem("sessionID");
-        
-        if (!sessionID) {
-            setMessage("Session expired. Please log in again.");
-            setShowModal(true);
-            setTimeout(() => navigate("/"), 2000);
-            return;
-        }
-
+        // Cegah klik jika timer masih jalan
         if (resendTimer > 0) return;
 
-        const resp = await postResendOtp({ sessionID });
-
-        if (!resp.ok) {
-            setMessage(resp.message || "Gagal mengirim ulang OTP");
-            setShowModal(true);
+        const sessionID = sessionStorage.getItem("sessionID");
+        if (!sessionID) {
+            Swal.fire({
+                icon: "error",
+                title: "Session Expired",
+                text: "Please log in again.",
+            }).then(() => navigate("/"));
             return;
         }
 
-        const cooldown = resp.data?.resendCooldown ?? 30;
-        setResendTimer(cooldown);
+        try {
+            const resp = await postResendOtp({ sessionID });
 
-        setOtp(["", "", "", "", "", ""]);
-        inputsRef.current[0].focus();
+            if (!resp.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: resp.message || "Gagal mengirim ulang OTP",
+                });
+                return;
+            }
 
-        const interval = setInterval(() => {
-            setResendTimer((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    return 0;
-                }
-                return prev - 1;
+            // Reset Timer & Input
+            const cooldown = resp.data?.resendCooldown ?? 30;
+            setResendTimer(cooldown);
+            setOtp(["", "", "", "", "", ""]);
+            inputsRef.current[0].focus();
+
+            // Tampilkan Modal Konfirmasi (User harus klik OK)
+            Swal.fire({
+                icon: "success",
+                title: "OTP Resent",
+                text: resp.data.message || "Kode OTP baru telah dikirim ke email Anda.",
+                confirmButtonColor: "#00bfa6",
             });
-        }, 1000);
-        
-        setMessage(resp.data.message || "Kode OTP baru telah dikirim.");
-        setShowModal(true);
+
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Gagal menghubungi server.",
+            });
+        }
     };
 
     return (
@@ -172,7 +220,10 @@ export default function OtpLogin() {
                     Didn’t get code?{" "}
                     <span
                         className={`otp-resend-link ${resendTimer > 0 ? "disabled" : ""}`}
-                        style={{ cursor: resendTimer > 0 ? "not-allowed" : "pointer" }}
+                        style={{ 
+                            cursor: resendTimer > 0 ? "not-allowed" : "pointer",
+                            opacity: resendTimer > 0 ? 0.5 : 1
+                        }}
                         onClick={handleResend}
                     >
                         {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Click to resend"}
@@ -183,18 +234,6 @@ export default function OtpLogin() {
                     ← Back to Sign In
                 </div>
             </div>
-
-            {showModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content fade-in">
-                        <h3 className="modal-title">OTP Verification</h3>
-                        <p className="modal-message">{message}</p>
-                        <button className="modal-btn" onClick={() => setShowModal(false)}>
-                            OK
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
