@@ -94,15 +94,22 @@ export default function TransactionHistory({
                 <hr className="trx-group-divider" />
 
                 {group.items?.map((item, itemIndex) => {
+                  const amountStr = String(item.amount || "");
+
                   const isCredit = 
                     item.debit_credit === "C" || 
                     item.jenisTransaksi === "Pemasukan" ||
-                    (typeof item.amount === "string" && item.amount.startsWith("+"));
+                    amountStr.startsWith("+");
 
                   const isDebit =
                     item.debit_credit === "D" ||
                     item.jenisTransaksi === "Pengeluaran" ||
-                    (typeof item.amount === "string" && item.amount.startsWith("-"));
+                    amountStr.startsWith("-");
+
+                  let amountColor = "#000000"; 
+                  if (isCredit && !amountStr.startsWith("-")) {
+                    amountColor = "#16a34a";
+                  }
 
                   return (
                     <div
@@ -124,11 +131,10 @@ export default function TransactionHistory({
 
                       <div className="trx-item-right">
                         <span
-                          className={`trx-item-amount ${
-                            isCredit ? "credit" : isDebit ? "debit" : ""
-                          }`}
+                          className="trx-item-amount"
+                          style={{ color: amountColor, fontWeight: "600" }}
                         >
-                          {item.amount}
+                          Rp {item.amount}
                         </span>
 
                         {productType === "SAV" && isDebit && (
