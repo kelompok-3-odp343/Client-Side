@@ -7,7 +7,7 @@ const api = axios.create({
 export async function fetchLifeGoalsRevamp() {
   try {
     const token = sessionStorage.getItem("token");
-    
+
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -34,13 +34,12 @@ export async function fetchLifeGoalsRevamp() {
 export async function fetchLifeGoalDetail(accountNumber) {
   try {
     const token = sessionStorage.getItem("token");
-    
+
     if (!token) {
       throw new Error("No authentication token found");
     }
 
-    const res = await api.get(`/api/v1/lifegoals-detail`, {
-      params: { accountNumber }, 
+    const res = await api.post(`/api/v1/lifegoals-detail`, { accountNumber }, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -62,13 +61,18 @@ export async function fetchLifeGoalDetail(accountNumber) {
 export async function fetchLifeGoalTransactions(accountNumber, month, year) {
   try {
     const token = sessionStorage.getItem("token");
-    
+    const payload = {
+      accountNumber: accountNumber,
+      month: month,
+      year: year,
+      productType: 'LFG'
+    };
+
     if (!token) {
       throw new Error("No authentication token found");
     }
 
-    const res = await api.get(`/api/v1/lifegoals-tx/${accountNumber}`, {
-      params: { month, year },
+    const res = await api.post(`/api/v1/trx-history`, payload, {
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",

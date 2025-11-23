@@ -43,7 +43,7 @@ export default function LifeGoalDetail() {
 
   const mapTransactions = (txData) => {
     if (!Array.isArray(txData)) return [];
-    
+
     return txData.map(group => ({
       date: new Date(group.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
       items: group.items.map((item, idx) => ({
@@ -67,10 +67,10 @@ export default function LifeGoalDetail() {
         setLoading(false);
         return;
       }
-      
+
       setLoading(true);
       setError(null);
-      
+
       try {
         const detailRes = await fetchLifeGoalDetail(accountNumber);
         setGoalDetail(detailRes?.data || null);
@@ -90,17 +90,17 @@ export default function LifeGoalDetail() {
     setSelectedMonth(monthObj);
     setLoading(true);
     try {
-        const txRes = await fetchLifeGoalTransactions(
-            accountNumber, 
-            monthObj.month, 
-            monthObj.year
-        );
-        setTransactions(mapTransactions(txRes));
+      const txRes = await fetchLifeGoalTransactions(
+        accountNumber,
+        monthObj.month,
+        monthObj.year,
+      );
+      setTransactions(mapTransactions(txRes));
     } catch (err) {
-        console.error("Error loading transactions:", err);
-        setTransactions([]);
+      console.error("Error loading transactions:", err);
+      setTransactions([]);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -142,9 +142,8 @@ export default function LifeGoalDetail() {
       className="lg-container"
       style={{
         "--theme": goal.color || "#6dddd0",
-        "--accent-gradient": `linear-gradient(135deg, ${
-          goal.color || "#6dddd0"
-        } 0%, #ffffff 100%)`,
+        "--accent-gradient": `linear-gradient(135deg, ${goal.color || "#6dddd0"
+          } 0%, #ffffff 100%)`,
       }}
     >
       <Navbar />
@@ -170,15 +169,15 @@ export default function LifeGoalDetail() {
                 target: goal.target,
                 color: goal.color,
               }}
-              onClick={() => {}}
+              onClick={() => { }}
             />
 
             <div className="history-panel glass-card">
               <TransactionHistory
-                transactions={transactions} 
+                transactions={transactions}
                 months={months}
                 selectedMonth={selectedMonth}
-                onMonthChange={handleMonthChange} 
+                onMonthChange={handleMonthChange}
                 themeColor={goal.color || "#71d9d0"}
                 title="Transaction History"
                 loading={loading}
@@ -233,8 +232,8 @@ export default function LifeGoalDetail() {
               <div className="lg-label">Maturity Date</div>
               <div className="lg-value">
                 {(() => {
-                   const d = toDate(goalDetail.maturityDate);
-                   return d instanceof Date ? d.toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+                  const d = toDate(goalDetail.maturityDate);
+                  return d instanceof Date ? d.toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
                 })()}
               </div>
 
