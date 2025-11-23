@@ -42,26 +42,26 @@ export default function Deposits() {
       const resApi = responseData.data;
 
       const formattedData = {
-        totalBalance: resApi.total_balance,
-        totalCount: resApi.count_accounts,
+        totalBalance: resApi.totalBalance,
+        totalCount: resApi.countAccounts,
         deposits: resApi.items.map((item) => ({
-          id: item.item_id,
-          title: `Account ${item.deposit_account_number}`,
+          id: item.itemId,
+          title: `Account ${item.depositAccountNumber}`,
           balance: item.balance,
-          interest: `${item.interest_rate}%`,
-          opening: new Date(item.maturity_date).toLocaleDateString("id-ID", {
+          interest: `${item.interestRate}%`,
+          opening: new Date(item.maturityDate).toLocaleDateString("id-ID", {
             day: "2-digit",
             month: "long",
             year: "numeric",
           }),
-          period: `${item.tenor_months} months`,
-          date: new Date(item.maturity_date).toLocaleDateString("id-ID", {
+          period: `${item.tenorMonths} months`,
+          date: new Date(item.maturityDate).toLocaleDateString("id-ID", {
             day: "2-digit",
             month: "short",
             year: "numeric",
           }),
           status: item.status,
-          account_number: item.deposit_account_number,
+          account_number: item.depositAccountNumber,
         })),
       };
 
@@ -164,7 +164,11 @@ export default function Deposits() {
 
     return Object.values(groups)
       .sort((a, b) => b.sortKey - a.sortKey)
-      .map(({ sortKey, ...rest }) => rest);
+      .map((g) => ({
+        ...g,
+        key: String(g.sortKey),
+      }));
+
   };
 
   useEffect(() => {

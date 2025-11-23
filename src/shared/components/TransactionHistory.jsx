@@ -13,7 +13,7 @@ export default function TransactionHistory({
   productType = "SAV",
   showDownloadButton = false,
   onDownload,
-  loading = false, 
+  loading = false,
   emptyMessage = "No transactions available",
 }) {
   const [hoveredMonth, setHoveredMonth] = useState(null);
@@ -35,11 +35,11 @@ export default function TransactionHistory({
       <div className="trx-history-header">
         <h3 className="trx-history-title">{title}</h3>
         {showDownloadButton && onDownload && (
-          <button 
-            className="trx-history-download-btn" 
+          <button
+            className="trx-history-download-btn"
             onClick={onDownload}
             aria-label="Download transactions"
-            disabled={loading} 
+            disabled={loading}
           >
             <i className="fas fa-download"></i>
           </button>
@@ -60,7 +60,7 @@ export default function TransactionHistory({
                 onClick={() => handleMonthClick(month)}
                 onMouseEnter={() => setHoveredMonth(month)}
                 onMouseLeave={() => setHoveredMonth(null)}
-                disabled={loading} 
+                disabled={loading}
                 style={{
                   backgroundColor: isActive ? themeColor : undefined,
                   color: isActive ? "#fff" : undefined,
@@ -77,7 +77,7 @@ export default function TransactionHistory({
       )}
 
       <div className="trx-history-list-container">
-        
+
         {loading && (
           <div className="trx-loading-overlay">
             <div className="trx-spinner" style={{ borderTopColor: themeColor }}></div>
@@ -87,7 +87,7 @@ export default function TransactionHistory({
         <div className="trx-history-list" style={{ opacity: loading ? 0.4 : 1 }}>
           {transactions.length > 0 ? (
             transactions.map((group, groupIndex) => (
-              <div key={`${group.date}-${groupIndex}`} className="trx-group">
+              <div key={group.key} className="trx-group">
                 <p className="trx-group-date">
                   <strong>{group.date}</strong>
                 </p>
@@ -96,8 +96,8 @@ export default function TransactionHistory({
                 {group.items?.map((item, itemIndex) => {
                   const amountStr = String(item.amount || "");
 
-                  const isCredit = 
-                    item.debit_credit === "C" || 
+                  const isCredit =
+                    item.debit_credit === "C" ||
                     item.jenisTransaksi === "Pemasukan" ||
                     amountStr.startsWith("+");
 
@@ -106,14 +106,14 @@ export default function TransactionHistory({
                     item.jenisTransaksi === "Pengeluaran" ||
                     amountStr.startsWith("-");
 
-                  let amountColor = "#000000"; 
+                  let amountColor = "#000000";
                   if (isCredit && !amountStr.startsWith("-")) {
                     amountColor = "#16a34a";
                   }
 
                   return (
                     <div
-                      key={item.transactionId || `${groupIndex}-${itemIndex}`}
+                      key={item.transactionId || `${group.key}-${item.transactionDate}-${itemIndex}`}
                       className="trx-item"
                       onClick={() => !loading && handleTransactionClick(item)}
                       role="button"
@@ -167,10 +167,10 @@ export default function TransactionHistory({
             <div className="trx-history-empty">
               <p>
                 {!loading && (
-                   <>
-                     {emptyMessage}
-                     {selectedMonth && ` for ${selectedMonth.label} ${selectedMonth.year}`}
-                   </>
+                  <>
+                    {emptyMessage}
+                    {selectedMonth && ` for ${selectedMonth.label} ${selectedMonth.year}`}
+                  </>
                 )}
               </p>
             </div>

@@ -71,7 +71,16 @@ export default function Dashboard() {
           }));
           setCards(mappedCards);
         } else {
-          setCards([]);
+          const mappedCards = (d.accountList ?? []).map((item) => ({
+            type: item.accountProductName || "ACCOUNT NUMBER",
+            account_number: item.accountNumber,
+            card_number: item.debit_card_number || item.accountNumber,
+            account_holder_name: item.accountName,
+            effective_balance: item.effectiveBalance,
+            is_main: false,
+            showCardNumber: false,
+          }));
+          setCards(mappedCards);
         }
       } catch (error) {
         console.error("Error loading dashboard:", error);
@@ -106,7 +115,7 @@ export default function Dashboard() {
   };
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
-  
+
   if (error) return (
     <div className="dashboard-page">
       <Navbar />
@@ -246,12 +255,12 @@ export default function Dashboard() {
                             {currentCard?.type || "Tabungan"}
                           </p>
                           <p className="bank-card-number">
-                            {currentCard?.account_number 
-                              ? String(currentCard.account_number).replace(/(.{4})/g, "$1 ").trim() 
+                            {currentCard?.account_number
+                              ? String(currentCard.account_number).replace(/(.{4})/g, "$1 ").trim()
                               : "---- ---- ----"}
                           </p>
                         </div>
-                        
+
                         {currentCard?.is_main && (
                           <div className="bank-card-badge">
                             <span>Main Account</span>

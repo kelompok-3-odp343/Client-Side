@@ -7,7 +7,7 @@ const api = axios.create({
 export async function fetchAllCards() {
   try {
     const token = sessionStorage.getItem("token");
-    
+
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -22,14 +22,10 @@ export async function fetchAllCards() {
 
     const result = res?.data?.data;
 
-    if (!Array.isArray(result)) {
-      throw new Error("Invalid response format from API");
-    }
-
     return result;
 
   } catch (error) {
-    console.error("Failed to fetch cards:", error?.message);
+    console.error("Failed to fetch cards:", error);
     throw error;
   }
 }
@@ -44,7 +40,7 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
     };
 
     const token = sessionStorage.getItem("token");
-    
+
     if (!token) {
       throw new Error("No authentication token found");
     }
