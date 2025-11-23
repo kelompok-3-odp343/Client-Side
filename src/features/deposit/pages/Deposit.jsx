@@ -41,10 +41,12 @@ export default function Deposits() {
       const responseData = await getTimeDeposits();
       const resApi = responseData.data;
 
+      const items = Array.isArray(resApi.items) ? resApi.items : [];
+
       const formattedData = {
         totalBalance: resApi.totalBalance,
         totalCount: resApi.countAccounts,
-        deposits: resApi.items.map((item) => ({
+        deposits: items.map((item) => ({
           id: item.itemId,
           title: `Account ${item.depositAccountNumber}`,
           balance: item.balance,
@@ -226,9 +228,15 @@ export default function Deposits() {
 
           <h3 className="your-deposit-title">Your Time Deposits</h3>
           <div className="deposit-grid">
-            {depositsData?.deposits?.map((d) => (
-              <DepositCard key={d.id} {...d} />
-            ))}
+            {depositsData?.deposits?.length > 0 ? (
+              depositsData.deposits.map((d) => (
+                <DepositCard key={d.id} {...d} />
+              ))
+            ) : (
+              <div className="no-deposit-message">
+                No time deposits available
+              </div>
+            )}
           </div>
         </section>
 

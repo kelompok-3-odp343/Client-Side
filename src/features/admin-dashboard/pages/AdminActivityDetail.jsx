@@ -135,26 +135,39 @@ export default function AdminActivityDetail() {
 
 	const handleReject = () => setShowRejectModal(true);
 
-	const confirmRejection = () => {
+	const confirmRejection = async () => {
 		if (!rejectNotes.trim()) {
-			alert("Please provide rejection notes");
+			Swal.fire("Warning", "Please provide rejection notes", "warning");
 			return;
 		}
 
-		const now = new Date();
-		const displayTime = now.toLocaleString("en-GB");
+		const payload = {
+			activityId: activityData.activityId,
+			isApprove: false,
+			approverData: {}
+		};
 
 		setShowRejectModal(false);
 
-		setSuccessMessage("Activity Rejected");
-		setSuccessDetails({
-			timestampLabel: "Rejected at",
-			timestamp: displayTime,
-			activityId: activityData.activityId,
-			menu: activityData.menu,
-			actionMenu: activityData.menu_action
-		});
-		setShowSuccessModal(true);
+		const resp = await postAdminApproval(payload);
+
+		if (resp.ok) {
+			const timestamp = new Date(resp.data.updatedTime).toLocaleString("en-GB");
+
+			setSuccessMessage("Activity Rejected");
+			setSuccessDetails({
+				timestampLabel: "Rejected at",
+				timestamp,
+				activityId: activityData.activityId,
+				menu: resp.data.data.menuData.menuName,
+				actionMenu: resp.data.data.menuData.actionFlow
+			});
+
+			setShowSuccessModal(true);
+
+		} else {
+			Swal.fire("Error", resp.message || "Rejection failed", "error");
+		}
 	};
 
 	const cancelReject = () => {

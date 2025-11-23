@@ -7,7 +7,7 @@ const api = axios.create({
 export const getTimeDeposits = async () => {
     try {
         const token = sessionStorage.getItem("token");
-        
+
         if (!token) {
             throw new Error("No authentication token found");
         }
@@ -20,21 +20,37 @@ export const getTimeDeposits = async () => {
             },
         });
 
-        if (!response.data?.status) {
-            throw new Error("Invalid response from API");
+        const data = response.data;
+        if (!data?.status || !Array.isArray(data.items)) {
+            return {
+                status: false,
+                data: {
+                    totalBalance: 0,
+                    countAccounts: 0,
+                    items: []
+                }
+            };
         }
 
-        return response.data;
+        return data;
+
     } catch (error) {
         console.error("Failed to fetch time deposits:", error?.message);
-        throw error;
+        return {
+            status: false,
+            data: {
+                totalBalance: 0,
+                countAccounts: 0,
+                items: []
+            }
+        };
     }
 };
 
 export const getTimeDepositTransactions = async ({ month, year, accountNumber }) => {
     try {
         const token = sessionStorage.getItem("token");
-        
+
         if (!token) {
             throw new Error("No authentication token found");
         }
@@ -52,7 +68,7 @@ export const getTimeDepositTransactions = async ({ month, year, accountNumber })
         if (response.data?.transactions?.length) {
             return response.data;
         }
-        
+
         if (response.data?.transaction?.length) {
             return { transactions: response.data.transaction };
         }
