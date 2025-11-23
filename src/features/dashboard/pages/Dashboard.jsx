@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
   const [cards, setCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showBalance, setShowBalance] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -118,7 +119,7 @@ export default function Dashboard() {
 
   if (error) return (
     <div className="dashboard-page">
-      <Navbar />
+      <Navbar title="Dashboard" />
       <div className="error-container" style={{ textAlign: 'center', padding: '3rem' }}>
         <h2>Failed to Load Dashboard</h2>
         <p>{error}</p>
@@ -129,7 +130,7 @@ export default function Dashboard() {
 
   if (!data) return (
     <div className="dashboard-page">
-      <Navbar />
+      <Navbar title="Dashboard" />
       <div className="empty" style={{ textAlign: 'center', padding: '3rem' }}>
         <h2>No Data Available</h2>
         <p>Unable to load dashboard information</p>
@@ -148,17 +149,27 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-page">
-      <Navbar />
+      <Navbar title="Dashboard" />
       <main className="dashboard-main">
-        <h2 className="page-title">Dashboard</h2>
-
+        
         <section className="top-grid">
           <div className="card card-gradient assets-card">
-            <div className="card-head"><h3>Assets Total</h3></div>
-            <div className="card-body">
-              <h1>Rp{fmt(assets)}</h1>
-              <p className="muted">You made extra Rp{fmt(assets_total?.extra_this_month ?? 0)} this month</p>
+            <h3>Assets Total</h3>
+            
+            <div className="asset-amount-wrapper">
+              <h1>
+                {showBalance ? `Rp${fmt(assets)}` : "Rp •••••••"}
+              </h1>
+              <button 
+                className="toggle-eye-btn"
+                onClick={() => setShowBalance(!showBalance)}
+                aria-label="Toggle balance visibility"
+              >
+                {showBalance ? <EyeOff size={22} /> : <Eye size={22} />}
+              </button>
             </div>
+
+            <p className="muted">You made extra Rp{fmt(assets_total?.extra_this_month ?? 0)} this month</p>
           </div>
 
           <div className="card income-card">
