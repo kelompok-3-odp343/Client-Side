@@ -85,7 +85,7 @@ export default function DetailMyCard() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const [showBalance, setShowBalance] = useState(true);
+  const [showBalance, setShowBalance] = useState(true); 
   const [months] = useState(getLastMonths());
   
   const [selectedMonth, setSelectedMonth] = useState(months[months.length - 1]);
@@ -250,12 +250,12 @@ export default function DetailMyCard() {
               padding: "0.5rem 1rem", 
               background: "#6dddd0", 
               border: "none", 
-              borderRadius: "6px", 
+              borderRadius: "0.375rem", 
               color: "white", 
               cursor: "pointer",
               display: "inline-flex",
               alignItems: "center",
-              gap: "8px"
+              gap: "0.5rem"
             }}
           >
             <RefreshCw size={16} /> Retry
@@ -289,27 +289,26 @@ export default function DetailMyCard() {
             <p className="subtext">Track your transaction history and payment information</p>
 
             <div className="account-card">
-              <div className="account-header">
-                <div>
-                  <h4>{selectedCard?.type}</h4>
-                  <p className="acc-number"><strong>{selectedCard?.account_number}</strong></p>
-                  <p className="acc-name">{selectedCard?.account_holder_name}</p>
-                </div>
-                {selectedCard?.is_main && (
-                  <div className="account-card-badge"><span>Main Account</span></div>
-                )}
-              </div>
+              <p className="card-bank-name">{selectedCard?.type}</p>
 
-              <p className="balance-title">Effective Balance</p>
-              <div className="balance-container">
-                <h3>
-                  {showBalance
-                    ? `Rp ${Number(selectedCard?.effective_balance || 0).toLocaleString("id-ID")}`
-                    : "•••••••••"}
-                </h3>
-                <span className="eye-icon" onClick={() => setShowBalance((s) => !s)}>
-                  {showBalance ? <EyeOff size={20} /> : <Eye size={20} />}
-                </span>
+              <p className="card-number-row">
+                {selectedCard?.account_number 
+                  ? String(selectedCard.account_number).replace(/(.{4})/g, "$1 ").trim() 
+                  : ""}
+              </p>
+              
+              <div className="card-balance-section">
+                <p className="balance-title">Effective Balance</p>
+                <div className="balance-value-row">
+                  <p className="card-balance-large">
+                    {showBalance
+                      ? `Rp${Number(selectedCard?.effective_balance || 0).toLocaleString("id-ID")}`
+                      : "•••••••••"}
+                  </p>
+                  <span className="eye-icon" onClick={() => setShowBalance(!showBalance)}>
+                    {showBalance ? <EyeOff size={24} /> : <Eye size={24} />}
+                  </span>
+                </div>
               </div>
             </div>
 
