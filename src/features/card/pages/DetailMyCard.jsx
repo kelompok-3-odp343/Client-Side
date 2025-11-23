@@ -7,17 +7,18 @@ import Navbar from "../../../shared/components/Navbar";
 import { EyeOff, Eye, RefreshCw } from "lucide-react";
 import { fetchAllCards, fetchTransactionHistory } from "../api/card.api";
 import { useNavigate, useLocation } from "react-router-dom";
+import { select } from "framer-motion/client";
 
 export default function DetailMyCard() {
   const getLastMonths = () => {
     const now = new Date();
-    const currentYear = 2025; 
-    
+    const currentYear = 2025;
+
     const arr = [];
     for (let i = 0; i < 12; i++) {
       let m = now.getMonth() - i;
       let y = currentYear;
-      
+
       while (m < 0) {
         m += 12;
         y -= 1;
@@ -85,9 +86,9 @@ export default function DetailMyCard() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const [showBalance, setShowBalance] = useState(true); 
+  const [showBalance, setShowBalance] = useState(true);
   const [months] = useState(getLastMonths());
-  
+
   const [selectedMonth, setSelectedMonth] = useState(months[months.length - 1]);
 
   const [showSplitModal, setShowSplitModal] = useState(false);
@@ -109,6 +110,7 @@ export default function DetailMyCard() {
           initialCards = location.state.cards;
         } else {
           const response = await fetchAllCards();
+
           if (Array.isArray(response) && response.length > 0) {
             initialCards = response;
           } else {
@@ -117,10 +119,10 @@ export default function DetailMyCard() {
         }
 
         setCards(initialCards);
-        const targetCard = location.state?.selectedAccount 
+        const targetCard = location.state?.selectedAccount
           ? initialCards.find(c => c.account_number === location.state.selectedAccount)
           : initialCards[0];
-          
+
         setSelectedCard(targetCard || initialCards[0]);
       } catch (err) {
         console.error("Error loading cards:", err);
@@ -136,14 +138,14 @@ export default function DetailMyCard() {
 
   useEffect(() => {
     if (!selectedCard) return;
-    
-    setTransactions([]); 
+
+    setTransactions([]);
 
     const targetMonth = selectedMonth || months[months.length - 1];
     if (selectedMonth !== targetMonth) {
-        setSelectedMonth(targetMonth);
+      setSelectedMonth(targetMonth);
     }
-    
+
     handleSelectedMonth(targetMonth, selectedCard);
   }, [selectedCard]);
 
@@ -244,14 +246,14 @@ export default function DetailMyCard() {
           <p style={{ color: "#777", margin: "1rem 0" }}>
             {errorMsg || "No card information available"}
           </p>
-          <button 
-            onClick={() => window.location.reload()} 
-            style={{ 
-              padding: "0.5rem 1rem", 
-              background: "#6dddd0", 
-              border: "none", 
-              borderRadius: "0.375rem", 
-              color: "white", 
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: "0.5rem 1rem",
+              background: "#6dddd0",
+              border: "none",
+              borderRadius: "0.375rem",
+              color: "white",
               cursor: "pointer",
               display: "inline-flex",
               alignItems: "center",
@@ -292,11 +294,16 @@ export default function DetailMyCard() {
               <p className="card-bank-name">{selectedCard?.type}</p>
 
               <p className="card-number-row">
-                {selectedCard?.account_number 
-                  ? String(selectedCard.account_number).replace(/(.{4})/g, "$1 ").trim() 
+                {selectedCard?.account_number
+                  ? String(selectedCard.account_number).replace(/(.{4})/g, "$1 ").trim()
                   : ""}
               </p>
-              
+              <p className="card-number-row">
+                {selectedCard?.account_holder_name
+                  ? selectedCard.account_holder_name
+                  : ""}
+              </p>
+
               <div className="card-balance-section">
                 <p className="balance-title">Effective Balance</p>
                 <div className="balance-value-row">
