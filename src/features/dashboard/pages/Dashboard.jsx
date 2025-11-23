@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../../shared/components/Navbar";
 import { ChartPie, Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { usePageLoader } from "../../../shared/hooks/usePageLoader";
+import { useLoading } from "../../../context/LoadingContext";
 import "../styles/dashboard.css";
 import { fetchDashboard } from "../api/dashboard.api.js";
 import { fetchAllCards } from "../../card/api/card.api.js";
@@ -12,17 +13,18 @@ import dplkIcon from "../../../assets/images/dashboard-dplk-icon.png";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cards, setCards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showBalance, setShowBalance] = useState(true);
-  const navigate = useNavigate();
+  
+  const navigate = usePageLoader();
+  const { setIsLoading } = useLoading();
 
   useEffect(() => {
     const dataDashboards = async () => {
       try {
-        setLoading(true);
+        setIsLoading(true); 
         setError(null);
 
         const raw = await fetchDashboard();
@@ -87,7 +89,7 @@ export default function Dashboard() {
         console.error("Error loading dashboard:", error);
         setError(error.message || "Failed to load dashboard data");
       } finally {
-        setLoading(false);
+        setTimeout(() => setIsLoading(false), 300);
       }
     };
 
@@ -115,8 +117,6 @@ export default function Dashboard() {
     navigate("/detailmycard", { state: { cards, selectedAccount: cards[currentIndex]?.account_number } });
   };
 
-  if (loading) return <div className="loading">Loading dashboard...</div>;
-
   if (error) return (
     <div className="dashboard-page">
       <Navbar title="Dashboard" />
@@ -128,15 +128,7 @@ export default function Dashboard() {
     </div>
   );
 
-  if (!data) return (
-    <div className="dashboard-page">
-      <Navbar title="Dashboard" />
-      <div className="empty" style={{ textAlign: 'center', padding: '3rem' }}>
-        <h2>No Data Available</h2>
-        <p>Unable to load dashboard information</p>
-      </div>
-    </div>
-  );
+  if (!data) return <div className="dashboard-page"><Navbar title="Dashboard" /></div>;
 
   const { assets_total, earnings_overview, split, time_deposits, savings, pension_funds, life_goals } = data;
   const income = earnings_overview?.income ?? 0;
@@ -214,7 +206,7 @@ export default function Dashboard() {
                   <div className="panel-sub">The remaining bill that can be collected is <strong>Rp{fmt(split?.remaining ?? 0)}</strong></div>
                   <div className="potential">Your potential asset accumulation:</div>
                   <div className="potential-value">Rp{fmt(split?.potential ?? 0)}</div>
-                  <a href="#" className="view-detail" onClick={() => handleNavigate("splitbill")}>View Detail</a>
+                  <a href="#" className="view-detail" onClick={(e) => { e.preventDefault(); handleNavigate("splitbill"); }}>View Detail</a>
                 </div>
                 <button className="btn-add" onClick={() => navigate("/detailmycard", { state: { cards } })}>+ Add a New Bill</button>
               </div>

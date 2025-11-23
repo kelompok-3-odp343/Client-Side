@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { usePageLoader } from "../hooks/usePageLoader";
 import "../styles/components/navbar.css";
 import NotificationPanel from "./NotificationPanel";
 import logo from "../../assets/images/wandoor-logo-2.png";
 
 export default function Navbar({ title }) {
-  const navigate = useNavigate();
+  const navigate = usePageLoader();
   const [showNotif, setShowNotif] = useState(false);
   const bellRef = useRef(null);
 
