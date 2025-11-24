@@ -2,11 +2,12 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  height: 100%; 
   background: #fff;
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box; 
 }
 
 /* ===== HEADER ===== */
@@ -17,6 +18,7 @@
   margin-bottom: 1.25rem;
   padding-bottom: 0.75rem;
   border-bottom: 2px solid #f3f4f6;
+  flex-shrink: 0; 
 }
 
 .trx-history-title {
@@ -56,6 +58,7 @@
   margin-bottom: 1rem;
   overflow-x: auto;
   padding-bottom: 0.5rem;
+  flex-shrink: 0; 
 }
 
 .trx-month-btn {
@@ -86,11 +89,22 @@
   box-shadow: 0 2px 6px rgba(109, 221, 208, 0.3);
 }
 
-/* ===== TRANSACTION LIST ===== */
+/* ===== LIST CONTAINER WRAPPER ===== */
+.trx-history-list-container {
+  position: relative;
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  min-height: 0; 
+  overflow: hidden; 
+}
+
+/* ===== TRANSACTION LIST (SCROLLABLE AREA) ===== */
 .trx-history-list {
   flex: 1;
   overflow-y: auto;
-  max-height: 100%;
+  padding-bottom: 1rem;
+  padding-right: 0.5rem; 
 }
 
 /* Custom Scrollbar */
@@ -122,6 +136,12 @@
   font-weight: 600;
   color: #111827;
   margin-bottom: 0.5rem;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 5;
+  padding-top: 0.5rem;
+  padding-bottom: 0.2rem;
 }
 
 .trx-group-divider {
@@ -227,34 +247,13 @@
 }
 
 /* ===== LOADING STATE ===== */
-.trx-history-loading {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: #6b7280;
-  font-size: 1rem;
-}
-
-/* Wrapper agar posisi overlay bisa relative terhadap list */
-.trx-history-list-container {
-  position: relative;
-  min-height: 200px; 
-  transition: all 0.3s ease;
-}
-
-/* Efek transisi pada list saat opacity berubah */
-.trx-history-list {
-  transition: opacity 0.3s ease-in-out;
-  padding-bottom: 1rem;
-}
-
-/* Overlay Loading: Muncul di atas list */
 .trx-loading-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.6); /* Putih transparan */
+  background-color: rgba(255, 255, 255, 0.6); 
   z-index: 10;
   display: flex;
   justify-content: center;
@@ -277,14 +276,6 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-.trx-history-container {
-  /* ... style container lama ... */
-  width: 100%;
-  background: #fff;
-  border-radius: 12px;
-  /* shadow dll */
 }
 
 /* ===== RESPONSIVE ===== */
@@ -315,32 +306,5 @@
   .trx-split-btn {
     font-size: 0.7rem;
     padding: 0.2rem 0.5rem;
-  }
-}
-
-/* ===== ACCESSIBILITY ===== */
-@media (prefers-reduced-motion: reduce) {
-  .trx-item,
-  .trx-month-btn,
-  .trx-history-download-btn,
-  .trx-split-btn {
-    transition: none;
-  }
-}
-
-/* ===== PRINT STYLES ===== */
-@media print {
-  .trx-history-download-btn,
-  .trx-split-btn {
-    display: none;
-  }
-
-  .trx-history-months {
-    display: none;
-  }
-
-  .trx-item:hover {
-    background: transparent;
-    transform: none;
   }
 }
