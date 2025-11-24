@@ -45,7 +45,7 @@ function normalizeBill(b) {
 export async function fetchSplitBills() {
   try {
     const token = sessionStorage.getItem("token");
-    
+
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -82,7 +82,7 @@ export async function fetchSplitBills() {
 export async function getSplitBillById(splitBillId) {
   try {
     const token = sessionStorage.getItem("token");
-    
+
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -105,7 +105,28 @@ export async function getSplitBillById(splitBillId) {
       throw new Error("No data returned from API");
     }
 
-    return normalizeBill(data);
+    return {
+      split_bill_id: data.splitBillId,
+      split_bill_title: data.splitBillTitle,
+      account_number: data.accountNumber,
+      currency: data.currency,
+      transaction_id: data.transactionId,
+      ref_id: data.refId,
+      total_bill: data.totalBill,
+      created_time: data.createdTime,
+      transaction_date: data.transactionDate,
+
+      members: data.members?.map(m => ({
+        member_id: m.memberId,
+        member_name: m.memberName,
+        amount: Number(m.amount),
+        hasPaid: m.hasPaid,
+        status: m.hasPaid ? "Paid" : "Unpaid",
+        payment_time: m.paymentTime,
+        isNew: false,
+      })) || []
+    };
+
   } catch (error) {
     console.error("Failed to fetch split bill detail:", error?.message);
     throw error;
@@ -115,7 +136,7 @@ export async function getSplitBillById(splitBillId) {
 export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
   try {
     const token = sessionStorage.getItem("token");
-    
+
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -154,7 +175,7 @@ export async function updateSplitBillStatus(split_bill_id, updatedMembers) {
 export async function createSplitBill(payload) {
   try {
     const token = sessionStorage.getItem("token");
-    
+
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -191,14 +212,14 @@ export async function createSplitBill(payload) {
 export async function editSplitBill(split_bill_id, bill, members) {
   try {
     const token = sessionStorage.getItem("token");
-    
+
     if (!token) {
       throw new Error("No authentication token found");
     }
 
     const payload = {
       splitBillId: split_bill_id,
-      transactionId: bill.ref_id,
+      transactionId: bill.transaction_id,
       splitBillTitle: bill.split_bill_title,
       totalAmount: Number(bill.total_bill),
       billMembers: members.map((m) => ({
@@ -219,6 +240,35 @@ export async function editSplitBill(split_bill_id, bill, members) {
     });
 
     return normalizeBill(res.data?.data || res.data);
+  } catch (error) {
+    console.error("Failed to edit split bill:", error?.message);
+    throw error;
+  }
+}
+
+export async function markAsPaid(split_bill_id, memberId) {
+  try {
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const payload = {
+      splitBillId: split_bill_id,
+      memberId
+    };
+
+    const res = await api.post("/api/v1/split-bill/mark-paid", payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+      timeout: 5000,
+    });
+
+    return res.data;
   } catch (error) {
     console.error("Failed to edit split bill:", error?.message);
     throw error;

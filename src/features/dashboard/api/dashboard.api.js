@@ -22,7 +22,7 @@ export async function fetchDashboard() {
     });
 
     if (!resp?.data) {
-      throw new Error("Invalid response from API");
+      return { data: {} };
     }
 
     return resp;

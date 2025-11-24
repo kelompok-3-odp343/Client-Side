@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import "../styles/components/transaction-history.css";
-
+import { useNavigate } from "react-router-dom";
 export default function TransactionHistory({
   transactions = [],
   months = [],
@@ -17,6 +17,7 @@ export default function TransactionHistory({
   emptyMessage = "No transactions available",
 }) {
   const [hoveredMonth, setHoveredMonth] = useState(null);
+  const navigate = useNavigate();
 
   const handleMonthClick = (month) => {
     if (onMonthChange) {
@@ -147,7 +148,12 @@ export default function TransactionHistory({
                             onClick={(e) => {
                               e.stopPropagation();
                               if (item.split_bill_id) {
-                                window.location.href = `/splitbill/detail?id=${item.split_bill_id}`;
+                                navigate("/splitbill/detail", {
+                                  state: {
+                                    splitBillId: item.split_bill_id,
+                                    color: themeColor
+                                  }
+                                });
                               } else {
                                 if (onTransactionClick) onTransactionClick(item);
                               }

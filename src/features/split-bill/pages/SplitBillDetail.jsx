@@ -10,6 +10,7 @@ import {
   getSplitBillById,
   updateSplitBillStatus,
   editSplitBill,
+  markAsPaid
 } from "../api/split-bill.api";
 
 export default function SplitBillDetail() {
@@ -38,6 +39,7 @@ export default function SplitBillDetail() {
       }
 
       const data = await getSplitBillById(state.splitBillId);
+
       if (!data || !data.members?.length) {
         await Swal.fire({
           icon: "warning",
@@ -153,12 +155,17 @@ export default function SplitBillDetail() {
     setMembers(updatedMembers);
 
     try {
-      const updatedBill = await updateSplitBillStatus(
-        bill.split_bill_id,
-        updatedMembers
-      );
-      setBill(updatedBill);
-      setMembers(updatedBill.members.map((m) => ({ ...m, isNew: false })));
+      await markAsPaid(bill.split_bill_id, target.member_id);
+      const updated = await getSplitBillById(bill.split_bill_id);
+
+      setBill(updated);
+      setMembers(updated.members.map((m) => ({ ...m, isNew: false })));
+      Swal.fire({
+        icon: "success",
+        title: `marked as paid`,
+        timer: 1200,
+        showConfirmButton: false,
+      });
     } catch {
       Swal.fire({
         icon: "error",
@@ -191,8 +198,13 @@ export default function SplitBillDetail() {
         members
       );
 
-      setBill(updatedBill);
-      setMembers(updatedBill.members.map((m) => ({ ...m, isNew: false })));
+      const updated = await getSplitBillById(bill.split_bill_id);
+
+      setBill(updated);
+      setMembers(updated.members.map((m) => ({ ...m, isNew: false })));
+
+      // setBill(updatedBill);
+      // setMembers(updatedBill.members.map((m) => ({ ...m, isNew: false })));
       setIsEditing(false);
 
       Swal.fire({
