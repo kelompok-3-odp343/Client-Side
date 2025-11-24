@@ -81,14 +81,14 @@ export default function AdminUserDetail() {
 				: sessionStorage.getItem("user_unblock_menu_id"),
 			menuName: "USER_MANAGEMENT",
 			menuAction: type === "block" ? "BLOCK_USER" : "UNBLOCK_USER",
-			actionFlow: "NO_APPROVAL"
+			actionFlow: "NO_APPROVER"
 		};
 
 		const payload = {
 			userData: {
 				userId: userData.userId,
 			},
-			reason: `Direct ${label.toLowerCase()} (NO_APPROVAL rule)`,
+			reason: `Direct ${label.toLowerCase()} (NO_APPROVER rule)`,
 			checkerData: null,
 			menuData,
 			approverData: {}
@@ -107,7 +107,7 @@ export default function AdminUserDetail() {
 
 
 	const handleBlock = () => {
-		if (blockRule === "NO_APPROVAL") return confirmDirectAction("block");
+		if (blockRule === "NO_APPROVER") return confirmDirectAction("block");
 
 		if (blockRule === "CHECKER_AND_APPROVER") {
 			setActionType("block");
@@ -120,7 +120,7 @@ export default function AdminUserDetail() {
 	};
 
 	const handleUnblock = () => {
-		if (unblockRule === "NO_APPROVAL") return confirmDirectAction("unblock");
+		if (unblockRule === "NO_APPROVER") return confirmDirectAction("unblock");
 
 		if (unblockRule === "CHECKER_AND_APPROVER") {
 			setActionType("unblock");
