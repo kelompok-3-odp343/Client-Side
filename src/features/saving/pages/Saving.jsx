@@ -205,8 +205,13 @@ export default function SavingsDashboard() {
 
               <div className="metric-card metric-card-net">
                 <h4 className="metric-label">Net Income</h4>
-                <p className="metric-value metric-net-income">
-                  Rp{(rightData?.netIncome ?? 0).toLocaleString("id-ID")}
+                <p
+                  className="metric-value metric-net-income"
+                  style={{
+                    color: (rightData?.netIncome ?? 0) < 0 ? "#f94449" : "#3DBF4A"
+                  }}
+                >
+                  Rp{(Number(rightData?.netIncome) || 0).toLocaleString("id-ID")}
                 </p>
               </div>
             </div>
