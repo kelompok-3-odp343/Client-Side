@@ -48,7 +48,7 @@ export default function Deposits() {
         totalCount: resApi.countAccounts,
         deposits: items.map((item) => ({
           id: item.itemId,
-          title: `Account ${item.depositAccountNumber}`,
+          title: `Account - ${item.depositAccountNumber}`,
           balance: item.balance,
           interest: `${item.interestRate}%`,
           opening: new Date(item.maturityDate).toLocaleDateString("id-ID", {
@@ -217,7 +217,10 @@ export default function Deposits() {
               <h3 className="summary-title">Time Deposits</h3>
               <p className="summary-label">Total Balance</p>
               <p className="summary-balance">
-                {depositsData ? `Rp${depositsData.totalBalance?.toLocaleString()}` : 'Loading...'}
+                {depositsData ? `${depositsData.totalBalance?.toLocaleString("id-ID", {
+                  style: "currency",
+                  currency: "IDR"
+                })}` : 'RP. 0'}
               </p>
               <div className="summary-divider" />
               <p className="summary-sub">
@@ -282,7 +285,10 @@ function DepositCard({ title, balance, date, interest, opening, period }) {
       <h4 className="deposit-title">{title}</h4>
       <p className="deposit-balance">
         Balance:<br />
-        <strong>Rp{balance.toLocaleString()}</strong>
+        <strong>{Number(balance).toLocaleString("id-ID", {
+          style: "currency",
+          currency: "IDR"
+        })}</strong>
       </p>
 
       <div className="circle-container">

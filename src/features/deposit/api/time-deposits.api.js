@@ -21,7 +21,7 @@ export const getTimeDeposits = async () => {
         });
 
         const data = response.data;
-        if (!data?.status || !Array.isArray(data.items)) {
+        if (!data?.status) {
             return {
                 status: false,
                 data: {

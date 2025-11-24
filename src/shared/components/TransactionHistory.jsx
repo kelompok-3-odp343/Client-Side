@@ -134,7 +134,10 @@ export default function TransactionHistory({
                           className="trx-item-amount"
                           style={{ color: amountColor, fontWeight: "600" }}
                         >
-                          Rp {item.amount}
+                          {(Number(item.amount) || 0).toLocaleString("id-ID", {
+                            style: "currency",
+                            currency: "IDR"
+                          })}
                         </span>
 
                         {productType === "SAV" && isDebit && (
