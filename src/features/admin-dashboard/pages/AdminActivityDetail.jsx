@@ -98,8 +98,8 @@ export default function AdminActivityDetail() {
 				timestampLabel: "Checked at",
 				timestamp,
 				activityId: activityData.activityId,
-				menu: resp.data.data.menuData.menuName,
-				actionMenu: resp.data.data.menuData.actionFlow
+				menu: resp.data.menudata.menuName,
+				actionMenu: resp.data.menudata.actionFlow
 			});
 			setShowSuccessModal(true);
 		} else {
@@ -124,8 +124,8 @@ export default function AdminActivityDetail() {
 				timestampLabel: "Approved at",
 				timestamp,
 				activityId: activityData.activityId,
-				menu: resp.data.data.menuData.menuName,
-				actionMenu: resp.data.data.menuData.actionFlow
+				menu: resp.data.menudata.menuName,
+				actionMenu: resp.data.menudata.actionFlow
 			});
 			setShowSuccessModal(true);
 		} else {
@@ -159,8 +159,8 @@ export default function AdminActivityDetail() {
 				timestampLabel: "Rejected at",
 				timestamp,
 				activityId: activityData.activityId,
-				menu: resp.data.data.menuData.menuName,
-				actionMenu: resp.data.data.menuData.actionFlow
+				menu: resp.data.menudata.menuName,
+				actionMenu: resp.data.menudata.actionFlow
 			});
 
 			setShowSuccessModal(true);
