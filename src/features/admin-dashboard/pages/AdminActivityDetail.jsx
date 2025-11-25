@@ -59,11 +59,11 @@ export default function AdminActivityDetail() {
 	}, []);
 
 	const handleApprove = () => {
-		if (activityData.status === "PENDING_CHECKER") {
+		if (activityData.activityData.activityStatus === "PENDING_CHECKER") {
 			setShowApproveModal(true);
 			return;
 		}
-		if (activityData.status === "PENDING_APPROVER") {
+		if (activityData.activityData.activityStatus === "PENDING_APPROVER") {
 			confirmFinalApproval();
 		}
 	};
@@ -92,14 +92,14 @@ export default function AdminActivityDetail() {
 
 		if (resp.ok) {
 			const timestamp = new Date(resp.data.updatedTime).toLocaleString("en-GB");
-
 			setSuccessMessage("Activity Checked");
+
 			setSuccessDetails({
 				timestampLabel: "Checked at",
 				timestamp,
 				activityId: activityData.activityId,
-				menu: activityData.menu,
-				actionMenu: activityData.menu_action
+				menu: resp.data.menudata.menuName,
+				actionMenu: resp.data.menudata.actionFlow
 			});
 			setShowSuccessModal(true);
 		} else {
@@ -124,8 +124,8 @@ export default function AdminActivityDetail() {
 				timestampLabel: "Approved at",
 				timestamp,
 				activityId: activityData.activityId,
-				menu: activityData.menu,
-				actionMenu: activityData.menu_action
+				menu: resp.data.menudata.menuName,
+				actionMenu: resp.data.menudata.actionFlow
 			});
 			setShowSuccessModal(true);
 		} else {
@@ -135,26 +135,39 @@ export default function AdminActivityDetail() {
 
 	const handleReject = () => setShowRejectModal(true);
 
-	const confirmRejection = () => {
+	const confirmRejection = async () => {
 		if (!rejectNotes.trim()) {
-			alert("Please provide rejection notes");
+			Swal.fire("Warning", "Please provide rejection notes", "warning");
 			return;
 		}
 
-		const now = new Date();
-		const displayTime = now.toLocaleString("en-GB");
+		const payload = {
+			activityId: activityData.activityId,
+			isApprove: false,
+			approverData: {}
+		};
 
 		setShowRejectModal(false);
 
-		setSuccessMessage("Activity Rejected");
-		setSuccessDetails({
-			timestampLabel: "Rejected at",
-			timestamp: displayTime,
-			activityId: activityData.activityId,
-			menu: activityData.menu,
-			actionMenu: activityData.menu_action
-		});
-		setShowSuccessModal(true);
+		const resp = await postAdminApproval(payload);
+
+		if (resp.ok) {
+			const timestamp = new Date(resp.data.updatedTime).toLocaleString("en-GB");
+
+			setSuccessMessage("Activity Rejected");
+			setSuccessDetails({
+				timestampLabel: "Rejected at",
+				timestamp,
+				activityId: activityData.activityId,
+				menu: resp.data.menudata.menuName,
+				actionMenu: resp.data.menudata.actionFlow
+			});
+
+			setShowSuccessModal(true);
+
+		} else {
+			Swal.fire("Error", resp.message || "Rejection failed", "error");
+		}
 	};
 
 	const cancelReject = () => {
@@ -175,7 +188,7 @@ export default function AdminActivityDetail() {
 
 	const getWorkflowStep = () => {
 		if (!activityData) return 0;
-		switch (activityData.status) {
+		switch (activityData.activityData.activityStatus) {
 			case "PENDING_CHECKER": return 1;
 			case "PENDING_APPROVER": return 2;
 			case "APPROVED": return 3;
@@ -211,12 +224,12 @@ export default function AdminActivityDetail() {
 	const rejectedInfo = parseTimelineInfo(activityData?.checker_updated_time);
 
 	const canReject = () =>
-		activityData.status === "PENDING_CHECKER" ||
-		activityData.status === "PENDING_APPROVER";
+		activityData.activityData.activityStatus === "PENDING_CHECKER" ||
+		activityData.activityData.activityStatus === "PENDING_APPROVER";
 
 	const canApprove = () =>
-		activityData.status === "PENDING_CHECKER" ||
-		activityData.status === "PENDING_APPROVER";
+		activityData.activityData.activityStatus === "PENDING_CHECKER" ||
+		activityData.activityData.activityStatus === "PENDING_APPROVER";
 
 	if (!activityData) {
 		return (
@@ -274,7 +287,7 @@ export default function AdminActivityDetail() {
 
 						<div className="activity-detail-row">
 							<span className="activity-label">Reason</span>
-							<span className="activity-value">: {activityData.reason}</span>
+							<span className="activity-value">: {activityData.activityData.reason}</span>
 						</div>
 
 						<div className="activity-detail-row">
@@ -293,7 +306,7 @@ export default function AdminActivityDetail() {
 							</div>
 						</div>
 
-						{activityData.status !== "REJECTED" ? (
+						{activityData.activityData.activityStatus !== "REJECTED" ? (
 							<>
 								<div className={`workflow-step ${workflowStep >= 2 ? "completed" : ""}`}>
 									<div className="workflow-circle"></div>

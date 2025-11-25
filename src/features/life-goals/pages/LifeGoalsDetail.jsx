@@ -9,6 +9,7 @@ import {
   fetchLifeGoalTransactions,
   fetchLifeGoalDetail,
 } from "../api/life-goals.api";
+import { ChevronLeft } from "lucide-react";
 
 export default function LifeGoalDetail() {
   const navigate = useNavigate();
@@ -16,109 +17,115 @@ export default function LifeGoalDetail() {
   const goal = state?.goal || {};
   const accountNumber = state?.accountNumber;
 
+  const getLastMonths = () => {
+    const now = new Date();
+    const arr = [];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      arr.push({
+        label: d.toLocaleString("en-US", { month: "short" }),
+        month: d.getMonth() + 1,
+        year: d.getFullYear(),
+      });
+    }
+    return arr.reverse();
+  };
+
+  const [months] = useState(getLastMonths());
+  const [selectedMonth, setSelectedMonth] = useState(months[months.length - 1]);
+
   const [transactions, setTransactions] = useState([]);
   const [goalDetail, setGoalDetail] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
-  const months = [
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sept",
-    "Oct",
-    "Nov",
-    "Dec",
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-  ];
+  const mapTransactions = (txData) => {
+    if (!Array.isArray(txData)) return [];
 
-  const [selectedMonth, setSelectedMonth] = useState("May");
-
-  // Convert months array to format compatible with TransactionHistory
-  const monthsData = months.map((label, index) => {
-    const now = new Date();
-    const monthIndex = months.indexOf(label);
-    const yearOffset = monthIndex < 4 ? 1 : 0; // Jan-Apr are next year
-    
-    return {
-      label,
-      month: monthIndex + 1,
-      year: now.getFullYear() + yearOffset,
-    };
-  });
-
-  const selectedMonthData = monthsData.find((m) => m.label === selectedMonth);
+    return txData.map(group => ({
+      date: new Date(group.date).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+      items: group.items.map((item, idx) => ({
+        transactionId: item.transactionId || `LFG-${idx}`,
+        transactionDate: group.date,
+        type: item.type,
+        transactionType: item.type,
+        detail: item.desc,
+        partyName: item.type,
+        amount: item.amount,
+        debit_credit: String(item.amount).startsWith("-") ? "D" : "C",
+        jenisTransaksi: String(item.amount).startsWith("-") ? "Expense" : "Income",
+      }))
+    }));
+  };
 
   useEffect(() => {
     async function loadData() {
+      if (!accountNumber) {
+        setError("Account number not provided");
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
+      setError(null);
+
       try {
-        const [txRes, detailRes] = await Promise.all([
-          fetchLifeGoalTransactions(accountNumber),
-          fetchLifeGoalDetail(accountNumber),
-        ]);
-        
-        // Convert transaction format to groups
-        const txData = txRes || {};
-        const allTransactions = [];
-
-        months.forEach((month) => {
-          const monthData = txData[month];
-          if (Array.isArray(monthData) && monthData.length > 0) {
-            monthData.forEach((group) => {
-              allTransactions.push({
-                date: group.date,
-                month: month,
-                items: group.items.map((item) => ({
-                  transactionId: `LFG-${month}-${item.type}-${item.desc}`,
-                  transactionDate: group.date,
-                  type: item.type,
-                  transactionType: item.type,
-                  detail: item.desc,
-                  partyName: item.type,
-                  partyDetail: item.desc,
-                  amount: item.amount,
-                  debit_credit: String(item.amount).startsWith("-") ? "D" : "C",
-                  jenisTransaksi: String(item.amount).startsWith("-")
-                    ? "Pengeluaran"
-                    : "Pemasukan",
-                })),
-              });
-            });
-          }
-        });
-
-        setTransactions(allTransactions);
+        const detailRes = await fetchLifeGoalDetail(accountNumber);
         setGoalDetail(detailRes?.data || null);
-      } catch {
-        setTransactions([]);
-        setGoalDetail(null);
+
+        await handleMonthChange(selectedMonth);
+      } catch (err) {
+        console.error("Error loading life goal detail:", err);
+        setError(err.message || "Failed to load life goal details");
       } finally {
         setLoading(false);
       }
     }
-    if (accountNumber) loadData();
+    loadData();
   }, [accountNumber]);
 
-  // Filter transactions by selected month
-  const filteredTransactions = transactions.filter(
-    (group) => group.month === selectedMonth
-  );
+  const handleMonthChange = async (monthObj) => {
+    setSelectedMonth(monthObj);
+    setLoading(true);
+    try {
+      const txRes = await fetchLifeGoalTransactions(
+        accountNumber,
+        monthObj.month,
+        monthObj.year,
+      );
+      setTransactions(mapTransactions(txRes));
+    } catch (err) {
+      console.error("Error loading transactions:", err);
+      setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (loading || !goalDetail)
-    return <div className="loading">Loading...</div>;
+  if (loading && !goalDetail) return <div className="loading" style={{ textAlign: 'center', padding: '3rem' }}>Loading...</div>;
+
+  if (error) {
+    return (
+      <div className="lg-container">
+        <Navbar />
+        <main className="lg-main" style={{ textAlign: 'center', padding: '3rem' }}>
+          <h2>Unable to Load Life Goal</h2>
+          <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+          <button onClick={() => navigate(-1)}>Go Back</button>
+        </main>
+      </div>
+    );
+  }
+
+  if (!goalDetail) return <div className="loading" style={{ textAlign: 'center', padding: '3rem' }}>No data available</div>;
 
   const toDate = (str) => {
     if (!str) return "";
-    const [d, m, rest] = str.split("-");
-    const y = (rest || "").split("T")[0];
-    if (!y) return str;
-    return new Date(`${y}-${m}-${d}`);
+    const d = new Date(str);
+    if (isNaN(d.getTime())) return str;
+    return d;
   };
 
   const handleMouseMove = (e) => {
@@ -134,10 +141,9 @@ export default function LifeGoalDetail() {
     <div
       className="lg-container"
       style={{
-        "--theme": goal.color || "#71d9d0",
-        "--accent-gradient": `linear-gradient(135deg, ${
-          goal.color || "#71d9d0"
-        } 0%, #ffffff 100%)`,
+        "--theme": goal.color || "#6dddd0",
+        "--accent-gradient": `linear-gradient(135deg, ${goal.color || "#6dddd0"
+          } 0%, #ffffff 100%)`,
       }}
     >
       <Navbar />
@@ -148,12 +154,12 @@ export default function LifeGoalDetail() {
             onClick={() => navigate(-1)}
             onMouseMove={handleMouseMove}
           >
-            ← Back to Life Goals
+            <ChevronLeft size={24} className="back-icon" />
+            Back to Life Goals
           </button>
         </header>
 
         <div className="lg-grid">
-          {/* LEFT COLUMN */}
           <section className="left-column">
             <LifeGoalsCard
               goal={{
@@ -163,17 +169,18 @@ export default function LifeGoalDetail() {
                 target: goal.target,
                 color: goal.color,
               }}
-              onClick={() => {}}
+              onClick={() => { }}
             />
 
             <div className="history-panel glass-card">
               <TransactionHistory
-                transactions={filteredTransactions}
-                months={monthsData}
-                selectedMonth={selectedMonthData}
-                onMonthChange={(m) => setSelectedMonth(m.label)}
+                transactions={transactions}
+                months={months}
+                selectedMonth={selectedMonth}
+                onMonthChange={handleMonthChange}
                 themeColor={goal.color || "#71d9d0"}
                 title="Transaction History"
+                loading={loading}
                 onTransactionClick={(item) => {
                   setSelectedTransaction(item);
                   setShowDetailModal(true);
@@ -184,60 +191,54 @@ export default function LifeGoalDetail() {
             </div>
           </section>
 
-          {/* RIGHT COLUMN */}
           <aside className="info-column glass-card">
-            <h3 className="info-title">Life Goal Details</h3>
-            <div className="info-grid">
-              <div className="label">Account Number</div>
-              <div className="value">{goalDetail.accountNumber}</div>
+            <div className="lg-info-grid">
+              <h3 className="info-title">Life Goal Details</h3>
+              <div className="divider" />
+              <div className="lg-label">Account Number</div>
+              <div className="lg-value">{goalDetail.accountNumber}</div>
 
-              <div className="label">Estimated Accumulated Funds</div>
-              <div className="value">
+              <div className="lg-label">Estimated Accumulated Funds</div>
+              <div className="lg-value">
                 Rp
-                {Number(
-                  goalDetail.estimatedAccumulatedBalance || 0
-                ).toLocaleString("id-ID")}
+                {Number(goalDetail.estimatedAccumulatedBalance || 0).toLocaleString("id-ID")}
               </div>
 
-              <div className="label">Initial Deposit</div>
-              <div className="value">
+              <div className="lg-label">Initial Deposit</div>
+              <div className="lg-value">
                 Rp
                 {Number(goalDetail.initalDeposit || 0).toLocaleString("id-ID")}
               </div>
 
-              <div className="label">Annual Interest Rate</div>
-              <div className="value">
-                {(Number(goalDetail.interestRate || 0) * 100)
-                  .toFixed(2)
-                  .replace(/\.00$/, "")}
-                %
+              <div className="lg-label">Annual Interest Rate</div>
+              <div className="lg-value">
+                {(Number(goalDetail.interestRate || 0) * 100).toFixed(2).replace(/\.00$/, "")}%
               </div>
 
-              <div className="label">Duration</div>
-              <div className="value">{goalDetail.lifegoalsDuration} years</div>
+              <div className="lg-label">Duration</div>
+              <div className="lg-value">{goalDetail.lifegoalsDuration} years</div>
 
-              <div className="label">Created On</div>
-              <div className="value">
-                {toDate(goalDetail.createdTime).toLocaleDateString("id-ID", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
+              <div className="lg-label">Created On</div>
+              <div className="lg-value">
+                {(() => {
+                  const d = toDate(goalDetail.createdTime);
+                  return d instanceof Date ? d.toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+                })()}
               </div>
 
+              <h3 className="info-title">Disbursement Details</h3>
               <div className="divider" />
 
-              <div className="label">Maturity Date</div>
-              <div className="value">
-                {toDate(goalDetail.maturityDate).toLocaleDateString("id-ID", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
+              <div className="lg-label">Maturity Date</div>
+              <div className="lg-value">
+                {(() => {
+                  const d = toDate(goalDetail.maturityDate);
+                  return d instanceof Date ? d.toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+                })()}
               </div>
 
-              <div className="label">Disbursement Account</div>
-              <div className="value">
+              <div className="lg-label">Disbursement Account</div>
+              <div className="lg-value">
                 {goalDetail.disbursementAccountNumber}
               </div>
             </div>

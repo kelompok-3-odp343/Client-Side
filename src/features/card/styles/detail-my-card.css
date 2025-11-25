@@ -7,96 +7,122 @@
   --radius: 0.9rem;
 }
 
-/* PAGE */
 .detail-mycard {
   font-family: "Poppins", sans-serif;
   background: #fff;
   color: #111;
-  min-height: 100vh;
+  height: 100vh; 
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 2rem;
+  padding-bottom: 0; 
 }
 
 .main {
   width: 88%;
+  height: calc(100vh - 7rem); 
   margin-top: 5rem;
+  margin-bottom: 2rem;
   display: flex;
   gap: 2rem;
   box-sizing: border-box;
 }
 
-/* LEFT PANEL */
 .left-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  overflow-y: auto; 
+  padding-right: 0.5rem;
 }
 
-/* ACCOUNT CARD */
+.left-panel::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
 .account-card {
-  background: linear-gradient(to bottom, var(--accent) 0%, #ffffff 100%);
-  border-radius: var(--radius);
-  padding: 1.2rem;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-}
-
-.account-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-}
-
-.account-card-badge {
-  background: #ffeadb;
-  font-size: 0.75rem;
-  padding: 0.4rem 0.6rem;
-  border-radius: 8px;
-  color: #333;
-  font-weight: 500;
-}
-
-.acc-number {
-  color: #000;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.acc-name {
-  font-size: 0.8rem;
+  background: linear-gradient(180deg, #fff 0%, #ffa669 100%);
+  border-radius: 0.75rem;     
+  padding: 1.5rem 1.75rem;    
+  box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.15); 
   margin-bottom: 1rem;
-  color: #111;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 14rem;          
+}
+
+.card-bank-name {
+  font-size: 1.125rem;         
+  font-weight: 500;            
+  margin: 0;
+  color: #000;
+  letter-spacing: 0.03rem;
+}
+
+.card-number-row {
+  font-weight: 500;            
+  font-size: 1.5rem;         
+  margin: 1rem 0;              
+  display: flex;
+  align-items: center;
+  color: #000;
+  letter-spacing: 0.1rem;      
+}
+
+.card-balance-section {
+  margin-top: auto;
+  width: 100%;
 }
 
 .balance-title {
-  font-size: 0.8rem;
-  color: #777;
+  font-size: 0.8125rem;        
+  color: #444;
+  margin: 0 0 0.375rem 0;      
+  font-weight: 500;
 }
 
-.balance-container {
+.balance-value-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
 }
 
-.balance-container h3 {
-  font-size: 1rem;
-  font-weight: 700;
+.card-balance-large {
+  font-size: 1.75rem;         
+  font-weight: 800;
+  color: #000;
+  line-height: 1;
+  margin: 0;
 }
 
-/* WARNING */
+.eye-icon {
+  margin-left: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #222;
+  transition: opacity 0.2s;
+}
+
+.eye-icon:hover {
+  opacity: 0.7;
+}
+
 .warning-box {
   background: #fff4d9;
-  border: 1px solid #f0c070;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  border: 0.0625rem solid #f0c070; 
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
   color: #6b4f10;
+  line-height: 1.4;
 }
 
-/* ---------- EARNINGS OVERVIEW ---------- */
 h5 {
   font-size: 1rem;
   font-weight: 600;
@@ -106,7 +132,7 @@ h5 {
 .earnings {
   background: #fff;
   border-radius: 0.9rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.15);
   padding: 1rem 1rem 2rem;
   margin-bottom: 2rem;
 }
@@ -148,17 +174,14 @@ h5 {
   border-radius: 50%;
 }
 
-/* left (Income) legend color */
 .numbers div:first-child p::after {
   background: #00a884;
 }
 
-/* right (Expense) legend color */
 .numbers div:last-child p::after {
   background: #ffbc8e;
 }
 
-/* Difference line */
 .difference {
   text-align: center;
   font-size: 0.85rem;
@@ -168,7 +191,6 @@ h5 {
   font-weight: 500;
 }
 
-/* Bar Chart */
 .bar-chart {
   display: flex;
   justify-content: center;
@@ -180,36 +202,44 @@ h5 {
 
 .bar {
   width: 2rem;
-  border-radius: 10px;
+  border-radius: 0.625rem; 
   transition: height 0.3s ease;
 }
 
 .income-bar {
   background: #00a884;
-  box-shadow: 0 2px 6px rgba(0, 168, 132, 0.3);
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 168, 132, 0.3);
 }
 
 .expense-bar {
   background: #ffbc8e;
-  box-shadow: 0 2px 6px rgba(242, 179, 138, 0.3);
+  box-shadow: 0 0.125rem 0.375rem rgba(242, 179, 138, 0.3);
 }
 
-/* ---------- RIGHT PANEL ---------- */
 .right-panel {
   flex: 1.4;
   padding-left: 2rem;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: hidden; 
 }
 
-/* ---------- RESPONSIVE ---------- */
 @media (max-width: 1024px) {
+  .detail-mycard {
+    height: auto;
+    overflow-y: auto;
+  }
+  
   .main {
     flex-direction: column;
     width: 94%;
     margin-top: 4rem;
+    height: auto; 
   }
+  
   .right-panel {
     padding-left: 0;
+    height: 500px; 
   }
 }

@@ -65,7 +65,7 @@ export default function Login() {
 			const ADMIN_ROLES = ["ADMIN", "MAKER", "CHECKER", "APPROVER"];
 
 			if (apiRole === "NASABAH") {
-				navigate("/otpLogin");
+				navigate("/otpLogin", { replace: true });
 				return;
 			}
 
@@ -86,13 +86,15 @@ export default function Login() {
 					const resp = await fetchMenuAccess();
 
 					saveMenuAccessToSession(resp.data);
-					sessionStorage.setItem("user_block", getUserBlockRule());
-					sessionStorage.setItem("user_unblock", getUserUnblockRule());
+					sessionStorage.setItem("user_block_action_flow", getUserBlockRule()?.action_flow);
+					sessionStorage.setItem("user_block_menu_id", getUserBlockRule()?.menu_id);
+					sessionStorage.setItem("user_unblock_action_flow", getUserUnblockRule()?.action_flow);
+					sessionStorage.setItem("user_unblock_menu_id", getUserUnblockRule()?.menu_id);
 				} catch (err) {
 					console.warn("Failed to load menu access.", err);
 				}
 
-				navigate("/admin/home");
+				navigate("/admin/home", { replace: true });
 				return;
 			}
 			navigate("/otpLogin");

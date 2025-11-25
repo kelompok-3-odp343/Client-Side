@@ -2,7 +2,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
   Education: {
     totalTarget: 120000000,
     currentBalance: 60000000,
-    lifeGoalsList: [
+    lifegoalslist: [
       {
         id: "EDU-01",
         accountNumber: 11234566,
@@ -35,7 +35,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
   Vacations: {
     totalTarget: 100000000,
     currentBalance: 40000000,
-    lifeGoalsList: [
+    lifegoalslist: [
       {
         id: "VAC-01",
         accountNumber: 11234569,
@@ -68,7 +68,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
   Marriage: {
     totalTarget: 100000000,
     currentBalance: 50000000,
-    lifeGoalsList: [
+    lifegoalslist: [
       {
         id: "M-01",
         accountNumber: 11234512,
@@ -92,7 +92,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
   Gadget: {
     totalTarget: 100000000,
     currentBalance: 50000000,
-    lifeGoalsList: [
+    lifegoalslist: [
       {
         id: "G-01",
         accountNumber: 11234514,
@@ -116,7 +116,7 @@ const LIFE_GOALS_REVAMP_DUMMY = {
   Vehicles: {
     totalTarget: 150000000,
     currentBalance: 75000000,
-    lifeGoalsList: [
+    lifegoalslist: [
       {
         id: "V-01",
         accountNumber: 11234516,

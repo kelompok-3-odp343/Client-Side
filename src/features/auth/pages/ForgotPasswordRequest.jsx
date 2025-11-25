@@ -31,14 +31,14 @@ export default function ForgotPasswordRequest() {
                 Swal.fire({
                     icon: "error",
                     title: "Failed",
-                    text: res.message || "Gagal mengirim OTP",
+                    text: res.message || "Failed to resend OTP",
                 });
             }
         } catch (err) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: err.message || "Terjadi kesalahan server",
+                text: err.message || "Server error occured",
             });
         } finally {
             setLoading(false);

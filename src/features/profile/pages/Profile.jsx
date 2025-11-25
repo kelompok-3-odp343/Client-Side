@@ -7,6 +7,7 @@ import { postLogout } from "../../auth/api/authService";
 export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [showOtpConfirm, setShowOtpConfirm] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -27,10 +28,13 @@ export default function Profile() {
   useEffect(() => {
     const getProfile = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const profileData = await getUserProfile();
         setProfile(profileData);
       } catch (err) {
         console.error("Error loading profile:", err);
+        setError(err.message || "Failed to load profile");
       } finally {
         setLoading(false);
       }
@@ -53,7 +57,31 @@ export default function Profile() {
     return () => clearInterval(interval);
   }, [timerActive, resendTimer]);
 
-  if (loading) return <div style={{ textAlign: "center" }}>Loading profile...</div>;
+  if (loading) return <div style={{ textAlign: "center", padding: "3rem" }}>Loading profile...</div>;
+
+  if (error) {
+    return (
+      <div className="profile-page">
+        <Navbar />
+        <main className="profile-wrapper" style={{ textAlign: 'center', padding: '3rem' }}>
+          <h2>Unable to Load Profile</h2>
+          <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </main>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="profile-page">
+        <Navbar />
+        <main className="profile-wrapper" style={{ textAlign: 'center', padding: '3rem' }}>
+          <p>No profile data available</p>
+        </main>
+      </div>
+    );
+  }
 
   const fullName = [profile.firstName, profile.middleName, profile.lastName]
     .filter(Boolean)
@@ -250,7 +278,7 @@ export default function Profile() {
           <div className="modal-card otp-verification">
             <button className="modal-close" onClick={handleCloseOtp}>×</button>
             <h2>Enter Verification Code</h2>
-            <p className="otp-desc">We’ve sent a 6-digit code to your email</p>
+            <p className="otp-desc">We've sent a 6-digit code to your email</p>
             <div className="otp-inputs">
               {otp.map((digit, index) => (
                 <input
@@ -274,7 +302,7 @@ export default function Profile() {
             </button>
 
             <div className="resend-wrapper">
-              <p>Didn’t get the code? {resendTimer > 0 ? `${resendTimer}s` : ""}</p>
+              <p>Didn't get the code? {resendTimer > 0 ? `${resendTimer}s` : ""}</p>
               <button
                 className="resend-btn"
                 onClick={handleResendOtp}
@@ -315,7 +343,7 @@ export default function Profile() {
             <div className="password-field">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm Password"
+                placeholder="Confirm New Password"
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
               />

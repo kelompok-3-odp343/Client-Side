@@ -1,4 +1,4 @@
-.lg-subcard {
+/* .lg-subcard {
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
@@ -131,7 +131,7 @@
 
 .lg-subcard:hover .lg-subcard-subtitle {
   color: #444;
-}
+} */
 
 @media (max-width: 768px) {
   .lg-subcard {

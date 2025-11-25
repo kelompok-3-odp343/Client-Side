@@ -12,23 +12,23 @@
   padding-bottom: 4rem;
 }
 
-.section-title {
-  font-size: 2.2rem;
+.section-title-lg {
+  font-size: 1.25rem;
   font-weight: 700;
   color: #111;
-  margin-bottom: 0.25rem;
-  text-align: center;
+  margin-bottom: 0rem;
+  text-align: left;
 }
 
 .section-subtitle {
-  font-size: 1.05rem;
+  font-size: 0.85rem;
   color: #666;
-  margin-bottom: 1.2rem;
-  text-align: center;
+  margin-bottom: 0 !important;
+  text-align: left;
   position: relative;
 }
 
-.section-subtitle::after {
+/* .section-subtitle::after {
   content: "";
   display: block;
   width: 80px;
@@ -36,81 +36,101 @@
   border-radius: 2px;
   background: linear-gradient(90deg, #9c7edc, #71d9d0);
   margin: 1.2rem auto 2rem;
-}
+} */
 
 .category-block {
-  background: #fff;
+  background: none;
   border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  /* box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); */
+  /* margin-bottom: 3rem; */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .category-block:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  /* box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); */
 }
 
 .category-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
 }
 
 .category-title {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
   color: #222;
 }
 
 .category-subtitle {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #777;
-}
-
-.category-total {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #333;
+  margin-bottom: 0.5rem;
 }
 
 .big-progress {
+  background: none !important;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   width: 100%;
-  height: 14px;
-  background: #edf0f4;
+  height: 1.5rem !important;
+  column-gap: 0.5rem;
+}
+
+.big-progress-bar {
+  /* flex: 1; */
+  height: 1.1rem;
+  background: #d9d9d9;
   border-radius: 8px;
   overflow: hidden;
-  position: relative;
+  /* position: relative; */
 }
 
 .big-progress-fill {
   height: 100%;
   transition: width 0.4s ease-in-out;
   border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  /* padding: 0 6px; */
+}
+
+.category-total {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #000;
+  white-space: nowrap;
 }
 
 .big-progress-meta {
   text-align: right;
-  color: #666;
-  font-size: 0.9rem;
-  margin-top: 6px;
+  color: #000 !important;
+  font-size: 0.85rem !important;
+  font-weight: 600;
+  margin: 0 !important;
+  padding-right: 0.4rem;
 }
 
 .subcards-grid {
-  margin-top: 1.8rem;
+  margin-top: 0.7rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.4rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.3rem;
+  justify-content: stretch;
 }
 
 .category-separator {
   width: 100%;
-  height: 1px;
-  background: #eaecef;
-  margin-top: 2.5rem;
+  height: 3px;
+  background: #d9d9d9;
+  margin-top: 1.2rem;
+  margin-bottom: 1.2rem;
 }
 
 .lg-subcard {
@@ -120,7 +140,8 @@
   border: 1px solid #ececec;
   overflow: hidden;
   position: relative;
-  min-height: 240px;
+  /* min-height: 240px; */
+  width: 100%;
   transition: all 0.25s ease;
   cursor: pointer;
 }
@@ -145,24 +166,24 @@
 .lg-subcard-body {
   position: relative;
   z-index: 2;
-  padding: 24px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   height: 100%;
 }
 
 .lg-subcard-title {
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.3rem;
   color: #111;
-  margin-bottom: 6px;
+  margin-bottom: 0.3rem;
 }
 
 .lg-subcard-subtitle {
   font-size: 0.95rem;
-  color: #444;
-  margin-bottom: 18px;
+  color: #000;
+  margin-bottom: 2rem;
 }
 
 .lg-progress-wrap {
@@ -173,8 +194,8 @@
 
 .lg-mini-progress {
   width: 100%;
-  height: 14px;
-  background: #f2f4f8;
+  height: 1.1rem;
+  background: #d9d9d9;
   border-radius: 10px;
   overflow: hidden;
   position: relative;
@@ -192,16 +213,16 @@
 .lg-progress-text {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #fff;
+  color: #000;
   padding-right: 6px;
 }
 
 .lg-progress-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
-  color: #666;
-  margin-top: 4px;
+  font-size: 0.9rem;
+  color: #000;
+  margin-top: 0.25rem;
 }
 
 .lg-progress-values {
@@ -211,6 +232,12 @@
   font-weight: 600;
   color: #111;
   margin-top: 2px;
+}
+
+@media (max-width: 1200px) {
+  .subcards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 768px) {

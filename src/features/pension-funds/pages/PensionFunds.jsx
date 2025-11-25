@@ -31,9 +31,14 @@ export default function PensionFunds() {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const pension = async () => {
     try {
+      setLoading(true);
+      setError(null);
+
       const response = await getPensionFunds();
       const funds = Array.isArray(response.data) ? response.data : [];
 
@@ -58,55 +63,17 @@ export default function PensionFunds() {
       if (pensionFunds.length) {
         setSelectedAccount(pensionFunds[0].accountNumber);
       }
-    } catch (error) {
-      console.error("error", error);
+    } catch (err) {
+      console.error("Error loading pension funds:", err);
+      setError(err.message || "Failed to load pension funds");
       setPensionFundsData({
         totalBalance: 0,
         totalCount: 0,
         pensionFunds: [],
       });
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleDownloadCSV = () => {
-    if (!transactions || transactions.length === 0) {
-      alert("No transactions to download");
-      return;
-    }
-
-    // Prepare CSV data
-    const csvData = [];
-    csvData.push(["Date", "Transaction Type", "Description", "Amount", "Type"]);
-
-    transactions.forEach((group) => {
-      group.items.forEach((item) => {
-        const type = item.debit_credit === "C" ? "Credit" : "Debit";
-        const amount = item.amount.replace(/[^\d]/g, "");
-        csvData.push([
-          item.transactionDate,
-          item.type,
-          item.detail,
-          amount,
-          type,
-        ]);
-      });
-    });
-
-    const csvContent = csvData.map((row) => row.join(",")).join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `DPLK_Transactions_${selectedMonth?.label}_${selectedMonth?.year}.csv`
-    );
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   const mapDPLKTransactions = (list) => {
@@ -143,21 +110,28 @@ export default function PensionFunds() {
   };
 
   const fetchDPLKTransactionsForMonth = async (m) => {
-    const data = await fetchDPLKTransactionHistory({
-      month: m.month,
-      year: m.year,
-      accountNumber: "",
-    });
-
-    const list = data.transactions || data.transaction || [];
-
-    if (!list.length) {
+    setLoading(true);
+    try {
+        const data = await fetchDPLKTransactionHistory({
+          month: m.month,
+          year: m.year,
+          accountNumber: selectedAccount || "",
+        });
+    
+        const list = data.transactions || data.transaction || [];
+    
+        if (!list.length) {
+          setTransactions([]);
+        } else {
+          const grouped = mapDPLKTransactions(list);
+          setTransactions(grouped);
+        }
+    } catch (err) {
+      console.error("Error loading DPLK transactions:", err);
       setTransactions([]);
-      return;
+    } finally {
+        setLoading(false);
     }
-
-    const grouped = mapDPLKTransactions(list);
-    setTransactions(grouped);
   };
 
   useEffect(() => {
@@ -165,15 +139,54 @@ export default function PensionFunds() {
   }, []);
 
   useEffect(() => {
-    fetchDPLKTransactionsForMonth(selectedMonth);
+    if (selectedMonth) {
+        fetchDPLKTransactionsForMonth(selectedMonth);
+    }
   }, [selectedMonth, selectedAccount]);
+
+  const handleDownloadCSV = () => {
+    if (!transactions || transactions.length === 0) {
+      alert("No transactions to download");
+      return;
+    }
+    const csvData = [];
+    csvData.push(["Date", "Transaction Type", "Description", "Amount", "Type"]);
+    transactions.forEach((group) => {
+      group.items.forEach((item) => {
+        const type = item.debit_credit === "C" ? "Credit" : "Debit";
+        const amount = String(item.amount).replace(/[^\d]/g, "");
+        csvData.push([item.transactionDate, item.type, item.detail, amount, type]);
+      });
+    });
+    const csvContent = csvData.map((row) => row.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `DPLK_Transactions_${selectedMonth?.label}_${selectedMonth?.year}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  if (error) {
+    return (
+      <div className="pension-fund-page">
+        <Navbar />
+        <main className="pension-fund-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
+          <h2>Unable to Load Pension Funds</h2>
+          <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="pension-fund-page">
       <Navbar />
 
       <main className="pension-fund-container">
-        {/* LEFT PANEL */}
         <section className="pension-fund-left">
           <div className="section-header">
             <h2 className="lg-title">Pension Funds Information</h2>
@@ -189,13 +202,10 @@ export default function PensionFunds() {
             <div className="pension-fund-summary-right">
               <h3 className="summary-title">Total Pension Funds</h3>
               <p className="summary-label">Total Balance</p>
-
               <p className="summary-balance">
-                Rp{(pensionFundsData?.totalBalance || 0).toLocaleString()}
+                {pensionFundsData ? `Rp${pensionFundsData.totalBalance.toLocaleString()}` : 'Loading...'}
               </p>
-
               <div className="summary-divider" />
-
               <p className="summary-sub">
                 You have {pensionFundsData?.totalCount || 0} Pension Funds
               </p>
@@ -203,7 +213,6 @@ export default function PensionFunds() {
           </div>
 
           <h3 className="your-pension-title">Your Account Numbers</h3>
-
           <div className="account-number-grid">
             {pensionFundsData?.pensionFunds?.map((d) => (
               <div key={d.id} className="account-number-column">
@@ -213,7 +222,6 @@ export default function PensionFunds() {
           </div>
         </section>
 
-        {/* RIGHT PANEL */}
         <section className="pension-fund-right">
           <TransactionHistory
             transactions={transactions}
@@ -222,6 +230,7 @@ export default function PensionFunds() {
             onMonthChange={setSelectedMonth}
             themeColor="#FFBC8E"
             title="Transaction History"
+            loading={loading}
             onTransactionClick={(item) => {
               setSelectedTransaction(item);
               setShowDetailModal(true);
@@ -263,18 +272,10 @@ function AccountNumberCard({ title, accountNumber, balance, growth }) {
             <strong>Rp{balance.toLocaleString()}</strong>
           </span>
         </p>
-
         <p>
           <span>Growth</span>
-          <span
-            style={{
-              color: growth > 0 ? "#3DBF4A" : growth < 0 ? "#F94449" : "#000",
-            }}
-          >
-            <strong>
-              ({growth > 0 ? "+" : ""}
-              {(growth * 100).toFixed(2)}%)
-            </strong>
+          <span style={{ color: growth > 0 ? "#3DBF4A" : growth < 0 ? "#F94449" : "#000" }}>
+            <strong>({growth > 0 ? "+" : ""}{(growth * 100).toFixed(2)}%)</strong>
           </span>
         </p>
       </div>

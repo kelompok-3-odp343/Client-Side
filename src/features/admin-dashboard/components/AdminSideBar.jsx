@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Home, Users, Activity, LogOut } from "lucide-react";
 import logo from "../../../assets/images/wandoor-logo-2.png";
 import "../styles/admin-sidebar.css";
+import { postLogout } from "../../auth/api/authService";
 
 export default function AdminSideBar({ isOpen, onClose }) {
 	const navigate = useNavigate();
@@ -15,12 +16,6 @@ export default function AdminSideBar({ isOpen, onClose }) {
 		{ name: "Activity", path: "/admin/activity", icon: Activity },
 	];
 
-	const handleLogout = () => {
-		sessionStorage.clear();
-		localStorage.clear();
-		navigate("/");
-	};
-
 	const handleMenuClick = (path) => {
 		navigate(path);
 		onClose();
@@ -29,6 +24,23 @@ export default function AdminSideBar({ isOpen, onClose }) {
 	const handleOverlayKeyDown = (event) => {
 		if (event.key === "Enter" || event.key === " ") {
 			onClose();
+		}
+	};
+
+	const handleLogout = async () => {
+		try {
+			const resp = await postLogout();
+			sessionStorage.clear();
+
+			if (!resp.ok) {
+				console.warn("Logout API failed:", resp.message);
+			}
+
+			window.location.href = "/";
+		} catch (err) {
+			console.error("Logout error:", err);
+			sessionStorage.clear();
+			window.location.href = "/";
 		}
 	};
 

@@ -9,10 +9,10 @@ export const getMenuAccessFromSession = () => {
 
 export const getUserBlockRule = () => {
     const menu = getMenuAccessFromSession();
-    return menu?.USER_MANAGEMENT?.USER_BLOCK || null;
+    return menu?.USER_MANAGEMENT?.BLOCK_USER || null;
 };
 
 export const getUserUnblockRule = () => {
     const menu = getMenuAccessFromSession();
-    return menu?.USER_MANAGEMENT?.USER_UNBLOCK || null;
+    return menu?.USER_MANAGEMENT?.UNBLOCK_USER || null;
 };

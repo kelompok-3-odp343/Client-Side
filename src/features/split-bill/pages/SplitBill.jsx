@@ -7,28 +7,55 @@ import "../styles/split-bill.css";
 export default function SplitBill() {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function loadData() {
-      setLoading(true);
-      const data = await fetchSplitBills();
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchSplitBills();
 
-      if (!data || !data.data || data.data.length === 0) {
+        if (!data || !data.data || data.data.length === 0) {
+          setBills([]);
+        } else {
+          setBills(data.data);
+        }
+      } catch (err) {
+        console.error("Error loading split bills:", err);
+        setError(err.message || "Failed to load split bills");
         setBills([]);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      setBills(data.data);
-      setLoading(false);
     }
     loadData();
   }, []);
 
   const cardColors = ["#6dddd0", "#FFB500", "#9c7edc"];
 
-  if (loading) return <div className="loading">Loading split bills...</div>;
+  if (loading) return (
+    <div className="sb-container">
+      <Navbar />
+      <div className="loading" style={{ textAlign: 'center', padding: '3rem' }}>Loading split bills...</div>
+    </div>
+  );
+
+  if (error) {
+    return (
+      <div className="sb-container">
+        <Navbar />
+        <main className="sb-main">
+          <div style={{ textAlign: 'center', padding: '3rem' }}>
+            <h2>Unable to Load Split Bills</h2>
+            <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="sb-container">
@@ -76,12 +103,10 @@ export default function SplitBill() {
               const col = i % 3;
               const color = cardColors[(row + col) % cardColors.length];
 
-              // normalized shape from API
               const members = bill.members || [];
               const membersToShow = members.slice(0, 3);
               const extraCount = Math.max(0, members.length - membersToShow.length);
 
-              // progress: percent of members who have paid
               const paidCount = members.filter((m) => m.hasPaid || m.status === "Paid").length;
               const progressPercent = (paidCount / Math.max(1, members.length)) * 100;
 

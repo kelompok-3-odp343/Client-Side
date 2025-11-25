@@ -16,13 +16,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.3125rem 3.75rem; 
+  position: relative;
 }
 
-/* LEFT */
 .navbar-left {
   display: flex;
   align-items: center;
   cursor: pointer;
+  z-index: 2;
 }
 
 .navbar-logo-img {
@@ -30,11 +31,28 @@
   object-fit: contain;
 }
 
-/* RIGHT */
+.navbar-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
 .navbar-right {
   display: flex;
   align-items: center;
   gap: 2.25rem; 
+  z-index: 2;
 }
 
 .nav-icon {

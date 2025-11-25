@@ -11,6 +11,8 @@ export default function Deposits() {
   const [transactions, setTransactions] = useState([]);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const getLastMonths = () => {
     const now = new Date();
@@ -33,41 +35,50 @@ export default function Deposits() {
 
   const fetchDeposits = async () => {
     try {
+      setLoading(true);
+      setError(null);
+
       const responseData = await getTimeDeposits();
       const resApi = responseData.data;
 
+      const items = Array.isArray(resApi.items) ? resApi.items : [];
+
       const formattedData = {
-        totalBalance: resApi.total_balance,
-        totalCount: resApi.count_accounts,
-        deposits: resApi.items.map((item) => ({
-          id: item.item_id,
-          title: `Account ${item.deposit_account_number}`,
+        totalBalance: resApi.totalBalance,
+        totalCount: resApi.countAccounts,
+        deposits: items.map((item) => ({
+          id: item.itemId,
+          title: `Account - ${item.depositAccountNumber}`,
           balance: item.balance,
-          interest: `${item.interest_rate}%`,
-          opening: new Date(item.maturity_date).toLocaleDateString("id-ID", {
+          interest: `${item.interestRate}%`,
+          opening: new Date(item.maturityDate).toLocaleDateString("id-ID", {
             day: "2-digit",
             month: "long",
             year: "numeric",
           }),
-          period: `${item.tenor_months} months`,
-          date: new Date(item.maturity_date).toLocaleDateString("id-ID", {
+          period: `${item.tenorMonths} months`,
+          date: new Date(item.maturityDate).toLocaleDateString("id-ID", {
             day: "2-digit",
             month: "short",
             year: "numeric",
           }),
           status: item.status,
-          account_number: item.deposit_account_number,
+          account_number: item.depositAccountNumber,
         })),
       };
 
       setDepositsData(formattedData);
     } catch (err) {
-      console.error("❌ Error get deposits:", err);
+      console.error("Error loading deposits:", err);
+      setError(err.message || "Failed to load deposit information");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSelectedMonth = async (m) => {
     setSelectedMonth(m);
+    setLoading(true);
 
     try {
       const accountNumber = depositsData?.deposits?.[0]?.account_number;
@@ -75,7 +86,7 @@ export default function Deposits() {
       const data = await getTimeDepositTransactions({
         month: m.month,
         year: m.year,
-        accountNumber: "",
+        accountNumber: accountNumber || "",
       });
 
       if (!data?.transactions) {
@@ -86,8 +97,10 @@ export default function Deposits() {
       const grouped = mapTransactionsToGroups(data.transactions);
       setTransactions(grouped);
     } catch (err) {
-      console.error("Gagal fetch transaksi deposit:", err);
+      console.error("Error loading deposit transactions:", err);
       setTransactions([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,39 +109,21 @@ export default function Deposits() {
       alert("No transactions to download");
       return;
     }
-
-    // Prepare CSV data
     const csvData = [];
     csvData.push(["Date", "Transaction Type", "Description", "Amount", "Type"]);
-
     transactions.forEach((group) => {
       group.items.forEach((item) => {
         const type = item.debit_credit === "C" ? "Credit" : "Debit";
-        const amount = item.amount.replace(/[^\d]/g, "");
-        csvData.push([
-          item.transactionDate,
-          item.type,
-          item.detail,
-          amount,
-          type,
-        ]);
+        const amount = String(item.amount).replace(/[^\d]/g, "");
+        csvData.push([item.transactionDate, item.type, item.detail, amount, type]);
       });
     });
-
-    // Convert to CSV string
     const csvContent = csvData.map((row) => row.join(",")).join("\n");
-
-    // Create blob and download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-
     link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `Time_Deposits_Transactions_${selectedMonth?.label}_${selectedMonth?.year}.csv`
-    );
-    link.style.visibility = "hidden";
+    link.setAttribute("download", `Time_Deposits_Transactions_${selectedMonth?.label}_${selectedMonth?.year}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -141,15 +136,9 @@ export default function Deposits() {
       try {
         const dateStr = trx.transactionDate;
         if (!dateStr) return;
-
         d = new Date(dateStr);
-
-        if (isNaN(d.getTime())) {
-          console.warn('Invalid date:', dateStr);
-          return;
-        }
+        if (isNaN(d.getTime())) return;
       } catch (e) {
-        console.warn('Error parsing date:', trx.transactionDate, e);
         return;
       }
 
@@ -177,7 +166,11 @@ export default function Deposits() {
 
     return Object.values(groups)
       .sort((a, b) => b.sortKey - a.sortKey)
-      .map(({ sortKey, ...rest }) => rest);
+      .map((g) => ({
+        ...g,
+        key: String(g.sortKey),
+      }));
+
   };
 
   useEffect(() => {
@@ -190,12 +183,24 @@ export default function Deposits() {
     }
   }, [depositsData]);
 
+  if (error) {
+    return (
+      <div className="deposit-page">
+        <Navbar />
+        <main className="deposit-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
+          <h2>Unable to Load Deposits</h2>
+          <p style={{ color: "#777", margin: "1rem 0" }}>{error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="deposit-page">
       <Navbar />
 
       <main className="deposit-container">
-        {/* LEFT PANEL */}
         <section className="deposit-left">
           <div className="section-header">
             <h2 className="lg-title">Deposits Information</h2>
@@ -212,24 +217,32 @@ export default function Deposits() {
               <h3 className="summary-title">Time Deposits</h3>
               <p className="summary-label">Total Balance</p>
               <p className="summary-balance">
-                Rp{depositsData?.totalBalance?.toLocaleString()}
+                {depositsData ? `${depositsData.totalBalance?.toLocaleString("id-ID", {
+                  style: "currency",
+                  currency: "IDR"
+                })}` : 'RP. 0'}
               </p>
               <div className="summary-divider" />
               <p className="summary-sub">
-                You have {depositsData?.totalCount} Time Deposits
+                You have {depositsData?.totalCount || 0} Time Deposits
               </p>
             </div>
           </div>
 
           <h3 className="your-deposit-title">Your Time Deposits</h3>
           <div className="deposit-grid">
-            {depositsData?.deposits?.map((d) => (
-              <DepositCard key={d.id} {...d} />
-            ))}
+            {depositsData?.deposits?.length > 0 ? (
+              depositsData.deposits.map((d) => (
+                <DepositCard key={d.id} {...d} />
+              ))
+            ) : (
+              <div className="no-deposit-message">
+                No time deposits available
+              </div>
+            )}
           </div>
         </section>
 
-        {/* RIGHT PANEL */}
         <section className="deposit-right">
           <TransactionHistory
             transactions={transactions}
@@ -238,6 +251,7 @@ export default function Deposits() {
             onMonthChange={handleSelectedMonth}
             themeColor="#FFE8B0"
             title="Transaction History"
+            loading={loading}
             onTransactionClick={(item) => {
               setSelectedTransaction(item);
               setShowDetailModal(true);
@@ -264,16 +278,17 @@ export default function Deposits() {
   );
 }
 
-/* Deposit Card */
 function DepositCard({ title, balance, date, interest, opening, period }) {
   const [day, month, year] = date.split(" ");
   return (
     <div className="deposit-card">
       <h4 className="deposit-title">{title}</h4>
       <p className="deposit-balance">
-        Balance:
-        <br />
-        <strong>Rp{balance.toLocaleString()}</strong>
+        Balance:<br />
+        <strong>{Number(balance).toLocaleString("id-ID", {
+          style: "currency",
+          currency: "IDR"
+        })}</strong>
       </p>
 
       <div className="circle-container">
@@ -288,18 +303,9 @@ function DepositCard({ title, balance, date, interest, opening, period }) {
 
       <hr />
       <div className="deposit-info">
-        <p>
-          <span>Interest</span>
-          <span>{interest}</span>
-        </p>
-        <p>
-          <span>Opening date</span>
-          <span>{opening}</span>
-        </p>
-        <p>
-          <span>Period</span>
-          <span>{period}</span>
-        </p>
+        <p><span>Interest</span><span>{interest}</span></p>
+        <p><span>Opening date</span><span>{opening}</span></p>
+        <p><span>Period</span><span>{period}</span></p>
       </div>
     </div>
   );

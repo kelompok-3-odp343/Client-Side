@@ -10,8 +10,8 @@ export const fetchAdminUserDetail = async (userId) => {
         const token = sessionStorage.getItem("token");
 
         const resp = await api.post(
-            "/api/admin/user/detail",
-            { userId },
+            "/api/admin/detail-user",
+            { targetUserId: userId },
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

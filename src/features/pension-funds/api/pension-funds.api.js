@@ -4,57 +4,14 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-// Dummy data untuk pension funds
-const DUMMY_PENSION_FUNDS = {
-    data: [
-        {
-            title: "DPLK BNI",
-            totalBalance: 68000000,
-            items: [
-                {
-                    fundId: "DPLK001",
-                    depositAccountNumber: "4001234567",
-                    accumulatedBalance: 35000000,
-                    growth: 0.08
-                },
-                {
-                    fundId: "DPLK002",
-                    depositAccountNumber: "4001234568",
-                    accumulatedBalance: 33000000,
-                    growth: 0.06
-                }
-            ]
-        }
-    ]
-};
-
-// Dummy transaction history
-const DUMMY_DPLK_TRX = {
-    transactions: [
-        {
-            transactionId: "TRX-DPLK-001",
-            transactionDate: "2025-11-01T08:00:00",
-            transactionType: "Contribution",
-            debit_credit: "C",
-            description: "Monthly Contribution",
-            partyName: "Employee Contribution",
-            amount: 1000000,
-        },
-        {
-            transactionId: "TRX-DPLK-002",
-            transactionDate: "2025-11-01T08:00:00",
-            transactionType: "Investment Return",
-            debit_credit: "C",
-            description: "Investment Yield",
-            partyName: "Fund Management",
-            amount: 150000,
-        }
-    ]
-};
-
 export const getPensionFunds = async () => {
-    const token = sessionStorage.getItem("token");
     try {
+        const token = sessionStorage.getItem("token");
+        
+        if (!token) {
+            throw new Error("No authentication token found");
+        }
+
         const resp = await api.get(`/api/v1/dplk`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -63,22 +20,25 @@ export const getPensionFunds = async () => {
             },
         });
 
-        if (resp.data?.data) {
-            return resp.data;
+        if (!resp.data?.data) {
+            throw new Error("Invalid response from API");
         }
 
-        console.warn("⚠️ API returned invalid data, using dummy");
-        return DUMMY_PENSION_FUNDS;
-
+        return resp.data;
     } catch (error) {
-        console.warn("⚠️ Pension funds API failed, using dummy:", error?.message);
-        return DUMMY_PENSION_FUNDS;
+        console.error("Failed to fetch pension funds:", error?.message);
+        throw error;
     }
 };
 
 export async function fetchDPLKTransactionHistory({ month, year, accountNumber }) {
     try {
         const token = sessionStorage.getItem("token");
+        
+        if (!token) {
+            throw new Error("No authentication token found");
+        }
+
         const payload = { month, year, accountNumber, productType: 'DPLK' };
 
         const resp = await api.post("/api/v1/trx-history", payload, {
@@ -89,14 +49,17 @@ export async function fetchDPLKTransactionHistory({ month, year, accountNumber }
             }
         });
 
-        if (resp.data?.transaction?.length) return resp.data;
-        if (resp.data?.transactions?.length) return resp.data;
+        if (resp.data?.transaction?.length) {
+            return resp.data;
+        }
+        
+        if (resp.data?.transactions?.length) {
+            return resp.data;
+        }
 
-        console.warn("No transaction data, using dummy");
-        return DUMMY_DPLK_TRX;
-
+        return { transactions: [] };
     } catch (error) {
-        console.warn("DPLK transaction API failed, using dummy:", error?.message);
-        return DUMMY_DPLK_TRX;
+        console.error("Failed to fetch DPLK transactions:", error?.message);
+        return { transactions: [] };
     }
 }

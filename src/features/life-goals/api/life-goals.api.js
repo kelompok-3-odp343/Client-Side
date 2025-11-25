@@ -1,89 +1,17 @@
 import axios from "axios";
-import LIFE_GOALS_DETAILS_DUMMY from "../data/life-goals-details.dummy"
-import LIFE_GOALS_TX_DUMMY from "../data/life-goals-tx.dummy";
-import LIFE_GOALS_REVAMP_DUMMY from "../data/life-goals.revamp.dummy";
-import LIFE_GOALS_DUMMY from "../data/life-goals.dummy";
-
-const mapAccountToKey = (accountNumber) => {
-  if (!accountNumber) return "education";
-  const num = String(accountNumber).toLowerCase();
-
-  if (num.includes("edu")) return "education";
-  if (num.includes("vac")) return "vacations";
-  if (num.includes("mar")) return "marriage";
-  if (num.includes("hom")) return "home";
-  if (num.includes("gad")) return "gadget";
-  if (num.includes("veh")) return "vehicles";
-
-  return "education";
-};
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-export async function fetchLifeGoals(userId = "USER001") {
-  try {
-    const res = await api.get(`/api/v1/life-goals/${userId}`);
-    if (res?.data?.status && res.data.data?.goals) return res.data.data;
-
-    console.warn("⚠️ API returned invalid data, using dummy");
-    return LIFE_GOALS_DUMMY.data;
-  } catch (error) {
-    console.warn("⚠️ Life goals API failed, using dummy:", error?.message);
-    return LIFE_GOALS_DUMMY.data;
-  }
-}
-
-export async function fetchLifeGoalDetail(accountNumber) {
-  try {
-    const token = sessionStorage.getItem("token");
-    const res = await api.get(`/api/v1/lifegoals-detail/${accountNumber}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true",
-      },
-    });
-
-    if (res?.data) return res;
-
-    console.warn("⚠️ API returned invalid data, using dummy");
-    const key = mapAccountToKey(accountNumber);
-    return { data: LIFE_GOALS_DETAILS_DUMMY[key] };
-  } catch (error) {
-    console.warn("⚠️ Life goal detail API failed, using dummy:", error?.message);
-    const key = mapAccountToKey(accountNumber);
-    return { data: LIFE_GOALS_DETAILS_DUMMY[key] };
-  }
-}
-
-export async function fetchLifeGoalTransactions(accountNumber) {
-  try {
-    const token = sessionStorage.getItem("token");
-    const res = await api.get(`/api/v1/lifegoals-tx/${accountNumber}`, {
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true",
-      },
-    });
-
-    if (res?.data) return res.data;
-
-    console.warn("⚠️ API returned invalid data, using dummy");
-    const key = mapAccountToKey(accountNumber);
-    return LIFE_GOALS_TX_DUMMY[key] || LIFE_GOALS_TX_DUMMY.EDU001;
-  } catch (error) {
-    console.warn("⚠️ Life goal transactions API failed, using dummy:", error?.message);
-    const key = mapAccountToKey(accountNumber);
-    return LIFE_GOALS_TX_DUMMY[key] || LIFE_GOALS_TX_DUMMY.EDU001;
-  }
-}
-
 export async function fetchLifeGoalsRevamp() {
   try {
     const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
     const res = await api.get(`/api/v1/lifegoals`, {
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -92,12 +20,73 @@ export async function fetchLifeGoalsRevamp() {
       },
     });
 
-    if (res?.data) return res;
+    if (!res?.data) {
+      throw new Error("Invalid response from API");
+    }
 
-    console.warn("⚠️ API returned invalid data, using dummy");
-    return { data: LIFE_GOALS_REVAMP_DUMMY };
+    return res;
   } catch (error) {
-    console.warn("⚠️ Life goals revamp API failed, using dummy:", error?.message);
-    return { data: LIFE_GOALS_REVAMP_DUMMY };
+    console.error("Failed to fetch life goals:", error?.message);
+    throw error;
+  }
+}
+
+export async function fetchLifeGoalDetail(accountNumber) {
+  try {
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const res = await api.post(`/api/v1/lifegoals-detail`, { accountNumber }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+
+    if (!res?.data) {
+      throw new Error("Invalid response from API");
+    }
+
+    return res;
+  } catch (error) {
+    console.error("Failed to fetch life goal detail:", error?.message);
+    throw error;
+  }
+}
+
+export async function fetchLifeGoalTransactions(accountNumber, month, year) {
+  try {
+    const token = sessionStorage.getItem("token");
+    const payload = {
+      accountNumber: accountNumber,
+      month: month,
+      year: year,
+      productType: 'LFG'
+    };
+
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const res = await api.post(`/api/v1/trx-history`, payload, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+
+    if (!res?.data) {
+      return [];
+    }
+
+    return res.data;
+  } catch (error) {
+    console.error("Failed to fetch life goal transactions:", error?.message);
+    return [];
   }
 }

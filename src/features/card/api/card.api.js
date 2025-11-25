@@ -1,5 +1,4 @@
 import axios from "axios";
-import { DUMMY_CARDS, DUMMY_TRX_HISTORY } from "../data/card.dummy";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -8,6 +7,11 @@ const api = axios.create({
 export async function fetchAllCards() {
   try {
     const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
     const res = await api.post("/api/v1/account", {}, {
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -18,15 +22,11 @@ export async function fetchAllCards() {
 
     const result = res?.data?.data;
 
-    if (Array.isArray(result) && result.length > 0) {
-      return result;
-    }
-
-    return [];
+    return result;
 
   } catch (error) {
-    console.warn("⚠️ API failed, using dummy cards:", error?.message);
-    return [];
+    console.error("Failed to fetch cards:", error);
+    throw error;
   }
 }
 
@@ -40,6 +40,11 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
     };
 
     const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
     const resp = await api.post("/api/v1/trx-history", payload, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -50,14 +55,14 @@ export async function fetchTransactionHistory({ month, year, accountNumber }) {
 
     const trx = resp?.data?.transaction;
 
-    if (Array.isArray(trx)) {
-      return { transactions: trx };
+    if (!Array.isArray(trx)) {
+      return { transactions: [] };
     }
 
-    return { transactions: [] };
+    return { transactions: trx };
 
   } catch (error) {
-    console.warn("API trx failed:", error?.message);
+    console.error("Failed to fetch transaction history:", error?.message);
     return { transactions: [] };
   }
 }

@@ -86,7 +86,7 @@ export default function AdminHome() {
 
 	const transactions = dashboard.users.map((u, i) => ({
 		id: i + 1,
-		userId: u.userId,
+		userId: u.userid,
 		cif: u.customerId,
 		nik: u.nik,
 		name: u.customerName,
@@ -239,7 +239,7 @@ export default function AdminHome() {
 							</tbody>
 						</table>
 					</div>
-					
+
 					<Pagination
 						currentPage={page}
 						totalPages={totalPages}
