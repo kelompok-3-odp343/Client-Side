@@ -35,8 +35,6 @@ export default function AdminUserDetail() {
 	const [checkers, setCheckers] = useState([]);
 
 	useEffect(() => {
-		console.log('test', sessionStorage.getItem("user_block_menu_id"));
-
 		const load = async () => {
 			if (!userId) {
 				setError("User not found");
@@ -138,8 +136,6 @@ export default function AdminUserDetail() {
 		if (!isFormValid) return;
 
 		const selectedCheckerObj = checkers.find(c => c.userId === selectedChecker);
-		console.log('checker', selectedCheckerObj);
-
 
 		const checkerData = {
 			npp: selectedCheckerObj.npp,
