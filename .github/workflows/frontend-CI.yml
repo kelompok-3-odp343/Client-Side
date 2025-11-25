@@ -69,7 +69,7 @@ jobs:
 
       - name: Update image tag in frontend deployment
         run: |
-          cd infra/v2/k3s-manifests/frontend-wandoor
+          cd infra/k3s-manifests/frontend-wandoor
           sed -i "s|jrtr1/wandoor-frontend-app:.*|jrtr1/wandoor-frontend-app:frontend-${{ github.sha }}|g" frontend-deployment.yaml
 
       - name: Commit and push updated image tag
