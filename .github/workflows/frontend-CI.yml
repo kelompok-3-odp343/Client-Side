@@ -54,12 +54,14 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
+          cache-from: type=registry,ref=jrtr1/wandoor-frontend-app:cache
+          cache-to: type=registry,ref=jrtr1/wandoor-frontend-app:cache,mode=max
           tags: |
             jrtr1/wandoor-frontend-app:frontend-${{ github.sha }}
             jrtr1/wandoor-frontend-app:frontend-latest
 
       # === Find & Replace image tag di repo infra branch (main) ===
-      - name: Checkout infra repository (main)
+      - name: Checkout infra repository (prod)
         uses: actions/checkout@v3
         with:
           repository: kelompok-3-odp343/infra
